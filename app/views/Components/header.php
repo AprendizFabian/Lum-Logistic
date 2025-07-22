@@ -7,7 +7,7 @@
             <h1 class="text-xl text-white">LUM Logistic</h1>
         </div>
         <div class="flex items-center gap-3">
-            <a href="#">
+            <a href="/login">
                 <button class="text-[#FFE000] bg-white p-2">
                     Iniciar Sesion
                 </button>

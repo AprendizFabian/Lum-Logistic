@@ -10,6 +10,10 @@ class Router
     {
         $this->routes[$method][$uri] = $action;
     }
+        public function post($uri, $action)
+    {
+        $this->routes['POST'][$uri] = $action;
+    }
 
     public function get(string $uri, array $action): void
     {
