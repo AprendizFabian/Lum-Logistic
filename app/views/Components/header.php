@@ -27,12 +27,16 @@
                         href="#">Registrarse</a></li>
             </ul>
         </div>
-
-        <div class="flex flex-row items-center gap-3">
-            <img src="images/cropped-favicon-lum-192x192.png" alt="LUM Logistic Logo" class="size-10 md:size-12">
-            <a href="#"
-                class="text-[#ffffff] text-xl md:text-2xl hover:text-[#FFD700] transition-colors duration-300 tracking-wide">
-                LUM Logistic
+        <div class="flex items-center gap-3">
+            <a href="/login">
+                <button class="text-[#FFE000] bg-white p-2">
+                    Iniciar Sesion
+                </button>
+            </a>
+            <a href="/fecha-juliana">
+                <button class="text-[#FFE000] bg-white p-2">
+                    Registrarse
+                </button>
             </a>
         </div>
     </div>
