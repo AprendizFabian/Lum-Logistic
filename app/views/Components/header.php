@@ -12,7 +12,7 @@
                     Iniciar Sesion
                 </button>
             </a>
-            <a href="#">
+            <a href="/fecha-juliana">
                 <button class="text-[#FFE000] bg-white p-2">
                     Registrarse
                 </button>

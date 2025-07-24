@@ -17,7 +17,7 @@ class AuthController
         $modelo = new \App\Models\UsuarioModel();
 
         if ($modelo->verificarUsuario($usuario, $contrasena)) {
-            header('Location: /index');
+            header('Location: /catalogo');
         } else {
             header('Location: /login?error=1');
         }
