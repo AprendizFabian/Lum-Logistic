@@ -2,22 +2,26 @@
 
 namespace App\Controllers;
 
+use App\UserModel;
+
 class AuthController
 {
     public function showLogin()
     {
-        require_once __DIR__ . '/../views/login.php';
+        $title = "Inicio de Sesion";
+        $layout = "guest";
+        view('Auth/login', compact('title', 'layout'));
     }
-
-    public function procesarLogin()
+    public function processLogin()
     {
-        $usuario = $_POST['usuario'] ?? '';
-        $contrasena = $_POST['contrasena'] ?? '';
+        $user = $_POST['user'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-        $modelo = new \App\Models\UsuarioModel();
+        $usuarioModel = new UserModel();
 
-        if ($modelo->verificarUsuario($usuario, $contrasena)) {
-            header('Location: /index');
+        if ($usuarioModel->verifyUser($user, $password)) {
+            $_SESSION['user'] = $user;
+            header('Location: Landing/index');
         } else {
             header('Location: /login?error=1');
         }

@@ -16,9 +16,9 @@ class Database
             $dbname = $_ENV["DB_NAME"];
             $user = $_ENV["DB_USER"];
             $password = $_ENV["DB_PASS"];
-            $charset = 'utf8mb4';
+            $port = $_ENV["DB_PORT"];
 
-            $dsn = "mysql:host=$host;dbname=$dbname;charset=$charset";
+            $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
@@ -27,7 +27,7 @@ class Database
 
             try {
                 self::$instance = new PDO($dsn, $user, $password, $options);
-            } catch (PDOException $e) {
+            } catch (PDOException    $e) {
                 throw new PDOException($e->getMessage(), (int) $e->getCode());
             }
         }
