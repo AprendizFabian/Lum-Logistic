@@ -12,6 +12,7 @@ class DateController
 
     public function convert()
     {
+        $title = 'Validador';
         $input = $_POST['fecha_juliana'] ?? '';
 
         if (!preg_match('/^\d{5}$/', $input)) {
@@ -25,6 +26,6 @@ class DateController
             $resultado = $fecha->format('d/m/Y');
         }
 
-        require_once __DIR__ . '/../views/fechajuliana.php';
+        view('Admin/dateJuliana', compact('resultado', 'title'));
     }
 }

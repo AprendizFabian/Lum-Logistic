@@ -27,16 +27,12 @@
                         href="#">Registrarse</a></li>
             </ul>
         </div>
-        <div class="flex items-center gap-3">
-            <a href="/login">
-                <button class="text-[#FFE000] bg-white p-2">
-                    Iniciar Sesion
-                </button>
-            </a>
-            <a href="/fecha-juliana">
-                <button class="text-[#FFE000] bg-white p-2">
-                    Registrarse
-                </button>
+
+        <div class="flex flex-row items-center gap-3">
+            <img src="images/cropped-favicon-lum-192x192.png" alt="LUM Logistic Logo" class="size-10 md:size-12">
+            <a href="#"
+                class="text-[#ffffff] text-xl md:text-2xl hover:text-[#FFD700] transition-colors duration-300 tracking-wide">
+                LUM Logistic
             </a>
         </div>
     </div>
@@ -44,7 +40,7 @@
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1 gap-2">
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
-                    href="#">Inicio</a></li>
+                    href="/">Inicio</a></li>
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
                     href="#">Servicios</a></li>
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
@@ -54,11 +50,11 @@
 
     <div class="navbar-end gap-3 hidden lg:flex">
         <a class="btn w-full max-w-[130px] bg-[#FFD700] text-[#1a202c] font-bold hover:bg-yellow-500 border-none transition-colors duration-300 shadow-md hover:shadow-lg"
-            href="#">
+            href="/login">
             Iniciar Sesión
         </a>
         <a class="btn w-full max-w-[130px] border border-[#FFD700] bg-transparent text-[#FFD700] font-bold hover:bg-[#FFD700] hover:text-[#1a202c] transition-all duration-300 shadow-md hover:shadow-lg"
-            href="#">
+            href="/fecha-juliana">
             Registrarse
         </a>
     </div>

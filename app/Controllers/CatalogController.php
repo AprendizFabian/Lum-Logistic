@@ -6,6 +6,6 @@ class CatalogController
     public function showCatalog()
     {
         $title = 'Catalogo';
-        view('Admin/catalog', compact('title'));
+        view('Admin/catalogo', compact('title'));
     }
 }
