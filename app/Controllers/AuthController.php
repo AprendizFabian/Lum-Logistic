@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\UserModel;
+use App\Models\UserModel;
 
 class AuthController
 {
@@ -21,7 +21,7 @@ class AuthController
 
         if ($usuarioModel->verifyUser($user, $password)) {
             $_SESSION['user'] = $user;
-            header('Location: Landing/index');
+            header('Location: /catalogo');
         } else {
             header('Location: /login?error=1');
         }

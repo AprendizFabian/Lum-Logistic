@@ -45,7 +45,7 @@
           <p class="text-red-500 text-center mb-4">Usuario o contraseña incorrectos</p>
         <?php endif; ?>
 
-        <form method="POST" action="/proccessLogin">
+        <form method="POST" action="/procesar-login">
           <div class="mb-5">
             <label for="user" class="block font-semibold mb-2 text-gray-800">Usuario</label>
             <div class="relative">

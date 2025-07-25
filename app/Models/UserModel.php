@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Database;
 use PDO;
@@ -15,7 +15,7 @@ class UserModel
     }
     public function verifyUser($usuario, $contrasena)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM lum_prueba.usuarios WHERE usuario = :usuario AND contraseña = :contrasena");
+        $stmt = $this->pdo->prepare("SELECT * FROM lum_pruaba.usuarios WHERE usuario = :usuario AND contraseña = :contrasena");
         $stmt->bindParam(':usuario', $usuario);
         $stmt->bindParam(':contrasena', $contrasena);
         $stmt->execute();
