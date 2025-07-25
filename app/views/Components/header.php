@@ -1,5 +1,5 @@
 <header
-    class="navbar w-full max-w-[1200px] min-h-[15vh] mx-auto my-2 p-3 bg-[#404141] text-[#ffffff] shadow-xl font-bold rounded-xl">
+    class="navbar w-full  min-h-[15vh]  p-3 bg-[#404141] text-[#ffffff] shadow-2xl font-bold ">
     <div class="navbar-start my-2">
         <div class="dropdown">
             <div tabindex="0" role="button"
@@ -42,20 +42,19 @@
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
                     href="/">Inicio</a></li>
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
-                    href="#">Servicios</a></li>
+                    href="/fecha-juliana">Validador</a></li>
             <li><a class="text-[#ffffff] text-lg hover:text-[#FFD700] transition-colors duration-300 px-4 py-2 rounded-md"
-                    href="#">Sobre Nosotros</a></li>
+                    href="/login">Sobre Nosotros</a></li>
         </ul>
     </div>
 
-    <div class="navbar-end gap-3 hidden lg:flex">
-        <a class="btn w-full max-w-[130px] bg-[#FFD700] text-[#1a202c] font-bold hover:bg-yellow-500 border-none transition-colors duration-300 shadow-md hover:shadow-lg"
-            href="/login">
-            Iniciar Sesión
-        </a>
-        <a class="btn w-full max-w-[130px] border border-[#FFD700] bg-transparent text-[#FFD700] font-bold hover:bg-[#FFD700] hover:text-[#1a202c] transition-all duration-300 shadow-md hover:shadow-lg"
-            href="/fecha-juliana">
-            Registrarse
-        </a>
+   <div class="navbar-end gap-3 hidden lg:flex items-center">
+    <div class="flex items-center gap-2 text-white font-semibold cursor-pointer hover:text-yellow-400 transition">
+       
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-current" viewBox="0 0 24 24">
+            <path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/>
+        </svg>
+        <span>Usuario</span>
     </div>
+</div>
 </header>

@@ -26,6 +26,7 @@ class DateController
             $resultado = $fecha->format('d/m/Y');
         }
 
+        $title = 'Validador'; // Si lo usas en la vista
         view('Admin/dateJuliana', compact('resultado', 'title'));
     }
 }

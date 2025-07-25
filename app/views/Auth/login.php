@@ -8,12 +8,15 @@
       <p class="text-red-500 text-center mb-4">Usuario o contraseña incorrectos</p>
     <?php endif; ?>
 
-    <form method="POST" action="/procesar-login" class="space-y-6">
-      <!-- Usuario -->
-      <div>
-        <label for="user" class="block font-medium text-gray-700 mb-1">Usuario</label>
-        <input type="text" name="user" id="user" required class="input input-bordered w-full text-black" />
-      </div>
+        <form method="POST" action="/procesar-login">
+          <div class="mb-5">
+            <label for="user" class="block font-semibold mb-2 text-gray-800">Usuario</label>
+            <div class="relative">
+              <input type="text" name="user" id="user" required
+                class="input input-bordered w-full pr-10 border-2 border-yellow-400 focus:border-yellow-500 focus:ring-yellow-500 text-black">
+              <i class="bi bi-person-fill absolute right-3 top-1/2 -translate-y-1/2 text-yellow-500 text-lg"></i>
+            </div>
+          </div>
 
       <!-- Contraseña -->
       <div>

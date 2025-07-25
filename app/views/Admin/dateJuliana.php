@@ -1,21 +1,21 @@
 <div class="container mx-auto py-10 px-4">
-  <h2 class="text-center text-3xl font-bold mb-10">Validador de Productos</h2>
+  <h2 class="text-center text-3xl text-white font-bold mb-10">Validador de Productos</h2>
 
   <div class="bg-white border border-[#dcdde1] rounded-xl p-6 mb-8 shadow-md">
-    <h5 class="text-xl font-semibold mb-4">Validar Producto</h5>
+    <h5 class="text-xl  text-black font-semibold mb-4">Validar Producto</h5>
     <form>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
         <div>
-          <label for="ean" class="block text-sm font-medium text-gray-700 mb-1">Código EAN</label>
+          <label for="ean" class="block text-sm text-black font-medium text-gray-700 mb-1">Código EAN</label>
           <input type="text"
-            class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
+            class="block w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
             id="ean" placeholder="Ingrese el código EAN">
         </div>
         <div>
-          <label for="fecha_vencimiento" class="block text-sm font-medium text-gray-700 mb-1">Fecha de
+          <label for="fecha_vencimiento" class="block text-sm text-black font-medium text-gray-700 mb-1">Fecha de
             Vencimiento</label>
           <input type="date"
-            class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
+            class="block w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
             id="fecha_vencimiento">
         </div>
         <div class="flex items-end">
@@ -27,15 +27,15 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm font-semibold">Fecha de Bloqueo:</strong>
-          <p class="text-gray-500 text-sm">DD/MM/AAAA</p>
+          <strong class="block text-sm text-black font-semibold">Fecha de Bloqueo:</strong>
+          <p class="text-black text-black text-sm">DD/MM/AAAA</p>
         </div>
         <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm font-semibold">Días de Vida Útil:</strong>
+          <strong class="block text-sm text-black font-semibold">Días de Vida Útil:</strong>
           <p class="text-gray-500 text-sm">-- días</p>
         </div>
         <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm font-semibold">Estado del Producto:</strong>
+          <strong class="block text-sm text-black font-semibold">Estado del Producto:</strong>
           <p class="text-green-500 text-sm font-medium">Vigente</p>
         </div>
       </div>
@@ -43,13 +43,13 @@
   </div>
 
   <div class="bg-white border border-[#dcdde1] rounded-xl p-6 mb-8 shadow-md">
-    <h5 class="text-xl font-semibold mb-4">Conversor de Fecha Juliana</h5>
+    <h5 class="text-xl text-black font-semibold mb-4">Conversor de Fecha Juliana</h5>
     <form method="POST" action="/convertir-fecha">
       <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
         <div class="col-span-1 md:col-span-3">
-          <input type="text"
-            class="block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
-            name="fecha_juliana" placeholder="Ingrese fecha Juliana (Ej: 24198)" required>
+         <input type="text"
+  class="text-black block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
+  name="fecha_juliana" placeholder="Ingrese fecha Juliana (Ej: 24198)" required>
         </div>
         <div class="col-span-1 md:col-span-1">
           <button
@@ -72,15 +72,15 @@
             $resultado = convertirJuliana($_POST["fecha_juliana"]);
             ?>
             <div class="bg-white border border-[#dcdde1] rounded-xl p-3 shadow-sm">
-              <strong class="block text-sm font-semibold">Resultado:</strong>
+              <strong class="block text-sm text-black font-semibold">Resultado:</strong>
               <p class="text-sm <?= ($resultado === 'Formato inválido') ? 'text-[#e84118]' : 'text-gray-500' ?>">
                 <?= $resultado ?>
               </p>
             </div>
           <?php else: ?>
             <div class="bg-white border border-[#dcdde1] rounded-xl p-3 shadow-sm">
-              <strong class="block text-sm font-semibold">Resultado:</strong>
-              <p class="text-gray-500 text-sm">DD/MM/AAAA</p>
+              <strong class="block text-sm text-black font-semibold">Resultado:</strong>
+              <p class="text-gray-500 text-black text-sm">DD/MM/AAAA</p>
             </div>
           <?php endif; ?>
         </div>
@@ -115,14 +115,14 @@
         <button
           onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=115512917'"
           class="w-full bg-[#44bd32] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Descargar bloqueos de próxima semana (.xls)
+          📥 Descargar bloqueos de los proximos 7 dias(.xls)
         </button>
       </div>
       <div>
         <button
           onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=115512917'"
           class="w-full bg-[#e84118] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Descargar bloqueos de la próxima semana (.pdf)
+          📥 Descargar bloqueos de los proximos 7 dias (.pdf)
         </button>
       </div>
     </div>
