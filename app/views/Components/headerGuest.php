@@ -46,18 +46,3 @@
         </div>
     </div>
 </header>
-<div class="flex flex-1">
-    <aside class="bg-[#404141] text-white w-64 p-6 space-y-6">
-        <h1 class="text-2xl font-bold border-b pb-4"></h1>
-        <nav class="flex flex-col gap-4 text-lg">
-            <a href="/catalogo" class="flex items-center gap-3 hover:text-yellow-400 transition">📦
-                <span>Catálogo</span></a>
-            <a href="/vida-util" class="flex items-center gap-3 hover:text-yellow-400 transition">⏳ <span>Vida
-                    Útil</span></a>
-            <a href="/usuarios" class="flex items-center gap-3 hover:text-yellow-400 transition">👥
-                <span>Usuarios</span></a>
-            <a href="/configuracion" class="flex items-center gap-3 hover:text-yellow-400 transition">⚙️
-                <span>Configuración</span></a>
-        </nav>
-    </aside>
-</div>

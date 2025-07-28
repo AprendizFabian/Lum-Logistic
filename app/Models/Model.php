@@ -33,6 +33,4 @@ abstract class Model
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
         return $result ?: null;
     }
-
-    
 }

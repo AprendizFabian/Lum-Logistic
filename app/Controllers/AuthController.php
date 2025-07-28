@@ -10,7 +10,7 @@ class AuthController
     {
         $title = "Inicio de Sesion";
         $layout = "guest";
-        view('Auth/login', compact('title', 'layout'));
+        view('Auth/loginView', compact('title', 'layout'));
     }
     public function processLogin()
     {
@@ -21,7 +21,7 @@ class AuthController
 
         if ($usuarioModel->verifyUser($user, $password)) {
             $_SESSION['user'] = $user;
-            header('Location: Auth/catalog');
+            header('Location: /catalogo');
         } else {
             header('Location: /login?error=1');
         }

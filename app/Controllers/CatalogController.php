@@ -5,7 +5,7 @@ use App\Models\SheetsModel;
 
 class CatalogController
 {
-    public function showCatalog()
+    public function showView()
     {
         $page = $_GET['page'] ?? 1;
         $sheetModel = new SheetsModel();

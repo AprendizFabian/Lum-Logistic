@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full bg-gray-100">
+<html lang="es" data-theme="light">
 
 <head>
     <meta charset="UTF-8">
@@ -7,13 +7,12 @@
     <title><?= $title ?> | LUM logistic</title>
     <link rel="shortcut icon" href="/images/cropped-favicon-lum-192x192.png" type="image/x-icon">
     <link rel="stylesheet" href="/assets/output.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 
-<body class="h-full font-bold">
+<body>
     <main>
-        <div class="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
-            <?php require_once $view_path; ?>
-        </div>
+        <?php require_once $view_path; ?>
     </main>
 </body>
 

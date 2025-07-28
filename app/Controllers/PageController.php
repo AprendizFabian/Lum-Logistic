@@ -3,10 +3,11 @@ namespace App\Controllers;
 
 class PageController
 {
-    public function index()
+    public function showView()
     {
         $title = "Inicio";
+        $layout = 'guest';
 
-        view('Landing/index', compact('title'));
+        view('Landing/mainView', compact('title', 'layout'));
     }
 }
