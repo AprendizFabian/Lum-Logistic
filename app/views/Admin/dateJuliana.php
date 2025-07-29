@@ -1,156 +1,143 @@
-<div class="container mx-auto py-10 px-4">
-  <h2 class="text-center text-3xl text-white font-bold mb-10">Validador de Productos</h2>
+<div class="container mx-auto py-6 px-4 max-w-4xl">
+  <!-- Encabezado compacto -->
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-bold text-white mb-1">Validador de Productos</h1>
+    <p class="text-white/80 text-sm">Verificación de fechas y estados</p>
+  </div>
 
-  <div class="bg-white border border-[#dcdde1] rounded-xl p-6 mb-8 shadow-md">
-    <h5 class="text-xl  text-black font-semibold mb-4">Validar Producto</h5>
-    <form>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+  <!-- Sección principal más compacta -->
+  <div class="space-y-4">
+    <!-- Validación de Producto -->
+    <div class="bg-white rounded-lg p-4 shadow">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-[#4a69bd] text-white p-1.5 rounded-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+          </svg>
+        </span>
+        <h2 class="text-lg font-semibold text-gray-800">Validar Producto</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-3">
         <div>
-          <label for="ean" class="block text-sm text-black font-medium text-gray-700 mb-1">Código EAN</label>
-          <input type="text"
-            class="block w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
-            id="ean" placeholder="Ingrese el código EAN">
+          <label class="block text-xs text-gray-600 mb-1">Código EAN</label>
+          <input type="text" class="w-full p-1.5 text-sm border rounded-md focus:ring-1 focus:ring-[#4a69bd]" placeholder="123456789012">
         </div>
         <div>
-          <label for="fecha_vencimiento" class="block text-sm text-black font-medium text-gray-700 mb-1">Fecha de
-            Vencimiento</label>
-          <input type="date"
-            class="block w-full px-4 py-2 border text-black border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
-            id="fecha_vencimiento">
+          <label class="block text-xs text-gray-600 mb-1">Fecha Vencimiento</label>
+          <input type="date" class="w-full p-1.5 text-sm border rounded-md focus:ring-1 focus:ring-[#4a69bd]">
         </div>
         <div class="flex items-end">
-          <button type="button"
-            class="w-full bg-[#4a69bd] text-white py-2 px-4 rounded-lg hover:bg-[#3b57a2] transition duration-300 ease-in-out shadow-md"
-            onclick="document.getElementById('modalResultado').classList.remove('hidden'); document.getElementById('modalResultado').classList.add('flex');">Calcular</button>
+          <button class="w-full bg-[#4a69bd] text-white p-1.5 text-sm rounded-md hover:bg-[#3b57a2] transition">
+            Calcular
+          </button>
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm text-black font-semibold">Fecha de Bloqueo:</strong>
-          <p class="text-black text-black text-sm">DD/MM/AAAA</p>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="bg-gray-50 p-2 rounded-md text-center">
+          <p class="text-xs text-gray-600">Fecha Bloqueo</p>
+          <p class="text-sm font-medium">--/--/----</p>
         </div>
-        <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm text-black font-semibold">Días de Vida Útil:</strong>
-          <p class="text-gray-500 text-sm">-- días</p>
+        <div class="bg-gray-50 p-2 rounded-md text-center">
+          <p class="text-xs text-gray-600">Días Vida Útil</p>
+          <p class="text-sm font-medium">-- días</p>
         </div>
-        <div class="bg-white border border-[#dcdde1] rounded-xl p-4 shadow-sm">
-          <strong class="block text-sm text-black font-semibold">Estado del Producto:</strong>
-          <p class="text-green-500 text-sm font-medium">Vigente</p>
+        <div class="bg-gray-50 p-2 rounded-md text-center">
+          <p class="text-xs text-gray-600">Estado</p>
+          <p class="text-sm font-medium text-green-500">Vigente</p>
         </div>
-      </div>
-    </form>
-  </div>
-
-  <div class="bg-white border border-[#dcdde1] rounded-xl p-6 mb-8 shadow-md">
-    <h5 class="text-xl text-black font-semibold mb-4">Conversor de Fecha Juliana</h5>
-    <form method="POST" action="/convertir-fecha">
-      <div class="grid grid-cols-1 md:grid-cols-6 gap-4 items-center">
-        <div class="col-span-1 md:col-span-3">
-         <input type="text"
-  class="text-black block w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#4a69bd]"
-  name="fecha_juliana" placeholder="Ingrese fecha Juliana (Ej: 24198)" required>
-        </div>
-        <div class="col-span-1 md:col-span-1">
-          <button
-            class="w-full bg-[#4a69bd] text-white py-2 px-4 rounded-lg hover:bg-[#3b57a2] transition duration-300 ease-in-out shadow-md"
-            type="submit">Convertir</button>
-        </div>
-        <div class="col-span-1 md:col-span-2">
-          <?php if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["fecha_juliana"])): ?>
-            <?php
-            function convertirJuliana($fechaJuliana)
-            {
-              if (!preg_match('/^\d{5}$/', $fechaJuliana))
-                return 'Formato inválido';
-              $año = substr($fechaJuliana, 0, 2);
-              $diaDelAño = substr($fechaJuliana, 2);
-              $añoFull = ($año < 50) ? '20' . $año : '19' . $año;
-              $fecha = DateTime::createFromFormat('Y z', "$añoFull " . ($diaDelAño - 1));
-              return $fecha ? $fecha->format('d/m/Y') : 'Formato inválido';
-            }
-            $resultado = convertirJuliana($_POST["fecha_juliana"]);
-            ?>
-            <div class="bg-white border border-[#dcdde1] rounded-xl p-3 shadow-sm">
-              <strong class="block text-sm text-black font-semibold">Resultado:</strong>
-              <p class="text-sm <?= ($resultado === 'Formato inválido') ? 'text-[#e84118]' : 'text-gray-500' ?>">
-                <?= $resultado ?>
-              </p>
-            </div>
-          <?php else: ?>
-            <div class="bg-white border border-[#dcdde1] rounded-xl p-3 shadow-sm">
-              <strong class="block text-sm text-black font-semibold">Resultado:</strong>
-              <p class="text-gray-500 text-black text-sm">DD/MM/AAAA</p>
-            </div>
-          <?php endif; ?>
-        </div>
-      </div>
-    </form>
-  </div>
-
-  <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold mb-4">Descargar bloqueos de hoy</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
-      <div>
-        <button
-          onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=416131206'"
-          class="w-full bg-[#44bd32] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Bloqueos de hoy (.xls)
-        </button>
-      </div>
-      <div>
-        <button
-          onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=416131206'"
-          class="w-full bg-[#e84118] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Bloqueos de hoy (.pdf)
-        </button>
       </div>
     </div>
-  </div>
 
-  <div class="text-center mb-8">
-    <h2 class="text-2xl font-bold mb-4">Descargar próximos de la semana</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-lg mx-auto">
-      <div>
-        <button
-          onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=115512917'"
-          class="w-full bg-[#44bd32] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Descargar bloqueos de los proximos 7 dias(.xls)
-        </button>
-      </div>
-      <div>
-        <button
-          onclick="window.location.href='https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=115512917'"
-          class="w-full bg-[#e84118] text-white py-3 px-6 rounded-lg hover:opacity-90 transition duration-300 ease-in-out shadow-md">
-          📥 Descargar bloqueos de los proximos 7 dias (.pdf)
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modalResultado" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden justify-center items-center z-50">
-    <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
-      <div class="flex justify-between items-center border-b pb-3 mb-4">
-        <h5 class="text-xl font-bold">Resultado del Producto</h5>
-        <button type="button" class="text-gray-400 hover:text-gray-600"
-          onclick="document.getElementById('modalResultado').classList.add('hidden'); document.getElementById('modalResultado').classList.remove('flex');">
-          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+    <!-- Conversor Juliano -->
+    <div class="bg-white rounded-lg p-4 shadow">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="bg-[#4a69bd] text-white p-1.5 rounded-md">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
           </svg>
-        </button>
+        </span>
+        <h2 class="text-lg font-semibold text-gray-800">Conversor Juliano</h2>
       </div>
-      <div class="space-y-2">
-        <p><strong class="font-semibold">EAN:</strong> 0123456789123</p>
-        <p><strong class="font-semibold">Fecha de Vencimiento:</strong> 25/12/2025</p>
-        <p><strong class="font-semibold">Fecha de Bloqueo:</strong> 10/12/2025</p>
-        <p><strong class="font-semibold">Días de Vida Útil:</strong> 90</p>
-        <p><strong class="font-semibold">Estado:</strong> <span class="text-green-500">Vigente</span></p>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div class="md:col-span-3">
+          <label class="block text-xs text-gray-600 mb-1">Fecha Juliana</label>
+          <input id="julianaInput" type="text" class="w-full p-1.5 text-sm border rounded-md focus:ring-1 focus:ring-[#4a69bd]" placeholder="Ej: 24198">
+        </div>
+        <div class="flex items-end">
+          <button onclick="convertirJuliana()" class="w-full bg-[#4a69bd] text-white p-1.5 text-sm rounded-md hover:bg-[#3b57a2] transition">
+            Convertir
+          </button>
+        </div>
       </div>
-      <div class="flex justify-end mt-6">
-        <button type="button"
-          class="bg-gray-200 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-300 transition duration-300 ease-in-out"
-          onclick="document.getElementById('modalResultado').classList.add('hidden'); document.getElementById('modalResultado').classList.remove('flex');">Cerrar</button>
+
+      <div id="resultadoJuliana" class="mt-3 bg-gray-50 p-2 rounded-md hidden">
+        <p class="text-xs text-gray-600">Resultado:</p>
+        <p class="text-sm font-medium" id="fechaConvertida">DD/MM/AAAA</p>
+      </div>
+    </div>
+
+    <!-- Descargas en una sola fila -->
+    <div class="grid grid-cols-2 gap-3">
+      <div class="bg-white rounded-lg p-3 shadow">
+        <h3 class="text-xs font-bold text-gray-800 mb-2">Bloqueos de hoy</h3>
+        <div class="space-y-1.5">
+          <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=416131206" 
+             download="bloqueos-hoy.xlsx"
+             class="block w-full bg-[#44bd32] text-white p-1.5 text-xs rounded-md hover:bg-[#3aa62a] transition text-center">
+            Excel (.xlsx)
+          </a>
+          <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=416131206" 
+             download="bloqueos-hoy.pdf"
+             class="block w-full bg-[#e84118] text-white p-1.5 text-xs rounded-md hover:bg-[#d13813] transition text-center">
+            PDF (.pdf)
+          </a>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-lg p-3 shadow">
+        <h3 class="text-xs font-bold text-gray-800 mb-2">Próximos 7 días</h3>
+        <div class="space-y-1.5">
+          <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=115512917" 
+             download="proximos-7dias.xlsx"
+             class="block w-full bg-[#44bd32] text-white p-1.5 text-xs rounded-md hover:bg-[#3aa62a] transition text-center">
+            Excel (.xlsx)
+          </a>
+          <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=115512917" 
+             download="proximos-7dias.pdf"
+             class="block w-full bg-[#e84118] text-white p-1.5 text-xs rounded-md hover:bg-[#d13813] transition text-center">
+            PDF (.pdf)
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function convertirJuliana() {
+  const input = document.getElementById('julianaInput').value;
+  const resultadoDiv = document.getElementById('resultadoJuliana');
+  const fechaOutput = document.getElementById('fechaConvertida');
+  
+  if (!/^\d{5}$/.test(input)) {
+    fechaOutput.textContent = 'Formato inválido';
+    fechaOutput.className = 'text-sm font-medium text-red-500';
+  } else {
+    const año = input.substring(0, 2);
+    const dia = input.substring(2);
+    const añoFull = (año < 50) ? '20' + año : '19' + año;
+    
+    const fecha = new Date(añoFull, 0);
+    fecha.setDate(parseInt(dia));
+    
+    const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+    fechaOutput.textContent = fecha.toLocaleDateString('es-ES', options);
+    fechaOutput.className = 'text-sm font-medium text-gray-800';
+  }
+  
+  resultadoDiv.classList.remove('hidden');
+}
+</script>

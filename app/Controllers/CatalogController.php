@@ -5,13 +5,44 @@ use App\Models\SheetsModel;
 
 class CatalogController
 {
-    public function showView()
-    {
-        $page = $_GET['page'] ?? 1;
-        $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getData($page);
+public function showCatalog()
+{
+    $page = $_GET['page'] ?? 1;
+    $search = $_GET['search'] ?? '';
 
-        $title = 'Catalogo';
-        view('Admin/catalog', compact('title', 'sheetData'));
-    }
+    $sheetModel = new SheetsModel();
+    $sheetData = $sheetModel->getData($page, 6, $search); 
+
+    $title = 'Catálogo';
+    viewCatalog('Admin/catalog', compact('title', 'sheetData'));
+}
+public function showVidaUtil()
+{
+    $page = $_GET['page'] ?? 1;
+    $search = $_GET['search'] ?? '';
+
+    $sheetModel = new SheetsModel();
+    $sheetData = $sheetModel->getVidaUtil($page, 6, $search);
+
+    $title = 'Vida Útil';
+    viewCatalog('Admin/vida_util', compact('title', 'sheetData'));
+}
+   public function ShowDate()
+{
+    $title = 'Fechas';
+
+    $modelo = new SheetsModel();
+
+    
+    $buscar = $_GET['buscar'] ?? '';
+    $page = $_GET['page'] ?? 1;
+    $perPage = 6;
+
+  
+    $fechasData = $modelo->getFechasDesdeOtroArchivo('Fechas!A:B', $page, $perPage, $buscar);
+
+    $layout = '';
+
+    viewCatalog('Admin/fecha', compact('title', 'fechasData', 'layout'));
+}
 }

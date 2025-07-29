@@ -1,180 +1,57 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Catálogo - Mi CRM</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+<body class="bg-gray-100 text-gray-800">
+    <div class="flex min-h-screen">
+        <main >
+          <section class="flex-1 p-10 bg-gray-100">
+     <body class="bg-gray-100 text-gray-800">
+    <div class="flex min-h-screen">
+        <main class="flex-1">
+            <section class="w-full max-w-7xl mx-auto px-4 py-6">
+                <div class="flex justify-between mb-6">
+                <button class="bg-yellow-400 hover:bg-yellow-500 text-black px-5 py-2 rounded-lg font-medium transition" onclick="document.getElementById('modalAgregar').showModal()">➕ Agregar nuevo</button>
+                    
+                    <form method="GET" action="">
+                        <input 
+                            type="text" 
+                            name="search" 
+                            placeholder="Buscar vida útil..." 
+                            class="border border-gray-400 rounded-lg px-4 py-2 w-72 text-base"
+                            value="<?= htmlspecialchars($_GET['search'] ?? '') ?>" 
+                        />
+                    </form>
+                </div>
 
-  <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+                <?php if (empty($sheetData['data'])): ?>
+                    <p class="text-gray-500">No hay datos disponibles.</p>
+                <?php else: ?>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                     <?php foreach ($sheetData['data'] as $row): ?>
+                        <div class="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition        break-words border border-gray-10">
+                           <p class="font-bold text-base mb-2">🔹 Nombre: <?= htmlspecialchars($row[0] ?? 'Sin nombre') ?></p>
+                            <p class="font-bold text-base mb-2">
+                              🔙 Salida-merma: <?= htmlspecialchars($row[1] ?? '-'), htmlspecialchars($row [2] ?? '-') ?>
+                              &nbsp;&nbsp;&nbsp;
+                            </p>
+                          </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
 
-  <!-- Bootstrap Icons -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
-  <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #f4f5f7;
-      margin: 0;
-    }
-
-    .sidebar {
-      background-color: #2f4050;
-      min-height: 100vh;
-      padding: 1.5rem 1rem;
-      color: white;
-      width: 230px;
-    }
-
-    .sidebar h4 {
-      color: white;
-      margin-bottom: 2rem;
-    }
-
-    .sidebar a {
-      display: block;
-      color: white;
-      margin: 10px 0;
-      text-decoration: none;
-      padding: 8px;
-      border-radius: 5px;
-    }
-
-    .sidebar a:hover {
-      background-color: #1c2b3a;
-    }
-
-    .topbar {
-      background-color: #e9ecef;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      border-bottom: 1px solid #dee2e6;
-    }
-
-    .btn-agregar {
-      background-color: #f0c000;
-      border: none;
-      color: black;
-      font-weight: 500;
-      padding: 8px 16px;
-      border-radius: 6px;
-    }
-
-    .btn-agregar:hover {
-      background-color: #e6b800;
-    }
-
-    .icono-editar {
-      color: #f4b400;
-      cursor: pointer;
-    }
-
-    .icono-eliminar {
-      color: #e53935;
-      cursor: pointer;
-    }
-
-    .main-content {
-      padding: 2rem;
-      background-color: #f4f5f7;
-      flex-grow: 1;
-    }
-
-    .search-box {
-      width: 250px;
-    }
-  </style>
-</head>
-<body>
-  <div class="d-flex">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-      <h4>Mi CRM</h4>
-      <a href="index.html"><i class="bi bi-box"></i> Catálogo</a>
-      <a href="#"><i class="bi bi-clock-history"></i> Vida Útil</a>
-      <a href="tabla_usuarios.html"><i class="bi bi-people"></i> Usuarios</a>
-      <a href="configuracion.html"><i class="bi bi-gear"></i> Configuración</a>
-    </aside>
-
-    <div class="flex-grow-1">
-      <!-- Topbar -->
-      <div class="topbar">
-        <h5 class="mb-0">Catálogo</h5>
-        <div class="d-flex align-items-center gap-3">
-          <input type="text" class="form-control search-box" placeholder="Buscar...">
-       <a href="perfil.html" class="btn btn-outline-dark d-flex align-items-center gap-2">
-  <i class="bi bi-person-circle"></i> <span>Admin</span>
-</a>
-
-        </div>
-      </div>
-
-      <!-- Main content -->
-      <div class="main-content">
-        <!-- Botón que abre el modal -->
-        <button class="btn btn-agregar mb-3" data-bs-toggle="modal" data-bs-target="#modalAgregar">
-          <i class="bi bi-plus-circle"></i> Agregar nuevo
-        </button>
-
-        <!-- Tabla -->
-        <div class="table-responsive">
-          <table class="table table-bordered bg-white">
-            <thead class="table-light">
-              <tr>
-                <th>ID_vida_util</th>
-                <th>Concepto</th>
-                <th>Tiempo</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>1</td>
-                <td>0</td>
-                <td>Próximo a vencer</td>
-              </tr>
-              <!-- Más filas aquí -->
-            </tbody>
-          </table>
-        </div>
-      </div>
+       <?php if ($sheetData['totalPages'] > 1): ?>
+                    <div class="mt-8 flex justify-center items-center space-x-2">
+                        <?php if ($sheetData['currentPage'] > 1): ?>
+                            <a href="?page=<?= $sheetData['currentPage'] - 1 ?><?= $sheetData['searchParam'] ?>" class="px-4 py-2 border rounded-lg">Anterior</a>
+                        <?php endif; ?>
+                        <?php for ($i = $sheetData['startPage']; $i <= $sheetData['endPage']; $i++): ?>
+                            <a href="?page=<?= $i ?><?= $sheetData['searchParam'] ?>" class="px-4 py-2 border rounded-lg <?= $sheetData['currentPage'] == $i ? 'bg-black text-white' : '' ?>"><?= $i ?></a>
+                        <?php endfor; ?>
+                        <?php if ($sheetData['currentPage'] < $sheetData['totalPages']): ?>
+                            <a href="?page=<?= $sheetData['currentPage'] + 1 ?><?= $sheetData['searchParam'] ?>" class="px-4 py-2 border rounded-lg">Siguiente</a>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+        </main>
     </div>
-  </div>
-
-  <!-- MODAL AGREGAR -->
-  <div class="modal fade" id="modalAgregar" tabindex="-1" aria-labelledby="modalAgregarLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <form>
-          <div class="modal-header">
-            <h5 class="modal-title" id="modalAgregarLabel">Agregar Vida Útil</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label for="id_vida_util" class="form-label">ID Vida Útil</label>
-              <input type="text" class="form-control" id="id_vida_util" required>
-            </div>
-            <div class="mb-3">
-              <label for="concepto" class="form-label">Concepto</label>
-              <input type="text" class="form-control" id="concepto" required>
-            </div>
-            <div class="mb-3">
-              <label for="tiempo" class="form-label">Tiempo</label>
-              <input type="text" class="form-control" id="tiempo" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-primary">Guardar</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bootstrap JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-</html>
+
+</body>
