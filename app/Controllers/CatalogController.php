@@ -30,10 +30,7 @@ public function showVidaUtil()
    public function ShowDate()
 {
     $title = 'Fechas';
-
     $modelo = new SheetsModel();
-
-    
     $buscar = $_GET['buscar'] ?? '';
     $page = $_GET['page'] ?? 1;
     $perPage = 6;
