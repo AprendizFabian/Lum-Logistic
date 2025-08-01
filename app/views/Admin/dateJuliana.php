@@ -3,7 +3,6 @@
     <h1 class="text-4xl font-bold text-black mb-2">Validador de Productos</h1>
     <p class="text-sm text-gray-600">Herramientas para validar fechas, productos y descargar reportes</p>
   </div>
-
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
       <div class="flex items-center gap-3 mb-5">
@@ -14,7 +13,6 @@
         </span>
         <h2 class="text-xl font-semibold text-gray-800">Validar Producto</h2>
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div>
           <label class="block text-sm text-gray-700 mb-1">Código EAN</label>
@@ -30,8 +28,6 @@
           </button>
         </div>
       </div>
-  
-      <!-- Resultados de solo salida -->
       <div class="grid grid-cols-3 gap-4 text-center mt-6">
         <div class="bg-gray-100 py-3 px-2 rounded-md shadow-sm">
           <p class="text-xs text-gray-500">Fecha Bloqueo</p>
@@ -47,8 +43,6 @@
         </div>
       </div>
     </div>
-
-    <!-- Conversor Juliano -->
     <div class="bg-white border border-gray-200 rounded-xl shadow p-6">
       <div class="flex items-center gap-3 mb-5">
         <span class="bg-[#4a69bd] text-white p-2 rounded-lg">
@@ -58,7 +52,6 @@
         </span>
         <h2 class="text-xl font-semibold text-gray-800">Conversor Juliano</h2>
       </div>
-
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-3">
         <div class="md:col-span-3">
           <label class="block text-sm text-gray-700 mb-1">Fecha Juliana</label>
@@ -70,16 +63,13 @@
           </button>
         </div>
       </div>
-
       <div id="resultadoJuliana" class="mt-4 bg-gray-100 p-3 rounded-md hidden">
         <p class="text-xs text-gray-500">Resultado:</p>
         <p class="text-base font-medium" id="fechaConvertida">DD/MM/AAAA</p>
       </div>
     </div>
   </div>
-
  <h1 class="text-3xl font-semibold text-gray-800 text-center mt-10">Descarga de Bloqueos </h1>
-  <!-- Descargas -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mt-10">
     <div class="bg-white border border-gray-200 rounded-xl shadow p-5">
       <h3 class="text-sm font-semibold text-gray-800 mb-3">Bloqueos de hoy</h3>

@@ -1,8 +1,8 @@
 <body class="min-h-screen bg-gray-100 overflow-x-hidden">
-
-   <?php
-// NO pongas session_start() aquí
+<?php
+// Obtener nombre de usuario y rol si existe sesión
 $nombre_usuario = 'Usuario';
+$rol = $_SESSION['user']['rol_id_rol'] ?? 0;
 
 if (isset($_SESSION['user']) && isset($_SESSION['user']['usuario'])) {
     $nombre_usuario = htmlspecialchars($_SESSION['user']['usuario']);
@@ -40,42 +40,45 @@ if (isset($_SESSION['user']) && isset($_SESSION['user']['usuario'])) {
     </div>
 </header>
 
+<div id="sidebarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
 
-    <div id="sidebarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
+<div class="pt-[15vh] flex min-h-screen">
+    <aside id="sidebar" class="bg-[#404141] text-white w-64 p-6 space-y-6 fixed top-[15vh] left-0 bottom-0 z-50 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
+        <h1 class="text-2xl font-bold border-b pb-4">Menú</h1>
+        <nav class="flex flex-col gap-4 text-lg">
+            <a href="/catalogo" class="flex items-center gap-3 hover:text-yellow-400">📦 <span>Catálogo</span></a>
+            <a href="/vida-util" class="flex items-center gap-3 hover:text-yellow-400">⏳ <span>Vida Útil</span></a>
 
-    <div class="pt-[15vh] flex min-h-screen">
-
-        <aside id="sidebar" class="bg-[#404141] text-white w-64 p-6 space-y-6 fixed top-[15vh] left-0 bottom-0 z-50 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
-            <h1 class="text-2xl font-bold border-b pb-4">Menú</h1>
-            <nav class="flex flex-col gap-4 text-lg">
-                <a href="/catalogo" class="flex items-center gap-3 hover:text-yellow-400">📦 <span>Catálogo</span></a>
-                <a href="/vida-util" class="flex items-center gap-3 hover:text-yellow-400">⏳ <span>Vida Útil</span></a>
+            <?php if ($rol == 2): ?>
                 <a href="/usuarios" class="flex items-center gap-3 hover:text-yellow-400">👥 <span>Usuarios</span></a>
-                <a href="/fecha" class="flex items-center gap-3 hover:text-yellow-400">⚙️ <span>Fechas</span></a>
-                 <a href="/fecha-juliana" class="flex items-center gap-3 hover:text-yellow-400">✅ <span>Validador</span></a>
-            </nav>
-        </aside>
+                <a href="/estadisticas" class="flex items-center gap-3 hover:text-yellow-400">📊 <span>Estadísticas</span></a>
+            <?php endif; ?>
 
-        <!-- CONTENIDO -->
-        <main class="flex-5 px-auto py-1 ">
-            <?php if (isset($view_path)) require_once $view_path; ?>
-        </main>
-    </div>
+            <a href="/fecha" class="flex items-center gap-3 hover:text-yellow-400">⚙️ <span>Fechas</span></a>
+            <a href="/fecha-juliana" class="flex items-center gap-3 hover:text-yellow-400">✅ <span>Validador</span></a>
+        </nav>
+    </aside>
 
-    <!-- JS -->
-    <script>
-        const toggleSidebar = document.getElementById('toggleSidebar');
-        const sidebar = document.getElementById('sidebar');
-        const backdrop = document.getElementById('sidebarBackdrop');
+    <!-- CONTENIDO -->
+    <main class="flex-5 px-auto py-1">
+        <?php if (isset($view_path)) require_once $view_path; ?>
+    </main>
+</div>
 
-        toggleSidebar.addEventListener('click', () => {
-            sidebar.classList.toggle('-translate-x-full');
-            backdrop.classList.toggle('hidden');
-        });
+<!-- JS -->
+<script>
+    const toggleSidebar = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const backdrop = document.getElementById('sidebarBackdrop');
 
-        backdrop.addEventListener('click', () => {
-            sidebar.classList.add('-translate-x-full');
-            backdrop.classList.add('hidden');
-        });
-    </script>
+    toggleSidebar.addEventListener('click', () => {
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
+    });
+
+    backdrop.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        backdrop.classList.add('hidden');
+    });
+</script>
 </body>

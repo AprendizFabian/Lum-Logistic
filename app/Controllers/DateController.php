@@ -7,7 +7,7 @@ class DateController
     public function showFormDate()
     {
         $title = 'Validador';
-        view('Admin/dateJuliana', compact('title'));
+        viewCatalog('Admin/dateJuliana', compact('title'));
     }
 
     public function convert()
