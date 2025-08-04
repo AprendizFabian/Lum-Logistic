@@ -12,11 +12,6 @@
                 class="menu menu-sm dropdown-content bg-[#2d3748] rounded-box z-10 mt-3 w-52 p-2 shadow-lg border border-gray-700">
                 <li><a href="#hero-section" class="text-white hover:bg-gray-700 hover:text-[#FFD700]">Inicio</a></li>
                 <li><a href="#services-section" class="text-white hover:bg-gray-700 hover:text-[#FFD700]">Servicios</a>
-                </li>
-                <li><a href="#about-section" class="text-white hover:bg-gray-700 hover:text-[#FFD700]">Sobre
-                        Nosotros</a></li>
-                <li><a href="#contact-section" class="text-white hover:bg-gray-700 hover:text-[#FFD700]">Contacto</a>
-                </li>
             </ul>
         </div>
 
@@ -29,20 +24,15 @@
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1 gap-2">
             <li><a href="/" class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Inicio</a></li>
-            <li><a href="/fecha-juliana"
-                    class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Validador</a></li>
-            <li><a href="/login" class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Sobre Nosotros</a>
+            <li><a href="#servicios"
+                    class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Servicios</a></li>
             </li>
         </ul>
     </div>
 
     <div class="navbar-end gap-3 hidden lg:flex items-center">
-        <div class="flex items-center gap-2 text-white font-semibold cursor-pointer hover:text-yellow-400 transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 fill-current" viewBox="0 0 24 24">
-                <path
-                    d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z" />
-            </svg>
-            <span>Usuario</span>
+        <div class="flex">
+            <a href="/login" class="bg-[#FFD700] text-black p-2.5 rounded-md">Iniciar Sesion</a>
         </div>
     </div>
 </header>
@@ -84,7 +74,7 @@
 <section class="w-full bg-base-100 py-10 px-4">
     <div class="max-w-[1200px] mx-auto space-y-16">
         <h2 class="text-3xl sm:text-4xl font-bold text-center text-neutral mb-10">
-            Nuestros <span class="text-warning">Servicios</span>
+            Nuestros <span class="text-warning" id="servicios">Servicios</span>
         </h2>
         <div class="flex flex-col lg:flex-row items-center gap-8 group">
             <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"

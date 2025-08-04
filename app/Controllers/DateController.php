@@ -1,8 +1,7 @@
 <?php
 
 namespace App\Controllers;
-
-class DateController
+require_once __DIR__ . '/../helpers/SessionHelper.php';class DateController
 {
     public function showFormDate()
     {
@@ -12,6 +11,7 @@ class DateController
 
     public function convert()
     {
+         checkInactivity(350);
         $title = 'Validador';
         $input = $_POST['fecha_juliana'] ?? '';
 
