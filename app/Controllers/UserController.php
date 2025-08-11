@@ -11,7 +11,7 @@ class UserController
     {
         session_start();
 
-        if (!isset($_SESSION['user']) || $_SESSION['user']['rol_id_rol'] != 2) {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['rol_id_rol'] != 1) {
             header('Location: /login');
             exit;
         }
