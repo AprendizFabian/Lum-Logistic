@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 use App\Controllers\PageController;
 use App\Controllers\AuthController;
@@ -16,8 +16,8 @@ $router->get('/vida-util', [CatalogController::class, 'showVidaUtil']);
 $router->get('/fecha', [CatalogController::class, 'ShowDate']);
 $router->get('/usuarios', [UserController::class, 'showUser']);
 $router->get('/logout', [AuthController::class, 'logout']);
-
-
-
-
-
+$router->get('/usuario', [UserController::class, 'verDetalle']);
+$router->post('/eliminar', [UserController::class, 'eliminarUsuario']);
+$router->post('/agregar', [UserController::class, 'agregarUsuario']);
+$router->post('/editar', [UserController::class, 'editarUsuario']);
+$router->post('/validar', [DateController::class, 'validar']);

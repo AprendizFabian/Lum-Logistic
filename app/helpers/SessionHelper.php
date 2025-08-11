@@ -14,4 +14,5 @@ function checkInactivity($timeout = 300)
     }
 
     $_SESSION['LAST_ACTIVITY'] = time() + $timeout;
+
 }

@@ -25,7 +25,7 @@ class AuthController
         $userData = $usuarioModel->verifyUser($user, $password);
 
         if ($userData) {
-            $_SESSION['user'] = $userData; 
+            $_SESSION['user'] = $userData;
             // Solo para depurar
             // echo '<pre>'; print_r($_SESSION); echo '</pre>';
             header('Location: /catalogo');
@@ -35,7 +35,8 @@ class AuthController
         exit;
     }
 
-    public function logout(){
+    public function logout()
+    {
         session_start();
         session_destroy();
         header('Location: /');

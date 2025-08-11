@@ -27,7 +27,7 @@ class Database
 
             try {
                 self::$instance = new PDO($dsn, $user, $password, $options);
-            } catch (PDOException    $e) {
+            } catch (PDOException $e) {
                 throw new PDOException($e->getMessage(), (int) $e->getCode());
             }
         }

@@ -5,13 +5,12 @@ namespace App\Controllers;
 use App\Models\SheetsModel;
 
 // Incluir helper de sesión
-require_once __DIR__ . '/../helpers/SessionHelper.php';
+
 
 class CatalogController
 {
     public function showCatalog()
     {
-        checkInactivity(350); 
         $page = $_GET['page'] ?? 1;
         $search = $_GET['search'] ?? '';
 
@@ -24,7 +23,6 @@ class CatalogController
 
     public function showVidaUtil()
     {
-        checkInactivity(350);
 
         $page = $_GET['page'] ?? 1;
         $search = $_GET['search'] ?? '';
@@ -38,7 +36,6 @@ class CatalogController
 
     public function ShowDate()
     {
-        checkInactivity(350);
 
         $title = 'Fechas';
         $modelo = new SheetsModel();
@@ -51,4 +48,5 @@ class CatalogController
         $layout = '';
         viewCatalog('Admin/fecha', compact('title', 'fechasData', 'layout'));
     }
+
 }

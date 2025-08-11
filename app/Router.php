@@ -10,7 +10,7 @@ class Router
     {
         $this->routes[$method][$uri] = $action;
     }
-        public function post($uri, $action)
+    public function post($uri, $action)
     {
         $this->routes['POST'][$uri] = $action;
     }
@@ -51,6 +51,6 @@ class Router
         http_response_code(404);
         echo "<h1>404 Not Found</h1>";
         echo "<p>La página que buscas no existe.</p>";
-        
+
     }
 }

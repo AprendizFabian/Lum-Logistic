@@ -24,8 +24,8 @@
     <div class="navbar-center hidden lg:flex">
         <ul class="menu menu-horizontal px-1 gap-2">
             <li><a href="/" class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Inicio</a></li>
-            <li><a href="#servicios"
-                    class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Servicios</a></li>
+            <li><a href="#servicios" class="text-white text-lg hover:text-[#FFD700] px-4 py-2 rounded-md">Servicios</a>
+            </li>
             </li>
         </ul>
     </div>
@@ -77,8 +77,7 @@
             Nuestros <span class="text-warning" id="servicios">Servicios</span>
         </h2>
         <div class="flex flex-col lg:flex-row items-center gap-8 group">
-            <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                alt="Gestión de Inventario"
+            <img src="images\employees-consult-while-working-in-the-warehouse-FFRA3HS.jpg" alt="Gestión de Inventario"
                 class="w-full lg:w-1/2 h-64 object-cover rounded-2xl shadow-md group-hover:scale-[1.02] transition-transform duration-300" />
             <div class="lg:w-1/2 space-y-4">
                 <h3 class="text-2xl font-semibold text-neutral">Gestión de Inventario</h3>
@@ -93,8 +92,7 @@
             </div>
         </div>
         <div class="flex flex-col lg:flex-row-reverse items-center gap-8 group">
-            <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                alt="Distribución Nacional"
+            <img src="images\employees-consult-while-working-in-the-warehouse-FFRA3HS.jpg" alt="Distribución Nacional"
                 class="w-full lg:w-1/2 h-64 object-cover rounded-2xl shadow-md group-hover:scale-[1.02] transition-transform duration-300" />
             <div class="lg:w-1/2 space-y-4">
                 <h3 class="text-2xl font-semibold text-neutral">Distribución Nacional</h3>
@@ -109,8 +107,7 @@
             </div>
         </div>
         <div class="flex flex-col lg:flex-row items-center gap-8 group">
-            <img src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-                alt="Tecnología In-house"
+            <img src="images\employees-consult-while-working-in-the-warehouse-FFRA3HS.jpg" alt="Tecnología In-house"
                 class="w-full lg:w-1/2 h-64 object-cover rounded-2xl shadow-md group-hover:scale-[1.02] transition-transform duration-300" />
             <div class="lg:w-1/2 space-y-4">
                 <h3 class="text-2xl font-semibold text-neutral">Tecnología In-house</h3>
