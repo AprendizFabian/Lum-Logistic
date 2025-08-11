@@ -6,6 +6,7 @@ use App\Controllers\DateController;
 use App\Controllers\CatalogController;
 use App\Controllers\UserController;
 
+
 $router->get("/", [PageController::class, 'showView']);
 $router->get('/login', [AuthController::class, 'showLogin']);
 $router->post('/procesar-login', [AuthController::class, 'processLogin']);
@@ -21,3 +22,4 @@ $router->post('/eliminar', [UserController::class, 'eliminarUsuario']);
 $router->post('/agregar', [UserController::class, 'agregarUsuario']);
 $router->post('/editar', [UserController::class, 'editarUsuario']);
 $router->post('/validar', [DateController::class, 'validar']);
+$router->post('/validar-masivo', [DateController::class,'validarMasivo']);

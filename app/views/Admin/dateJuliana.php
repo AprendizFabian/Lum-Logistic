@@ -127,9 +127,83 @@
     </div>
   </div>
 </div>
+<a href="http://localhost/proyecto/LUM-Logistic-Prueba/public/plantillas/plantilla.xlsx"
+download="plantilla.xlsx" 
+   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+   Descargar plantilla
+</a>
 
+<!-- Bloque de cargue masivo -->
+<div class="mt-12 bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+  <h2 class="text-2xl font-semibold text-gray-700 mb-4">Cargue Masivo de Productos</h2>
+  <form id="formCargueMasivo" enctype="multipart/form-data">
+    <div class="mb-4">
+      <label for="archivoMasivo" class="block text-gray-700 font-medium mb-1">Seleccionar archivo:</label>
+      <input type="file" id="archivoMasivo" name="archivo" accept=".csv" required
+        class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
+    </div>
+    <button type="submit"
+      class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition">
+      Subir archivo
+    </button>
+  </form>
+  <div id="mensajeCargue" class="mt-4 text-sm font-medium hidden"></div>
+  <ul id="listaErrores" class="mt-2 text-red-500 text-sm list-disc pl-5 hidden"></ul>
+</div>
 
 <script>
+  const formCargueMasivo = document.getElementById("formCargueMasivo");
+  const mensajeCargue = document.getElementById("mensajeCargue");
+  const listaErrores = document.getElementById("listaErrores");
+
+  formCargueMasivo.addEventListener("submit", async function (e) {
+    e.preventDefault();
+
+    const formData = new FormData(formCargueMasivo);
+
+    // Mostrar mensaje de carga
+    mensajeCargue.classList.remove("hidden");
+    mensajeCargue.textContent = "⏳ Subiendo archivo, por favor espera...";
+    mensajeCargue.className = "mt-4 text-sm font-medium text-blue-600";
+    listaErrores.classList.add("hidden");
+    listaErrores.innerHTML = "";
+
+    try {
+      const resp = await fetch("/validar-masivo", { 
+        method: "POST",
+        body: formData
+      });
+
+      if (!resp.ok) throw new Error("Error al subir archivo");
+
+      const datos = await resp.json();
+
+      if (datos.error) {
+        mensajeCargue.textContent = `❌ ${datos.error}`;
+        mensajeCargue.className = "mt-4 text-sm font-medium text-red-600";
+        return;
+      }
+
+      // Mostrar éxito
+      mensajeCargue.textContent = `✅ ${datos.mensaje || 'Cargue realizado con éxito'} | Insertados: ${datos.insertados ?? 0}`;
+      mensajeCargue.className = "mt-4 text-sm font-medium text-green-600";
+
+      // Mostrar errores si hay
+      if (datos.errores && datos.errores.length > 0) {
+        listaErrores.classList.remove("hidden");
+        datos.errores.forEach(err => {
+          const li = document.createElement("li");
+          li.textContent = err;
+          listaErrores.appendChild(li);
+        });
+      }
+
+    } catch (err) {
+      mensajeCargue.textContent = `❌ Error: ${err.message}`;
+      mensajeCargue.className = "mt-4 text-sm font-medium text-red-600";
+    }
+  });
+
   const formValidador = document.getElementById("formValidador");
   const loader = document.getElementById("loader");
   const contenido = document.getElementById("resultadoContenido");
@@ -137,7 +211,7 @@
   formValidador.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    // Abrir modal y mostrar loader
+    
     document.getElementById("resultadoModal").checked = true;
     loader.classList.remove("hidden");
     contenido.classList.add("hidden");
@@ -171,8 +245,7 @@
       loader.classList.add("hidden");
       contenido.classList.remove("hidden");
 
-      // Mostrar mensaje de error sin destruir el HTML
-      contenido.querySelectorAll("p").forEach(p => p.textContent = "—"); // Limpia datos previos
+      contenido.querySelectorAll("p").forEach(p => p.textContent = "—"); 
       const errorMsg = document.createElement("p");
       errorMsg.className = "text-red-500 font-medium";
       errorMsg.textContent = `Hubo un problema al validar: ${err.message}`;
@@ -201,4 +274,4 @@
 
     resultadoDiv.classList.remove('hidden');
   }
-</script>
+</script> 
