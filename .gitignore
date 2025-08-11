@@ -13,7 +13,7 @@
 
 # Archivos generados automáticamente
 /public/src/input.css
-/public/sheetsconexion-f0e1890e48bc.json
+public/*.json
 
 # Archivos del sistema operativo
 .DS_Store
