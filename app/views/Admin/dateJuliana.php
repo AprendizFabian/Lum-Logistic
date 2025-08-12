@@ -127,10 +127,9 @@
     </div>
   </div>
 </div>
-<a href="http://localhost/proyecto/LUM-Logistic-Prueba/public/plantillas/plantilla.xlsx"
-download="plantilla.xlsx" 
-   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-   Descargar plantilla
+<a href="/plantillas/plantilla.xlsx" download="plantilla.xlsx"
+  class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+  Descargar plantilla
 </a>
 
 <!-- Bloque de cargue masivo -->
@@ -169,7 +168,7 @@ download="plantilla.xlsx"
     listaErrores.innerHTML = "";
 
     try {
-      const resp = await fetch("/validar-masivo", { 
+      const resp = await fetch("/validar-masivo", {
         method: "POST",
         body: formData
       });
@@ -211,7 +210,7 @@ download="plantilla.xlsx"
   formValidador.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-    
+
     document.getElementById("resultadoModal").checked = true;
     loader.classList.remove("hidden");
     contenido.classList.add("hidden");
@@ -245,7 +244,7 @@ download="plantilla.xlsx"
       loader.classList.add("hidden");
       contenido.classList.remove("hidden");
 
-      contenido.querySelectorAll("p").forEach(p => p.textContent = "—"); 
+      contenido.querySelectorAll("p").forEach(p => p.textContent = "—");
       const errorMsg = document.createElement("p");
       errorMsg.className = "text-red-500 font-medium";
       errorMsg.textContent = `Hubo un problema al validar: ${err.message}`;
@@ -274,4 +273,4 @@ download="plantilla.xlsx"
 
     resultadoDiv.classList.remove('hidden');
   }
-</script> 
+</script>

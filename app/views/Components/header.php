@@ -8,122 +8,84 @@ $nombre_usuario = htmlspecialchars($_SESSION['user']['usuario'] ?? 'Usuario');
 $rol = $_SESSION['user']['rol_id_rol'] ?? 0;
 ?>
 
-<header
-    class="fixed top-0 left-0 right-0 z-50 w-full h-[15vh] bg-[#404141] text-white flex items-center justify-between px-4 shadow-2xl">
-    <div class="flex items-center gap-4">
-        <button id="toggleSidebar" class="lg:hidden text-white hover:text-[#FFD700] transition">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" />
-            </svg>
-        </button>
-        <div class="flex items-center gap-3">
-            <img src="/images/cropped-favicon-lum-192x192.png" alt="Logo" class="size-10 md:size-12">
-            <a href="/catalogo" class="text-white text-xl md:text-2xl hover:text-[#FFD700]">LUM Logistic</a>
-        </div>
-    </div>
-
-    <!-- Usuario con menú -->
-    <!-- Usuario con menú -->
-    <div class="relative block">
-        <button id="userMenuButton" class="flex items-center gap-2 hover:text-yellow-400 focus:outline-none">
-            <i class="fa-solid fa-user"></i>
-            <span class="hidden sm:inline"><?= $nombre_usuario ?></span>
-        </button>
-        <div id="userDropdown" class="absolute right-0 mt-2 w-40 bg-white text-black rounded-md shadow-lg hidden">
-            <a href="/usuario" class="block px-4 py-2 hover:bg-gray-200"><i class="fa-solid fa-user"></i> Ver
-                perfil</a>
-            <a href="/logout" class="block px-4 py-2 hover:bg-gray-200"><i
-                    class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar sesión</a>
-        </div>
-    </div>
-
-</header>
-
-<div id="sidebarBackdrop" class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden lg:hidden"></div>
-
-<div class="pt-[15vh] flex min-h-screen">
+<div class="flex min-h-screen">
+    <!-- Sidebar -->
     <aside id="sidebar"
-        class="bg-[#404141] text-white w-64 p-6 space-y-6 fixed top-[15vh] left-0 bottom-0 z-50 transform -translate-x-full lg:translate-x-0 lg:static transition-transform duration-300 ease-in-out">
-        <h1 class="text-2xl font-bold border-b pb-4">Menú</h1>
-        <nav class="flex flex-col gap-4 text-lg">
-            <a href="/catalogo" class="flex items-center gap-3 hover:text-yellow-400"><i
-                    class="fa-solid fa-boxes-stacked"></i></i><span>Catálogo</span></a>
-            <a href="/vida-util" class="flex items-center gap-3 hover:text-yellow-400"><i class="fa-solid fa-clock"></i>
-                <span>Vida Útil</span></a>
+        class="bg-neutral text-neutral-content w-64 p-6 space-y-6 fixed top-0 left-0 bottom-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full overflow-y-auto">
+
+        <!-- Logo -->
+        <div class="flex items-center gap-3 mb-6">
+            <img src="/images/cropped-favicon-lum-192x192.png" alt="Logo" class="w-10 h-10 rounded-md">
+            <a href="/catalogo/" class="text-xl font-bold hover:text-warning transition">LUM Logistic</a>
+        </div>
+
+        <!-- Menú principal -->
+        <h1 class="text-2xl font-bold border-b border-gray-600 pb-4">Menú</h1>
+        <nav class="menu text-lg space-y-2">
+            <li><a href="/catalogo" class="hover:text-warning"><i class="fa-solid fa-boxes-stacked"></i> Catálogo</a>
+            </li>
+            <li><a href="/vida-util" class="hover:text-warning"><i class="fa-solid fa-clock"></i> Vida Útil</a>
+            </li>
 
             <?php if ($rol == 1): ?>
-                <a href="/usuarios" class="flex items-center gap-3 hover:text-yellow-400"><i
-                        class="fa-solid fa-users"></i><span>Usuarios</span></a>
+                <li><a href="/usuarios" class="hover:text-warning"><i class="fa-solid fa-users"></i> Usuarios</a></li>
             <?php endif; ?>
 
-            <a href="/fecha" class="flex items-center gap-3 hover:text-yellow-400"><i
-                    class="fa-solid fa-calendar"></i><span>Fechas</span></a>
-            <a href="/fecha-juliana" class="flex items-center gap-3 hover:text-yellow-400"><i
-                    class="fa-solid fa-check"></i><span>Validador</span></a>
+            <li><a href="/fecha" class="hover:text-warning"><i class="fa-solid fa-calendar"></i> Fechas</a></li>
+            <li><a href="/fecha-juliana" class="hover:text-warning"><i class="fa-solid fa-check"></i> Validador</a></li>
         </nav>
+
+        <!-- Menú usuario -->
+        <div class="border-t border-gray-600 pt-4">
+            <details class="w-full">
+                <summary
+                    class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-warning hover:text-black rounded-lg transition-colors">
+                    <i class="fa-solid fa-user"></i>
+                    <span><?= $nombre_usuario ?></span>
+                    <i class="fa-solid fa-caret-down ml-auto"></i>
+                </summary>
+                <ul class="mt-2 pl-6 space-y-2 text-base">
+                    <li>
+                        <a href="/usuario" class="flex items-center gap-2 hover:text-warning transition">
+                            <i class="fa-solid fa-id-badge"></i> Mi Perfil
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/logout" class="flex items-center gap-2 text-error hover:text-red-400 transition">
+                            <i class="fa-solid fa-arrow-right-from-bracket"></i> Cerrar Sesión
+                        </a>
+                    </li>
+                </ul>
+            </details>
+        </div>
     </aside>
 
-    <!-- CONTENIDO -->
-    <main class="flex-5 px-auto py-1">
+    <!-- Botón tipo pestaña -->
+    <button id="sidebarToggle"
+        class="fixed top-1/2 -translate-y-1/2 left-0 z-50 bg-neutral text-neutral-content p-2 rounded-r-lg shadow-lg hover:bg-warning hover:text-black transition block lg:hidden">
+        <i id="sidebarIcon" class="fa-solid fa-arrow-right"></i>
+    </button>
+    <!-- Contenido -->
+    <main id="mainContent" class="flex-1 p-2 lg:ml-64 transition-all duration-300 overflow-y-auto">
         <?php if (isset($view_path))
             require_once $view_path; ?>
     </main>
 </div>
 
-<!-- ALERTA + CIERRE AUTOMÁTICO POR INACTIVIDAD -->
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<!-- JS toggle -->
 <script>
-    let tiempoInactividad = 60 * 60 * 1000; // 1 minuto
-    let temporizador;
-
-    function cerrarSesionPorInactividad() {
-        Swal.fire({
-            title: 'Sesión cerrada',
-            text: 'Tu sesión ha expirado por inactividad.',
-            icon: 'info',
-            confirmButtonText: 'OK'
-        }).then(() => {
-            window.location.href = '/logout'; // Ruta de cierre de sesión
-        });
-    }
-
-    function reiniciarTemporizador() {
-        clearTimeout(temporizador);
-        temporizador = setTimeout(cerrarSesionPorInactividad, tiempoInactividad);
-    }
-
-    // Detecta actividad del usuario
-    ['click', 'mousemove', 'keydown', 'scroll'].forEach(evt => {
-        window.addEventListener(evt, reiniciarTemporizador);
-    });
-
-    reiniciarTemporizador(); // Iniciar al cargar
-</script>
-<script>
-    const toggleSidebar = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
-    const backdrop = document.getElementById('sidebarBackdrop');
-    const userMenuButton = document.getElementById('userMenuButton');
-    const userDropdown = document.getElementById('userDropdown');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarIcon = document.getElementById('sidebarIcon');
 
-    toggleSidebar.addEventListener('click', () => {
+    sidebarToggle.addEventListener('click', () => {
         sidebar.classList.toggle('-translate-x-full');
-        backdrop.classList.toggle('hidden');
-    });
-
-    backdrop.addEventListener('click', () => {
-        sidebar.classList.add('-translate-x-full');
-        backdrop.classList.add('hidden');
-    });
-
-    userMenuButton.addEventListener('click', () => {
-        userDropdown.classList.toggle('hidden');
-    });
-
-    window.addEventListener('click', function (e) {
-        if (!userMenuButton.contains(e.target) && !userDropdown.contains(e.target)) {
-            userDropdown.classList.add('hidden');
+        if (sidebar.classList.contains('-translate-x-full')) {
+            sidebarIcon.classList.remove('fa-arrow-left');
+            sidebarIcon.classList.add('fa-arrow-right');
+        } else {
+            sidebarIcon.classList.remove('fa-arrow-right');
+            sidebarIcon.classList.add('fa-arrow-left');
         }
     });
 </script>

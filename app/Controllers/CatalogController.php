@@ -15,7 +15,7 @@ class CatalogController
         $search = $_GET['search'] ?? '';
 
         $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getData($page, 6, $search);
+        $sheetData = $sheetModel->getData($page, 8, $search);
 
         $title = 'Catálogo';
         viewCatalog('Admin/catalog', compact('title', 'sheetData'));
@@ -28,7 +28,7 @@ class CatalogController
         $search = $_GET['search'] ?? '';
 
         $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getVidaUtil($page, 6, $search);
+        $sheetData = $sheetModel->getVidaUtil($page, 9, $search);
 
         $title = 'Vida Útil';
         viewCatalog('Admin/vida_util', compact('title', 'sheetData'));
