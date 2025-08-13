@@ -21,13 +21,17 @@ class HistoryValidador
 public function existeEanOFecha($ean, $fecha)
 {
     $stmt = $this->pdo->prepare("
-        SELECT 1 
-        FROM lum_prueba.historial_validador
-        WHERE ean = ? AND fecha_bloqueo = ?
-        LIMIT 1
+        SELECT EXISTS (
+            SELECT 1 
+            FROM lum_prueba.historial_validador
+            WHERE ean = :ean AND fecha_bloqueo = :fecha
+        ) AS existe
     ");
-    $stmt->execute([$ean, $fecha]);
-    return $stmt->fetchColumn() ? true : false;
+    $stmt->execute([
+        'ean' => $ean,
+        'fecha' => $fecha
+    ]);
+    return (bool) $stmt->fetchColumn();
 }
 
 

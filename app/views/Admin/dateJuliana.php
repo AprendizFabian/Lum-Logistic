@@ -218,7 +218,6 @@ archivoInput.addEventListener('click', async function handler(e) {
     showCancelButton: true,
     confirmButtonText: 'Sí, descargar y continuar',
     cancelButtonText: 'No, solo subir archivo',
-     cancelButtonTex: 'No, solo subir archivo',
     allowOutsideClick: false
   });
 
