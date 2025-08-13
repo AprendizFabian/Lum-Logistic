@@ -1,3 +1,5 @@
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="container mx-auto px-6 py-10 max-w-7xl">
   <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Validador de Productos</h1>
 
@@ -49,10 +51,6 @@
 
   <!-- Botones de descarga -->
   <div class="mt-12 flex flex-col md:flex-row justify-center gap-4">
-    <a href="/descargar/validador"
-      class="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-xl text-center">
-      Descargar Validador
-    </a>
     <a href="/descargar/catalogo"
       class="bg-teal-600 hover:bg-teal-700 text-white font-semibold px-6 py-2 rounded-xl text-center">
       Descargar Catálogo
@@ -127,9 +125,10 @@
     </div>
   </div>
 </div>
-<a href="/plantillas/plantilla.xlsx" download="plantilla.xlsx"
-  class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
-  Descargar plantilla
+<a href="/plantillas/plantilla.xlsx"
+download="plantilla.xlsx" 
+   class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+   Descargar plantilla
 </a>
 
 <!-- Bloque de cargue masivo -->
@@ -138,9 +137,8 @@
   <form id="formCargueMasivo" enctype="multipart/form-data">
     <div class="mb-4">
       <label for="archivoMasivo" class="block text-gray-700 font-medium mb-1">Seleccionar archivo:</label>
-      <input type="file" id="archivoMasivo" name="archivo" accept=".csv" required
-        class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
-    </div>
+     <input type="file" id="archivoMasivo" name="archivo" accept=".csv, .xlsx" required
+  class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-400">
     <button type="submit"
       class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-lg transition">
       Subir archivo
@@ -151,57 +149,92 @@
 </div>
 
 <script>
-  const formCargueMasivo = document.getElementById("formCargueMasivo");
-  const mensajeCargue = document.getElementById("mensajeCargue");
-  const listaErrores = document.getElementById("listaErrores");
 
-  formCargueMasivo.addEventListener("submit", async function (e) {
-    e.preventDefault();
+const formCargueMasivo = document.getElementById("formCargueMasivo");
 
-    const formData = new FormData(formCargueMasivo);
+formCargueMasivo.addEventListener("submit", async e => {
+  e.preventDefault();
 
-    // Mostrar mensaje de carga
-    mensajeCargue.classList.remove("hidden");
-    mensajeCargue.textContent = "⏳ Subiendo archivo, por favor espera...";
-    mensajeCargue.className = "mt-4 text-sm font-medium text-blue-600";
-    listaErrores.classList.add("hidden");
-    listaErrores.innerHTML = "";
-
-    try {
-      const resp = await fetch("/validar-masivo", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!resp.ok) throw new Error("Error al subir archivo");
-
-      const datos = await resp.json();
-
-      if (datos.error) {
-        mensajeCargue.textContent = `❌ ${datos.error}`;
-        mensajeCargue.className = "mt-4 text-sm font-medium text-red-600";
-        return;
-      }
-
-      // Mostrar éxito
-      mensajeCargue.textContent = `✅ ${datos.mensaje || 'Cargue realizado con éxito'} | Insertados: ${datos.insertados ?? 0}`;
-      mensajeCargue.className = "mt-4 text-sm font-medium text-green-600";
-
-      // Mostrar errores si hay
-      if (datos.errores && datos.errores.length > 0) {
-        listaErrores.classList.remove("hidden");
-        datos.errores.forEach(err => {
-          const li = document.createElement("li");
-          li.textContent = err;
-          listaErrores.appendChild(li);
-        });
-      }
-
-    } catch (err) {
-      mensajeCargue.textContent = `❌ Error: ${err.message}`;
-      mensajeCargue.className = "mt-4 text-sm font-medium text-red-600";
-    }
+  // Modal de carga
+  Swal.fire({
+    title: 'Subiendo archivo...',
+    text: 'Por favor espera',
+    allowOutsideClick: false,
+    didOpen: () => Swal.showLoading()
   });
+
+  try {
+    const resp = await fetch("/validar-masivo", {
+      method: "POST",
+      body: new FormData(formCargueMasivo)
+    });
+
+    if (!resp.ok) throw new Error("Error al subir archivo");
+    const datos = await resp.json();
+
+    // Error crítico
+    if (datos.error) {
+      return Swal.fire({
+        icon: 'error',
+        title: 'Error en el cargue',
+        text: datos.error,
+        confirmButtonColor: '#d33'
+      });
+    }
+
+    const icono = datos.errores?.length ? 'warning' : 'success';
+    const titulo = icono === 'success' ? 'Cargue completado' : 'Cargue con advertencias';
+    const erroresHTML = datos.errores?.length
+      ? `<p>⚠️ Errores encontrados:</p><ul>${datos.errores.map(e => `<li>${e}</li>`).join('')}</ul>`
+      : '';
+    const mensajeHTML = `<p>${datos.mensaje || 'Cargue realizado con éxito'} | Insertados: ${datos.insertados ?? 0}</p>${erroresHTML}`;
+
+    Swal.fire({
+      icon: icono,
+      title: titulo,
+      html: mensajeHTML,
+      confirmButtonColor: '#3085d6'
+    });
+
+  } catch (err) {
+    Swal.fire({
+      icon: 'error',
+      title: 'Error inesperado',
+      text: err.message,
+      confirmButtonColor: 'rgba(255, 0, 0, 1)'
+    });
+  }
+});
+
+const archivoInput = document.getElementById('archivoMasivo');
+const urlPlantilla = '/plantillas/plantilla.xlsx';
+archivoInput.addEventListener('click', async function handler(e) {
+  e.preventDefault(); 
+  
+  const resultado = await Swal.fire({
+    title: 'Recuerda descargar la plantilla',
+    text: '¿Deseas descargarla antes de subir el archivo?',
+    icon: 'info',
+    showCancelButton: true,
+    confirmButtonText: 'Sí, descargar y continuar',
+    cancelButtonText: 'No, solo subir archivo',
+     cancelButtonTex: 'No, solo subir archivo',
+    allowOutsideClick: false
+  });
+
+  if (resultado.isConfirmed) {
+    const link = document.createElement('a');
+    link.href = urlPlantilla;
+    link.download = 'plantilla.xlsx';
+    link.click();
+    document.body.removeChild(link);
+  }
+  archivoInput.removeEventListener('click', handler);
+  archivoInput.click();
+  setTimeout(() => {
+    archivoInput.addEventListener('click', handler);
+  }, 50);
+});
 
   const formValidador = document.getElementById("formValidador");
   const loader = document.getElementById("loader");
@@ -210,7 +243,7 @@
   formValidador.addEventListener("submit", async function (e) {
     e.preventDefault();
 
-
+    
     document.getElementById("resultadoModal").checked = true;
     loader.classList.remove("hidden");
     contenido.classList.add("hidden");
@@ -244,7 +277,7 @@
       loader.classList.add("hidden");
       contenido.classList.remove("hidden");
 
-      contenido.querySelectorAll("p").forEach(p => p.textContent = "—");
+      contenido.querySelectorAll("p").forEach(p => p.textContent = "—"); 
       const errorMsg = document.createElement("p");
       errorMsg.className = "text-red-500 font-medium";
       errorMsg.textContent = `Hubo un problema al validar: ${err.message}`;
@@ -273,4 +306,4 @@
 
     resultadoDiv.classList.remove('hidden');
   }
-</script>
+</script> 

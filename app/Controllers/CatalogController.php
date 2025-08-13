@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Models\SheetsModel;
 
-// Incluir helper de sesión
 
 
 class CatalogController
@@ -15,7 +14,7 @@ class CatalogController
         $search = $_GET['search'] ?? '';
 
         $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getData($page, 8, $search);
+        $sheetData = $sheetModel->getData($page, 9, $search);
 
         $title = 'Catálogo';
         viewCatalog('Admin/catalog', compact('title', 'sheetData'));

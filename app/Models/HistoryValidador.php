@@ -18,16 +18,20 @@ class HistoryValidador
         ]);
     }
 
-    public function existeEanOFecha($ean, $fecha)
-    {
-        $stmt = $this->pdo->prepare("
-            SELECT 1 FROM lum_prueba.historial_validador
-            WHERE ean = ? OR fecha_bloqueo = ?
-            LIMIT 1
-        ");
-        $stmt->execute([$ean, $fecha]);
-        return $stmt->fetchColumn() ? true : false;
-    }
+public function existeEanOFecha($ean, $fecha)
+{
+    $stmt = $this->pdo->prepare("
+        SELECT 1 
+        FROM lum_prueba.historial_validador
+        WHERE ean = ? AND fecha_bloqueo = ?
+        LIMIT 1
+    ");
+    $stmt->execute([$ean, $fecha]);
+    return $stmt->fetchColumn() ? true : false;
+}
+
+
+
 
     public function insertarRegistro($descripcion, $diasVidaUtil, $fechaBloqueo, $categoria, $conceptoBloqueo, $estado, $ean)
     {

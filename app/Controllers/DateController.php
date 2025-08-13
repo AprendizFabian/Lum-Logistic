@@ -153,65 +153,107 @@ class DateController
     }
 
 public function validarMasivo()
-{
-    header('Content-Type: application/json; charset=utf-8');
-    ini_set('display_errors', 0);
-    error_reporting(E_ALL);
+    {
+        header('Content-Type: application/json; charset=utf-8');
+        ini_set('display_errors', '0');
+        error_reporting(E_ALL);
 
-    try {
-        if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
-            throw new \Exception('No se envió el archivo o hubo un error al subirlo');
-        }
-
-        $archivoTmp = $_FILES['archivo']['tmp_name'];
-        if (!($handle = fopen($archivoTmp, 'r'))) {
-            throw new \Exception('No se pudo abrir el archivo');
-        }
-
-        $historialModel = new HistoryValidador();
-        $sheetModel = new SheetsModel();
-
-        $insertados = 0;
-        $errores = [];
-        $linea = 0;
-
-        while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
-            $linea++;
-
-            if ($linea == 1 && strtolower($fila[0]) === 'ean') {
-                continue;
+        try {
+            // --- Verificar archivo ---
+            if (!isset($_FILES['archivo'])) {
+                throw new \Exception('No se recibió ningún archivo para validar.');
+            }
+            if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+                throw new \Exception('Error al subir el archivo. Código: ' . $_FILES['archivo']['error']);
             }
 
-            $ean = trim($fila[0] ?? '');
-            $fechaVencimiento = trim($fila[1] ?? '');
-
-            if (empty($ean) || empty($fechaVencimiento)) {
-                $errores[] = "Línea {$linea}: Faltan datos obligatorios";
-                continue;
+            $archivoTmp = $_FILES['archivo']['tmp_name'];
+            if (!is_readable($archivoTmp)) {
+                throw new \Exception('El archivo no se pudo leer o está dañado.');
             }
 
-            if ($historialModel->existeEanOFecha($ean, $fechaVencimiento)) {
-                $errores[] = "Línea {$linea}: EAN {$ean} ya existente en BD";
-                continue;
+            if (!($handle = fopen($archivoTmp, 'r'))) {
+                throw new \Exception('No se pudo abrir el archivo para lectura.');
             }
 
-            $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
-            if (isset($datos['error'])) {
-                $errores[] = "Línea {$linea}: {$datos['error']}";
-                continue;
-            }
+            $historialModel = new HistoryValidador();
+            $sheetModel = new SheetsModel();
 
-            $diasVidaUtil = $datos['diasVidaUtil'] ?? null;
-            $categoria = $datos['categoria'] ?? null;
-            $descripcion = $datos['descripcion'] ?? null;
-            $conceptoBloqueo = '';
-            $fechaBloqueo = '';
-            $estado = 'Desconocido';
+            $insertados = 0;
+            $errores = [];
+            $linea = 0;
 
-            if ($diasVidaUtil !== null && !empty($fechaVencimiento)) {
-                $fechaBloqueoObj = $this->parseFechaFlexible($fechaVencimiento);
-                if ($fechaBloqueoObj instanceof \DateTime) {
-                    $fechaBloqueoObj->sub(new \DateInterval("P{$diasVidaUtil}D"));
+            while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
+                $linea++;
+
+                // Saltar si fila vacía
+                if (empty(array_filter($fila))) {
+                    $errores[] = "Línea {$linea}: Fila vacía.";
+                    continue;
+                }
+
+                // Saltar cabecera si aplica
+                if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
+                    continue;
+                }
+
+                $ean = trim($fila[0] ?? '');
+                $fechaVencimiento = trim($fila[1] ?? '');
+
+                // --- Validar campos obligatorios ---
+                if ($ean === '' && $fechaVencimiento === '') {
+                    $errores[] = "Línea {$linea}: No se encontró ni el EAN ni la fecha de vencimiento.";
+                    continue;
+                }
+                if ($ean === '') {
+                    $errores[] = "Línea {$linea}: Falta el EAN.";
+                    continue;
+                }
+                if ($fechaVencimiento === '') {
+                    $errores[] = "Línea {$linea}: Falta la fecha de vencimiento para el EAN {$ean}.";
+                    continue;
+                }
+
+                // --- Validar formato de fecha ---
+                $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
+                if (!($fechaObj instanceof \DateTime)) {
+                    $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido para el EAN {$ean}.";
+                    continue;
+                }
+
+                // --- Validar duplicados (en tu tabla historial) ---
+                if ($historialModel->existeEanOFecha($ean, $fechaVencimiento)) {
+                    $errores[] = "Línea {$linea}: El EAN {$ean} con fecha {$fechaVencimiento} ya existe en la base de datos.";
+                    continue;
+                }
+
+                // --- Obtener datos externos (Sheets) ---
+                $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
+
+                // Si no hay datos o hay error, consideramos que el EAN no existe
+                if (!is_array($datos) || isset($datos['error']) || !array_key_exists('diasVidaUtil', $datos) || $datos['diasVidaUtil'] === null || $datos['diasVidaUtil'] === '') {
+                    $errores[] = "Línea {$linea}: El EAN {$ean} no existe.";
+                    continue;
+                }
+
+                // --- Calcular fecha de bloqueo y estado ---
+                $diasVidaUtil = $datos['diasVidaUtil'];
+                $categoria = $datos['categoria'] ?? '';
+                $descripcion = $datos['descripcion'] ?? '';
+                $estado = 'Desconocido';
+                $fechaBloqueo = '';
+
+                // Verificar que días de vida útil sea numérico
+                if (!is_numeric($diasVidaUtil)) {
+                    $errores[] = "Línea {$linea}: El valor de 'días de vida útil' para el EAN {$ean} no es numérico ('{$diasVidaUtil}').";
+                    continue;
+                }
+
+                // Hacer el cálculo de bloqueo
+                try {
+                    $diasInt = (int) $diasVidaUtil;
+                    $fechaBloqueoObj = clone $fechaObj;
+                    $fechaBloqueoObj->sub(new \DateInterval("P{$diasInt}D"));
                     $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
 
                     $hoy = new \DateTime();
@@ -225,49 +267,75 @@ public function validarMasivo()
                     } else {
                         $estado = 'VENCIDO';
                     }
-                } else {
-                    $errores[] = "Línea {$linea}: Formato de fecha inválido ({$fechaVencimiento})";
+                } catch (\Exception $e) {
+                    $errores[] = "Línea {$linea}: Error calculando fecha de bloqueo para el EAN {$ean} ({$e->getMessage()}).";
                     continue;
                 }
-            }
 
-            $conceptoBloqueo = $estado === 'VENCIDO' ? 'VENCIDO' : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
+                $conceptoBloqueo = $estado === 'VENCIDO'
+                    ? 'VENCIDO'
+                    : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
 
-            try {
-                $historialModel->insertarRegistro($descripcion, $diasVidaUtil, $fechaBloqueo, $categoria, $conceptoBloqueo, $estado, $ean);
-                $insertados++;
-            } catch (\PDOException $e) {
-                $errores[] = "Línea {$linea}: Error BD - {$e->getMessage()}";
-            }
+                // --- Insertar registro con captura de errores específicos ---
+                try {
+                    $historialModel->insertarRegistro(
+                        $descripcion,
+                        $diasInt,
+                        $fechaBloqueo,
+                        $categoria,
+                        $conceptoBloqueo,
+                        $estado,
+                        $ean
+                    );
+                    $insertados++;
+                } catch (\PDOException $e) {
+                    $mensajeError = strtolower($e->getMessage());
+                    if (str_contains($mensajeError, 'null value') || str_contains($mensajeError, 'not null')) {
+                        $errores[] = "Línea {$linea}: No se pudo guardar el registro porque falta un dato obligatorio para el EAN {$ean}.";
+                    } elseif (str_contains($mensajeError, 'duplicate') || str_contains($mensajeError, 'unique')) {
+                        $errores[] = "Línea {$linea}: Este registro ya está en la base de datos (EAN {$ean}).";
+                    } elseif (str_contains($mensajeError, 'foreign key')) {
+                        $errores[] = "Línea {$linea}: El valor ingresado para el EAN {$ean} no coincide con las referencias esperadas (clave foránea).";
+                    } else {
+                        // Mensaje completo para debugging, pero manténlo entendible
+                        $errores[] = "Línea {$linea}: Error al guardar en base de datos para el EAN {$ean} ({$e->getMessage()}).";
+                    }
+                }
+            } // fin while
+
+            fclose($handle);
+
+            echo json_encode([
+                'mensaje'    => 'Validación finalizada',
+                'insertados' => $insertados,
+                'errores'    => $errores
+            ], JSON_UNESCAPED_UNICODE);
+
+        } catch (\Throwable $e) {
+            // Respuesta amigable en caso de fallo crítico
+            echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
-
-        fclose($handle);
-
-        echo json_encode([
-            'mensaje' => 'Proceso finalizado',
-            'insertados' => $insertados,
-            'errores' => $errores
-        ], JSON_UNESCAPED_UNICODE);
-
-    } catch (\Throwable $e) {
-        echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
     }
-}
 
-/**
- * Convierte cualquier formato de fecha a DateTime
- */
-private function parseFechaFlexible($fechaTexto)
+    /**
+     * Convierte cualquier formato de fecha a DateTime (o false si no es válido)
+     */
+    private function parseFechaFlexible($fechaTexto)
 {
-    $fechaTexto = trim($fechaTexto);
+    $fechaTexto = trim((string) $fechaTexto);
     if ($fechaTexto === '') {
         return false;
     }
 
-    // Reemplazar separadores comunes por "/"
-    $fechaTexto = str_replace(['.', '-', '_', ' '], '/', $fechaTexto);
+    // Rechazar si es muy corta
+    if (strlen($fechaTexto) < 8) {
+        return false;
+    }
 
-    // Formatos comunes
+    // Reemplazar varios separadores por "/"
+    $fechaTexto = str_replace(['.', '-', '_', '  ', ' '], '/', $fechaTexto);
+    $fechaTexto = preg_replace('#/{2,}#', '/', $fechaTexto);
+
     $formatos = [
         'd/m/Y', 'j/n/Y',
         'd/m/y', 'j/n/y',
@@ -278,17 +346,24 @@ private function parseFechaFlexible($fechaTexto)
     foreach ($formatos as $formato) {
         $date = \DateTime::createFromFormat($formato, $fechaTexto);
         if ($date && $date->format($formato) === $fechaTexto) {
+            $year = (int) $date->format('Y');
+            if ($year < 1900 || $year > (int)date('Y') + 5) {
+                return false;
+            }
             return $date;
         }
     }
 
-    // Último intento: que PHP lo interprete
     try {
-        return new \DateTime($fechaTexto);
+        $date = new \DateTime($fechaTexto);
+        $year = (int) $date->format('Y');
+        if ($year < 1900 || $year > (int)date('Y') + 5) {
+            return false;
+        }
+        return $date;
     } catch (\Exception $e) {
         return false;
     }
 }
-
 
 }
