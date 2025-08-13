@@ -42,7 +42,6 @@ class DateController
                 \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION
             ]);
 
-            // Verificar si ya existe
             $checkStmt = $pdo->prepare("
                 SELECT *
                 FROM lum_prueba.historial_validador
@@ -152,7 +151,7 @@ class DateController
         ]);
     }
 
-public function validarMasivo()
+    public function validarMasivo()
     {
         header('Content-Type: application/json; charset=utf-8');
         ini_set('display_errors', '0');
@@ -179,20 +178,20 @@ public function validarMasivo()
             $historialModel = new HistoryValidador();
             $sheetModel = new SheetsModel();
 
-            $insertados = 0;
             $errores = [];
             $linea = 0;
+            $registrosParaInsertar = [];
 
             while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
                 $linea++;
 
-                // Saltar si fila vacía
+                // Saltar fila vacía
                 if (empty(array_filter($fila))) {
                     $errores[] = "Línea {$linea}: Fila vacía.";
                     continue;
                 }
 
-                // Saltar cabecera si aplica
+                // Saltar cabecera
                 if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
                     continue;
                 }
@@ -221,149 +220,149 @@ public function validarMasivo()
                     continue;
                 }
 
-                // --- Validar duplicados (en tu tabla historial) ---
-                if ($historialModel->existeEanOFecha($ean, $fechaVencimiento)) {
-                    $errores[] = "Línea {$linea}: El EAN {$ean} con fecha {$fechaVencimiento} ya existe en la base de datos.";
-                    continue;
-                }
-
                 // --- Obtener datos externos (Sheets) ---
                 $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
-
-                // Si no hay datos o hay error, consideramos que el EAN no existe
                 if (!is_array($datos) || isset($datos['error']) || !array_key_exists('diasVidaUtil', $datos) || $datos['diasVidaUtil'] === null || $datos['diasVidaUtil'] === '') {
                     $errores[] = "Línea {$linea}: El EAN {$ean} no existe.";
                     continue;
                 }
 
-                // --- Calcular fecha de bloqueo y estado ---
                 $diasVidaUtil = $datos['diasVidaUtil'];
-                $categoria = $datos['categoria'] ?? '';
-                $descripcion = $datos['descripcion'] ?? '';
-                $estado = 'Desconocido';
-                $fechaBloqueo = '';
-
-                // Verificar que días de vida útil sea numérico
                 if (!is_numeric($diasVidaUtil)) {
                     $errores[] = "Línea {$linea}: El valor de 'días de vida útil' para el EAN {$ean} no es numérico ('{$diasVidaUtil}').";
                     continue;
                 }
 
-                // Hacer el cálculo de bloqueo
+                // --- Calcular fecha de bloqueo ---
                 try {
                     $diasInt = (int) $diasVidaUtil;
                     $fechaBloqueoObj = clone $fechaObj;
                     $fechaBloqueoObj->sub(new \DateInterval("P{$diasInt}D"));
                     $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
-
-                    $hoy = new \DateTime();
-                    $hoy->setTime(0, 0);
-                    $fechaBloqueoObj->setTime(0, 0);
-
-                    if ($fechaBloqueoObj == $hoy) {
-                        $estado = 'BLOQUEAR HOY';
-                    } elseif ($fechaBloqueoObj > $hoy) {
-                        $estado = 'NO BLOQUEAR';
-                    } else {
-                        $estado = 'VENCIDO';
-                    }
                 } catch (\Exception $e) {
                     $errores[] = "Línea {$linea}: Error calculando fecha de bloqueo para el EAN {$ean} ({$e->getMessage()}).";
                     continue;
                 }
 
+                // --- Validar duplicado ---
+                if ($historialModel->existeEanOFecha($ean, $fechaBloqueo)) {
+                    $errores[] = "Línea {$linea}: El EAN {$ean} con fecha de bloqueo {$fechaBloqueo} ya existe en la base de datos.";
+                    continue;
+                }
+
+                // --- Calcular estado ---
+                $hoy = new \DateTime();
+                $hoy->setTime(0, 0);
+                $fechaBloqueoObj->setTime(0, 0);
+
+                if ($fechaBloqueoObj == $hoy) {
+                    $estado = 'BLOQUEAR HOY';
+                } elseif ($fechaBloqueoObj > $hoy) {
+                    $estado = 'NO BLOQUEAR';
+                } else {
+                    $estado = 'VENCIDO';
+                }
+
+                $categoria = $datos['categoria'] ?? '';
+                $descripcion = $datos['descripcion'] ?? '';
                 $conceptoBloqueo = $estado === 'VENCIDO'
                     ? 'VENCIDO'
                     : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
 
-                // --- Insertar registro con captura de errores específicos ---
-                try {
-                    $historialModel->insertarRegistro(
-                        $descripcion,
-                        $diasInt,
-                        $fechaBloqueo,
-                        $categoria,
-                        $conceptoBloqueo,
-                        $estado,
-                        $ean
-                    );
-                    $insertados++;
-                } catch (\PDOException $e) {
-                    $mensajeError = strtolower($e->getMessage());
-                    if (str_contains($mensajeError, 'null value') || str_contains($mensajeError, 'not null')) {
-                        $errores[] = "Línea {$linea}: No se pudo guardar el registro porque falta un dato obligatorio para el EAN {$ean}.";
-                    } elseif (str_contains($mensajeError, 'duplicate') || str_contains($mensajeError, 'unique')) {
-                        $errores[] = "Línea {$linea}: Este registro ya está en la base de datos (EAN {$ean}).";
-                    } elseif (str_contains($mensajeError, 'foreign key')) {
-                        $errores[] = "Línea {$linea}: El valor ingresado para el EAN {$ean} no coincide con las referencias esperadas (clave foránea).";
-                    } else {
-                        // Mensaje completo para debugging, pero manténlo entendible
-                        $errores[] = "Línea {$linea}: Error al guardar en base de datos para el EAN {$ean} ({$e->getMessage()}).";
-                    }
-                }
+                // Guardar en lista para insertar después
+                $registrosParaInsertar[] = [
+                    $descripcion,
+                    $diasInt,
+                    $fechaBloqueo,
+                    $categoria,
+                    $conceptoBloqueo,
+                    $estado,
+                    $ean
+                ];
             } // fin while
 
             fclose($handle);
 
+            // --- Decidir si insertar ---
+            if (!empty($errores)) {
+                echo json_encode([
+                    'mensaje' => 'Validación finalizada con errores. No se insertó ningún registro.',
+                    'insertados' => 0,
+                    'errores' => $errores
+                ], JSON_UNESCAPED_UNICODE);
+                return;
+            }
+
+            // Insertar todos si no hay errores
+            $insertados = 0;
+            foreach ($registrosParaInsertar as $registro) {
+                $historialModel->insertarRegistro(...$registro);
+                $insertados++;
+            }
+
             echo json_encode([
-                'mensaje'    => 'Validación finalizada',
+                'mensaje' => 'Validación finalizada sin errores. Registros insertados correctamente.',
                 'insertados' => $insertados,
-                'errores'    => $errores
+                'errores' => []
             ], JSON_UNESCAPED_UNICODE);
 
         } catch (\Throwable $e) {
-            // Respuesta amigable en caso de fallo crítico
             echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
         }
     }
+
 
     /**
      * Convierte cualquier formato de fecha a DateTime (o false si no es válido)
      */
     private function parseFechaFlexible($fechaTexto)
-{
-    $fechaTexto = trim((string) $fechaTexto);
-    if ($fechaTexto === '') {
-        return false;
-    }
+    {
+        $fechaTexto = trim((string) $fechaTexto);
+        if ($fechaTexto === '') {
+            return false;
+        }
 
-    // Rechazar si es muy corta
-    if (strlen($fechaTexto) < 8) {
-        return false;
-    }
+        // Rechazar si es muy corta
+        if (strlen($fechaTexto) < 8) {
+            return false;
+        }
 
-    // Reemplazar varios separadores por "/"
-    $fechaTexto = str_replace(['.', '-', '_', '  ', ' '], '/', $fechaTexto);
-    $fechaTexto = preg_replace('#/{2,}#', '/', $fechaTexto);
+        // Reemplazar varios separadores por "/"
+        $fechaTexto = str_replace(['.', '-', '_', '  ', ' '], '/', $fechaTexto);
+        $fechaTexto = preg_replace('#/{2,}#', '/', $fechaTexto);
 
-    $formatos = [
-        'd/m/Y', 'j/n/Y',
-        'd/m/y', 'j/n/y',
-        'Y/m/d', 'y/m/d',
-        'm/d/Y', 'm/d/y'
-    ];
+        $formatos = [
+            'd/m/Y',
+            'j/n/Y',
+            'd/m/y',
+            'j/n/y',
+            'Y/m/d',
+            'y/m/d',
+            'm/d/Y',
+            'm/d/y'
+        ];
 
-    foreach ($formatos as $formato) {
-        $date = \DateTime::createFromFormat($formato, $fechaTexto);
-        if ($date && $date->format($formato) === $fechaTexto) {
+        foreach ($formatos as $formato) {
+            $date = \DateTime::createFromFormat($formato, $fechaTexto);
+            if ($date && $date->format($formato) === $fechaTexto) {
+                $year = (int) $date->format('Y');
+                if ($year < 1900 || $year > (int) date('Y') + 5) {
+                    return false;
+                }
+                return $date;
+            }
+        }
+
+        try {
+            $date = new \DateTime($fechaTexto);
             $year = (int) $date->format('Y');
-            if ($year < 1900 || $year > (int)date('Y') + 5) {
+            if ($year < 1900 || $year > (int) date('Y') + 5) {
                 return false;
             }
             return $date;
-        }
-    }
-
-    try {
-        $date = new \DateTime($fechaTexto);
-        $year = (int) $date->format('Y');
-        if ($year < 1900 || $year > (int)date('Y') + 5) {
+        } catch (\Exception $e) {
             return false;
         }
-        return $date;
-    } catch (\Exception $e) {
-        return false;
     }
-}
 
 }
