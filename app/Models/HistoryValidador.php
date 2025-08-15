@@ -33,10 +33,6 @@ public function existeEanOFecha($ean, $fecha)
     ]);
     return (bool) $stmt->fetchColumn();
 }
-
-
-
-
     public function insertarRegistro($descripcion, $diasVidaUtil, $fechaBloqueo, $categoria, $conceptoBloqueo, $estado, $ean)
     {
         $stmt = $this->pdo->prepare("

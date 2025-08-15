@@ -16,7 +16,7 @@ $rol = $_SESSION['user']['rol_id_rol'] ?? 0;
         <!-- Logo -->
         <div class="flex items-center gap-3 mb-6">
             <img src="/images/cropped-favicon-lum-192x192.png" alt="Logo" class="w-10 h-10 rounded-md">
-            <a href="/catalogo/" class="text-xl font-bold hover:text-warning transition">LUM Logistic</a>
+            <a href="/catalogo" class="text-xl font-bold hover:text-warning transition">LUM Logistic</a>
         </div>
 
         <!-- Menú principal -->

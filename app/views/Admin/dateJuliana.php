@@ -269,55 +269,65 @@
       archivoInput.addEventListener('click', handler);
     }, 50);
   });
+const formValidador = document.getElementById("formValidador");
+const loader = document.getElementById("loader");
+const contenido = document.getElementById("resultadoContenido");
+const modalResultado = document.getElementById("resultadoModal");
 
-  const formValidador = document.getElementById("formValidador");
-  const loader = document.getElementById("loader");
-  const contenido = document.getElementById("resultadoContenido");
+formValidador.addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-  formValidador.addEventListener("submit", async function (e) {
-    e.preventDefault();
+  // Mostrar loader desde el inicio
+  loader.classList.remove("hidden");
+  contenido.classList.add("hidden");
 
+  // Asegurar que el modal esté abierto mientras carga
+  modalResultado.checked = true;
 
-    document.getElementById("resultadoModal").checked = true;
-    loader.classList.remove("hidden");
-    contenido.classList.add("hidden");
+  const formData = new FormData(formValidador);
 
-    const formData = new FormData(formValidador);
+  try {
+    const resp = await fetch("/validar", {
+      method: "POST",
+      body: formData
+    });
 
-    try {
-      const resp = await fetch("/validar", {
-        method: "POST",
-        body: formData
+    const datos = await resp.json();
+
+    if (datos.error) {
+      loader.classList.add("hidden");
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: datos.error,
       });
-
-      if (!resp.ok) throw new Error("Error en la validación");
-
-      const datos = await resp.json();
-
-      // Rellenar datos
-      document.getElementById("resEAN").textContent = datos.ean ?? "—";
-      document.getElementById("resDescripcion").textContent = datos.descripcion ?? "—";
-      document.getElementById("resCategoria").textContent = datos.categoria ?? "—";
-      document.getElementById("resVidaUtil").textContent = datos.dias_vida_util ?? "—";
-      document.getElementById("resBloqueo").textContent = datos.fecha_bloqueo ?? "—";
-      document.getElementById("resConcepto").textContent = datos.concepto_bloqueo ?? "—";
-      document.getElementById("resObservacion").textContent = datos.observacion ?? "—";
-
-      // Mostrar contenido y ocultar loader
-      loader.classList.add("hidden");
-      contenido.classList.remove("hidden");
-
-    } catch (err) {
-      loader.classList.add("hidden");
-      contenido.classList.remove("hidden");
-
-      contenido.querySelectorAll("p").forEach(p => p.textContent = "—");
-      const errorMsg = document.createElement("p");
-      errorMsg.className = "text-red-500 font-medium";
-      errorMsg.textContent = `Hubo un problema al validar: ${err.message}`;
-      contenido.prepend(errorMsg);
+      modalResultado.checked = false; // Cerrar modal si hay error
+      return;
     }
-  });
+
+    // Llenar datos
+    document.getElementById("resEAN").textContent = datos.ean ?? "—";
+    document.getElementById("resDescripcion").textContent = datos.descripcion ?? "—";
+    document.getElementById("resCategoria").textContent = datos.categoria ?? "—";
+    document.getElementById("resVidaUtil").textContent = datos.dias_vida_util ?? "—";
+    document.getElementById("resBloqueo").textContent = datos.fecha_bloqueo ?? "—";
+    document.getElementById("resConcepto").textContent = datos.concepto_bloqueo ?? "—";
+    document.getElementById("resObservacion").textContent = datos.observacion ?? "—";
+
+    loader.classList.add("hidden");
+    contenido.classList.remove("hidden");
+
+  } catch (err) {
+    loader.classList.add("hidden");
+    modalResultado.checked = false;
+    Swal.fire({
+      icon: "error",
+      title: "Error de conexión",
+      text: err.message,
+    });
+  }
+});
+
 
   function convertirJuliana() {
     const input = document.getElementById('julianaInput').value;
