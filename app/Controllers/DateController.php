@@ -9,8 +9,13 @@ class DateController
     public function showFormDate()
     {
         $title = 'Validador';
-        viewCatalog('Admin/dateJuliana', compact('title'));
+        viewCatalog('Admin/individual_charge', compact('title'));
     }
+    public function MasiveCharge(){
+        $title = 'cargue masivo';
+        viewCatalog('Admin/MasiveCharge', compact('title'));
+    }
+    
 public function validar()
 {
     header('Content-Type: application/json');

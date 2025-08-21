@@ -13,32 +13,35 @@ class AuthController
         view('Auth/loginView', compact('title', 'layout'));
     }
 
-    public function processLogin()
-    {
-        // ¡IMPORTANTE!
-        session_start(); // <-- Sin esto, $_SESSION no funciona
+public function processLogin()
+{
+    session_start(); // imprescindible
 
-        $user = $_POST['user'] ?? '';
-        $password = $_POST['password'] ?? '';
+    $user = $_POST['user'] ?? '';
+    $password = $_POST['password'] ?? '';
 
-        $usuarioModel = new UserModel();
-        $userData = $usuarioModel->verifyUser($user, $password);
+    $usuarioModel = new UserModel();
+    $userData = $usuarioModel->verifyUser($user, $password);
 
-        if ($userData) {
-            $_SESSION['user'] = $userData;
-            // Solo para depurar
-            // echo '<pre>'; print_r($_SESSION); echo '</pre>';
-            header('Location: /catalogo');
-        } else {
-            header('Location: /login?error=1');
-        }
-        exit;
+    if ($userData) {
+        // Guardamos siempre los campos uniformes
+        $_SESSION['user'] = $userData;
+
+        // Opcional: depurar
+        // echo '<pre>'; print_r($_SESSION); echo '</pre>';
+
+        header('Location: /catalogo');
+    } else {
+        header('Location: /login?error=1');
     }
+    exit;
+}
 
-    public function logout()
-    {
-        session_start();
-        session_destroy();
-        header('Location: /');
-    }
+public function logout()
+{
+    session_start();
+    session_destroy();
+    header('Location: /');
+    exit;
+}
 }

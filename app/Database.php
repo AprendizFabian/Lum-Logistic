@@ -18,7 +18,7 @@ class Database
             $password = $_ENV["DB_PASS"];
             $port = $_ENV["DB_PORT"];
 
-            $dsn = "pgsql:host=$host;port=$port;dbname=$dbname";
+            $dsn = "mysql:host=$host;port=$port;dbname=$dbname";
             $options = [
                 PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
                 PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,

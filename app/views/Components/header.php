@@ -4,9 +4,10 @@ if (!isset($_SESSION['user'])) {
     exit;
 }
 
-$nombre_usuario = htmlspecialchars($_SESSION['user']['usuario'] ?? 'Usuario');
-$rol = $_SESSION['user']['rol_id_rol'] ?? 0;
+$nombre_usuario = htmlspecialchars($_SESSION['user']['username'] ?? 'Usuario');
+$rol = $_SESSION['user']['id_role'] ?? 0;
 ?>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="flex min-h-screen">
     <!-- Sidebar -->
@@ -32,7 +33,7 @@ $rol = $_SESSION['user']['rol_id_rol'] ?? 0;
             <?php endif; ?>
 
             <li><a href="/fecha" class="hover:text-warning"><i class="fa-solid fa-calendar"></i> Fechas</a></li>
-            <li><a href="/fecha-juliana" class="hover:text-warning"><i class="fa-solid fa-check"></i> Validador</a></li>
+            <li><a href="/Masivo" class="hover:text-warning"><i class="fa-solid fa-check"></i> Validador</a></li>
         </nav>
 
         <!-- Menú usuario -->
@@ -74,6 +75,31 @@ $rol = $_SESSION['user']['rol_id_rol'] ?? 0;
 
 <!-- JS toggle -->
 <script>
+  const tiempoExpira = 60 * 60 * 1000; 
+  let timeout;
+
+  function resetTimer() {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Sesión expirada',
+        text: 'Tu sesión ha expirado por inactividad, volveras a la pagina de inicio.',
+        confirmButtonText: 'Aceptar',
+        allowOutsideClick: false,
+        allowEscapeKey: false
+      }).then(() => {
+        window.location.href = '/logout';
+      });
+    }, tiempoExpira);
+  }
+
+  // 🔹 Reinicia el contador con actividad del usuario
+  window.onload = resetTimer;
+  document.onmousemove = resetTimer;
+  document.onkeypress = resetTimer;
+  document.onscroll = resetTimer;
+  document.onclick = resetTimer;
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebarToggle');
     const sidebarIcon = document.getElementById('sidebarIcon');

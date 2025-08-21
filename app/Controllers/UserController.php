@@ -11,37 +11,58 @@ class UserController
     {
         session_start();
 
-        if (!isset($_SESSION['user']) || $_SESSION['user']['rol_id_rol'] != 1) {
+        if (!isset($_SESSION['user']) || $_SESSION['user']['id_role'] != 1) {
             header('Location: /login');
             exit;
         }
 
         $modelo = new UserModel();
-        $usuarios = $modelo->obtenerUsuarios();
-
+        $usuarios = $modelo->obtenerUsuarios(); // SELECT * FROM users
+        
+        $tiendas = $modelo->obtenerTiendas();
+        // --- Paginación ---
         $page = $_GET['page'] ?? 1;
         $perPage = 6;
         $total = count($usuarios);
         $totalPages = ceil($total / $perPage);
         $offset = ($page - 1) * $perPage;
 
+        $page = $_GET['page'] ?? 1;
+        $perPage = 6;
+        $total = count($tiendas);
+        $totalPages = ceil($total / $perPage);
+        $offset = ($page - 1) * $perPage;
+
+        $tiendasPaginadas = array_slice($tiendas, $offset, $perPage);
+
         $usuariosPaginados = array_slice($usuarios, $offset, $perPage);
 
+        // --- Edición / Eliminación ---
         $usuarioAEditar = null;
         $usuarioAEliminar = null;
 
         if (isset($_GET['editar'])) {
-            $usuarioAEditar = $modelo->obtenerUsuarioPorId($_GET['editar']);
+            $usuarioAEditar = $modelo->obtenerUsuarioPorId((int) $_GET['editar']);
         }
 
         if (isset($_GET['eliminar'])) {
-            $usuarioAEliminar = $modelo->obtenerUsuarioPorId($_GET['eliminar']);
+            $usuarioAEliminar = $modelo->obtenerUsuarioPorId((int) $_GET['eliminar']);
         }
 
         $title = 'Usuarios';
-        viewCatalog('Admin/userView', compact('title', 'usuariosPaginados', 'page', 'totalPages', 'usuarioAEditar', 'usuarioAEliminar'));
-
+        viewCatalog('Admin/userView', compact(
+            'title',
+            'usuariosPaginados',
+            'page',
+            'totalPages',
+            'usuarioAEditar',
+            'usuarioAEliminar',
+            'tiendasPaginadas'
+        ));
     }
+
+ 
+
 
     public function verDetalle()
     {
@@ -52,12 +73,12 @@ class UserController
             exit;
         }
 
-        $id = $_SESSION['user']['idusuarios'];
+        $id = $_SESSION['username']['id_user']; // PK real
 
         $modelo = new UserModel();
         $usuario = $modelo->obtenerUsuarioPorId($id);
 
-        if (empty($usuario)) {
+        if (!$usuario) {
             echo "Usuario no encontrado.";
             exit;
         }
@@ -65,15 +86,17 @@ class UserController
         $title = 'Detalle de Usuario';
         viewCatalog('Admin/ShowUser', compact('title', 'usuario'));
     }
+
     public function agregarUsuario()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $usuario = $_POST['usuario'];
-            $contraseña = password_hash($_POST['contraseña'], PASSWORD_DEFAULT); // Seguridad
-            $rol = $_POST['rol'];
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // hash seguro
+            $rol = $_POST['id_role'];
 
             $modelo = new UserModel();
-            $modelo->agregarUsuario($usuario, $contraseña, $rol);
+            $modelo->agregarUsuario($username, $email, $password, $rol);
 
             header('Location: /usuarios');
             exit;
@@ -83,12 +106,13 @@ class UserController
     public function editarUsuario()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
-            $usuario = $_POST['usuario'];
-            $rol = $_POST['rol'];
+            $id = $_POST['id_user'];
+            $username = $_POST['username'];
+            $email = $_POST['email'];
+            $rol = $_POST['id_role'];
 
             $modelo = new UserModel();
-            $modelo->editarUsuario($id, $usuario, $rol);
+            $modelo->editarUsuario($id, $username, $email, $rol);
 
             header('Location: /usuarios');
             exit;
@@ -98,7 +122,7 @@ class UserController
     public function eliminarUsuario()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id'];
+            $id = $_POST['id_user'];
 
             $modelo = new UserModel();
             $modelo->eliminarUsuario($id);
@@ -108,4 +132,59 @@ class UserController
         }
     }
 
+
+
+    public function agregarTienda()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $name = $_POST['store_name'];
+            $email = $_POST['store_email'];
+            $address = $_POST['store_address'];
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // hash seguro
+            $id_role = $_POST['id_role'];
+
+
+
+            $modelo = new UserModel();
+            $modelo->agregarTienda($name, $address, $email, $password, $id_role);
+
+            header('Location: /usuarios');
+            exit;
+        }
+    }
+
+    public function editarTienda()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id_store'];
+            $name = $_POST['name'];
+            $address = $_POST['address'];
+            $email = $_POST['email'];
+            $id_role = $_POST['id_role'];
+
+            $modelo = new UserModel();
+            $modelo->editarTienda($id, $name, $address, $email, $id_role);
+
+            header('Location: /tiendas');
+            exit;
+        }
+    }
+
+    public function eliminarTienda()
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $_POST['id_store'];
+
+            $modelo = new UserModel();
+            $modelo->eliminarTienda($id);
+
+            header('Location: /tiendas');
+            exit;
+        }
+    }
 }
+
+
+
+
+

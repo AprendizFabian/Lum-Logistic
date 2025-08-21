@@ -14,7 +14,7 @@ class CatalogController
         $search = $_GET['search'] ?? '';
 
         $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getData($page, 9, $search);
+        $sheetData = $sheetModel->getData($page, 8, $search);
 
         $title = 'Catálogo';
         viewCatalog('Admin/catalog', compact('title', 'sheetData'));

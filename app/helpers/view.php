@@ -18,7 +18,7 @@ function view(string $view, array $data = []): void
 function viewCatalog(string $view, array $data = []): void
 {
     if (session_status() === PHP_SESSION_NONE) {
-        session_start(); // NECESARIO
+        session_start(); 
     }
 
     extract($data); // Extrae $title, etc.

@@ -1,23 +1,86 @@
-<section class="px-6 py-10 max-w-screen-xl mx-auto text-[#404141]">
+<section class="px-6 py-10 max-w-screen-xl mx-auto text-[#404141] space-y-6">
 
-    <!-- Barra de búsqueda -->
-    <div class="mb-8 flex flex-col md:flex-row justify-between items-center gap-4">
-        <h1 class="text-3xl font-bold flex items-center gap-2">
-            <i class="fa-solid fa-barcode text-[#FEDF00]"></i> Fechas de Vencimiento
+    <!-- Encabezado con filtros + menú -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 relative">
+        <!-- Título -->
+        <h1 class="text-3xl font-bold flex items-center gap-3">
+            <i class="fa-solid fa-barcode text-[#FEDF00] text-2xl"></i>
+            Fechas de vencimiento
         </h1>
-        <form method="GET"
-            class="flex items-center gap-3 w-full md:w-1/2 bg-white p-3 rounded-2xl shadow-lg border border-[#e5e5e5]">
-            <input type="text" name="buscar" value="<?= htmlspecialchars($_GET['buscar'] ?? '') ?>"
+
+  <div class="flex justify-center w-full mb-4 ml-60">
+    <div class="items-start gap-2">
+        <select name="tienda"
+            class="px-4 py-2 text-sm rounded-xl border border-gray-300 bg-white shadow-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEDF00]">
+            <option value="">Tienda</option>
+            <option value="1">Turbo</option>
+            <option value="2">Turbo</option>
+        </select>
+
+        <input type="date" 
+            name="fecha" 
+            class="px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEDF00]">
+    </div>
+</div>
+        <!-- Menú tres puntos (arriba derecha) -->
+        <div class="absolute top-2 right-5">
+            <div class="dropdown dropdown-end">
+                <label tabindex="0" class="btn btn-sm bg-[#404141] text-white hover:bg-[#2f2f2f] rounded-lg">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </label>
+                <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-white rounded-xl w-56 border border-gray-200 space-y-1">
+                    <li>
+                        <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=pdf&gid=416131206" 
+                           target="_blank" class="flex items-center gap-2">
+                            <i class="fa-solid fa-file-pdf text-red-500"></i> Descargar Bloqueos HOY PDF
+                        </a>
+                    </li>
+                    <li>
+                        <a href="https://docs.google.com/spreadsheets/d/1zml_Q9YT5RVzBJoxs3rhqXz757dXaTaa7xcEStR0Rz0/export?format=xlsx&gid=416131206" 
+                           class="flex items-center gap-2">
+                            <i class="fa-solid fa-file-excel text-green-500"></i> Descargar Bloqueos HOY Excel
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <hr class="border-gray-300">
+
+    <!-- Barra de acciones -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+        
+        <!-- Buscador a la izquierda -->
+        <form method="GET" class="flex items-center gap-2">
+            <input type="text" 
+                name="buscar" 
+                value="<?= htmlspecialchars($_GET['buscar'] ?? '') ?>"
                 placeholder="Buscar por EAN o Fecha..."
-                class="flex-1 px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#FEDF00] text-[#404141] bg-[#f9f9f9] border border-[#ccc] transition">
+                class="w-64 px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEDF00]">
+            
             <button type="submit"
-                class="px-5 py-2 bg-[#404141] text-white font-medium rounded-xl hover:bg-[#2f2f2f] transition duration-200 shadow flex items-center gap-2">
+                class="px-4 py-2 bg-[#404141] text-white rounded-lg text-sm hover:bg-[#2f2f2f] flex items-center gap-2">
                 <i class="fa-solid fa-magnifying-glass"></i> Buscar
             </button>
         </form>
+
+        <!-- Botones a la derecha -->
+        <div class="flex items-center gap-3 flex-wrap">
+            <a href="/fecha-juliana" 
+               class="px-4 py-2 bg-[#404141] text-white rounded-lg text-sm hover:bg-[#2f2f2f] flex items-center gap-2">
+                <i class="fa-solid fa-upload"></i> Cargue Individual
+            </a>
+
+            <a href="/Masivo" 
+               class="px-4 py-2 bg-[#FEDF00] text-[#404141] rounded-lg text-sm hover:bg-yellow-500 flex items-center gap-2">
+                <i class="fa-solid fa-file-import"></i> Carga Masiva
+            </a>
+        </div>
     </div>
 
-    <!-- Grid de datos -->
+
+  <!-- Grid de datos -->
     <?php if (empty($fechasData['data'])): ?>
         <p class="text-center text-gray-500 py-10">No se encontraron resultados.</p>
     <?php else: ?>
@@ -70,7 +133,6 @@
     <?php endif; ?>
 
 </section>
-
 <!-- Animación -->
 <style>
     @keyframes fadeIn {
