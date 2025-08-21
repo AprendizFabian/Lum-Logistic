@@ -135,7 +135,7 @@
   <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
     <h3 class="font-bold mb-4 text-2xl">Agregar Usuario o Tienda</h3>
     
-    <form method="POST" id="agregarForm" action="/agregarUsuario">
+    <form method="POST" id="agregarForm" action="/agregar">
       <!-- Campos para usuarios -->
       <div id="userFields">
         <div class="mb-4">
@@ -223,7 +223,7 @@
       // Formulario de usuario
       userFields.style.display = "block";
       storeFields.style.display = "none";
-      form.action = "/agregarUsuario";
+      form.action = "/agregar";
     }
   });
 </script>

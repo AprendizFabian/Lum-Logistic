@@ -106,149 +106,163 @@ public function validar()
         echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
     }
 }
-    public function validarMasivo()
-    {
-        header('Content-Type: application/json; charset=utf-8');
-        ini_set('display_errors', '0');
-        error_reporting(E_ALL);
+  public function validarMasivo()
+{
+    header('Content-Type: application/json; charset=utf-8');
+    ini_set('display_errors', '0');
+    error_reporting(E_ALL);
 
-        try {
-            // --- Verificar archivo ---
-            if (!isset($_FILES['archivo'])) {
-                throw new \Exception('No se recibió ningún archivo para validar.');
-            }
-            if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
-                throw new \Exception('Error al subir el archivo. Código: ' . $_FILES['archivo']['error']);
-            }
-
-            $archivoTmp = $_FILES['archivo']['tmp_name'];
-            if (!is_readable($archivoTmp)) {
-                throw new \Exception('El archivo no se pudo leer o está dañado.');
-            }
-
-            if (!($handle = fopen($archivoTmp, 'r'))) {
-                throw new \Exception('No se pudo abrir el archivo para lectura.');
-            }
-
-            $historialModel = new HistoryValidador();
-            $sheetModel = new SheetsModel();
-
-            $errores = [];
-            $linea = 0;
-            $registrosParaInsertar = [];
-
-            while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
-                $linea++;
-                // Saltar fila vacía
-                if (empty(array_filter($fila))) {
-                    $errores[] = "Línea {$linea}: Fila vacía.";
-                    continue;
-                }
-                // Saltar cabecera
-                if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
-                    continue;
-                }
-                $ean = trim($fila[0] ?? '');
-                $fechaVencimiento = trim($fila[1] ?? '');
-                // --- Validar campos obligatorios ---
-                if ($ean === '' && $fechaVencimiento === '') {
-                    $errores[] = "Línea {$linea}: No se encontró ni el EAN ni la fecha de vencimiento.";
-                    continue;
-                }
-                if ($ean === '') {
-                    $errores[] = "Línea {$linea}: Falta el EAN.";
-                    continue;
-                }
-                if ($fechaVencimiento === '') {
-                    $errores[] = "Línea {$linea}: Falta la fecha de vencimiento para el EAN {$ean}.";
-                    continue;
-                }
-                // --- Validar formato de fecha ---
-                $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
-                if (!($fechaObj instanceof \DateTime)) {
-                    $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido para el EAN {$ean}.";
-                    continue;
-                }
-                // --- Obtener datos externos (Sheets) ---
-                $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
-                if (!is_array($datos) || isset($datos['error']) || !array_key_exists('diasVidaUtil', $datos) || $datos['diasVidaUtil'] === null || $datos['diasVidaUtil'] === '') {
-                    $errores[] = "Línea {$linea}: El EAN {$ean} no existe.";
-                    continue;
-                }
-                $diasVidaUtil = $datos['diasVidaUtil'];
-                if (!is_numeric($diasVidaUtil)) {
-                    $errores[] = "Línea {$linea}: El valor de 'días de vida útil' para el EAN {$ean} no es numérico ('{$diasVidaUtil}').";
-                    continue;
-                }
-                // --- Calcular fecha de bloqueo ---
-                try {
-                    $diasInt = (int) $diasVidaUtil;
-                    $fechaBloqueoObj = clone $fechaObj;
-                    $fechaBloqueoObj->sub(new \DateInterval("P{$diasInt}D"));
-                    $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $errores[] = "Línea {$linea}: Error calculando fecha de bloqueo para el EAN {$ean} ({$e->getMessage()}).";
-                    continue;
-                }
-                // --- Validar duplicado ---
-                if ($historialModel->existeEanOFecha($ean, $fechaBloqueo)) {
-                    $errores[] = "Línea {$linea}: El EAN {$ean} con fecha de bloqueo {$fechaBloqueo} ya existe en la base de datos.";
-                    continue;
-                }
-                // --- Calcular estado ---
-                $hoy = new \DateTime();
-                $hoy->setTime(0, 0);
-                $fechaBloqueoObj->setTime(0, 0);
-
-                if ($fechaBloqueoObj == $hoy) {
-                    $estado = 'BLOQUEAR HOY';
-                } elseif ($fechaBloqueoObj > $hoy) {
-                    $estado = 'NO BLOQUEAR';
-                } else {
-                    $estado = 'VENCIDO';
-                }
-
-                $categoria = $datos['categoria'] ?? '';
-                $descripcion = $datos['descripcion'] ?? '';
-                $conceptoBloqueo = $estado === 'VENCIDO'
-                    ? 'VENCIDO'
-                    : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
-                // Guardar en lista para insertar después
-                $registrosParaInsertar[] = [
-                    $descripcion,
-                    $diasInt,
-                    $fechaBloqueo,
-                    $categoria,
-                    $conceptoBloqueo,
-                    $estado,
-                    $ean
-                ];
-            } // fin while
-            fclose($handle);
-            // --- Decidir si insertar ---
-            if (!empty($errores)) {
-                echo json_encode([
-                    'mensaje' => 'Validación finalizada con errores. No se insertó ningún registro.',
-                    'insertados' => 0,
-                    'errores' => $errores
-                ], JSON_UNESCAPED_UNICODE);
-                return;
-            }
-            // Insertar todos si no hay errores
-            $insertados = 0;
-            foreach ($registrosParaInsertar as $registro) {
-                $historialModel->insertarRegistro(...$registro);
-                $insertados++;
-            }
-            echo json_encode([
-                'mensaje' => 'Validación finalizada sin errores. Registros insertados correctamente.',
-                'insertados' => $insertados,
-                'errores' => []
-            ], JSON_UNESCAPED_UNICODE);
-        } catch (\Throwable $e) {
-            echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    try {
+        // --- Verificar archivo ---
+        if (!isset($_FILES['archivo'])) {
+            throw new \Exception('No se recibió ningún archivo para validar.');
         }
+        if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+            throw new \Exception('Error al subir el archivo. Código: ' . $_FILES['archivo']['error']);
+        }
+
+        $archivoTmp = $_FILES['archivo']['tmp_name'];
+        if (!is_readable($archivoTmp)) {
+            throw new \Exception('El archivo no se pudo leer o está dañado.');
+        }
+
+        if (!($handle = fopen($archivoTmp, 'r'))) {
+            throw new \Exception('No se pudo abrir el archivo para lectura.');
+        }
+
+        $historialModel = new HistoryValidador();
+        $sheetModel = new SheetsModel();
+
+        $errores = [];
+        $linea = 0;
+        $registrosParaInsertar = [];
+
+        while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
+            $linea++;
+            // Saltar fila vacía
+            if (empty(array_filter($fila))) {
+                $errores[] = "Línea {$linea}: Fila vacía.";
+                continue;
+            }
+            // Saltar cabecera
+            if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
+                continue;
+            }
+
+            $ean = trim($fila[0] ?? '');
+            $fechaVencimiento = trim($fila[1] ?? '');
+
+            // --- Validar campos obligatorios ---
+            if ($ean === '' && $fechaVencimiento === '') {
+                $errores[] = "Línea {$linea}: No se encontró ni el EAN ni la fecha de vencimiento.";
+                continue;
+            }
+            if ($ean === '') {
+                $errores[] = "Línea {$linea}: Falta el EAN.";
+                continue;
+            }
+            if ($fechaVencimiento === '') {
+                $errores[] = "Línea {$linea}: Falta la fecha de vencimiento para el EAN {$ean}.";
+                continue;
+            }
+
+            // --- Validar formato de fecha ---
+            $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
+            if (!($fechaObj instanceof \DateTime)) {
+                $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido para el EAN {$ean}.";
+                continue;
+            }
+
+            // --- Obtener datos externos (Sheets) ---
+            $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
+            if (!is_array($datos) || isset($datos['error']) || !array_key_exists('diasVidaUtil', $datos) || $datos['diasVidaUtil'] === null || $datos['diasVidaUtil'] === '') {
+                $errores[] = "Línea {$linea}: El EAN {$ean} no existe.";
+                continue;
+            }
+
+            $diasVidaUtil = $datos['diasVidaUtil'];
+            if (!is_numeric($diasVidaUtil)) {
+                $errores[] = "Línea {$linea}: El valor de 'días de vida útil' para el EAN {$ean} no es numérico ('{$diasVidaUtil}').";
+                continue;
+            }
+
+            // --- Calcular fecha de bloqueo ---
+            try {
+                $diasInt = (int) $diasVidaUtil;
+                $fechaBloqueoObj = clone $fechaObj;
+                $fechaBloqueoObj->sub(new \DateInterval("P{$diasInt}D"));
+                $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
+            } catch (\Exception $e) {
+                $errores[] = "Línea {$linea}: Error calculando fecha de bloqueo para el EAN {$ean} ({$e->getMessage()}).";
+                continue;
+            }
+
+            // --- Validar duplicado ---
+            if ($historialModel->existeEanOFecha($ean, $fechaBloqueo)) {
+                $errores[] = "Línea {$linea}: El EAN {$ean} con fecha de bloqueo {$fechaBloqueo} ya existe en la base de datos.";
+                continue;
+            }
+
+            // --- Calcular estado ---
+            $hoy = new \DateTime();
+            $hoy->setTime(0, 0);
+            $fechaBloqueoObj->setTime(0, 0);
+
+            if ($fechaBloqueoObj == $hoy) {
+                $estado = 'BLOQUEAR HOY';
+            } elseif ($fechaBloqueoObj > $hoy) {
+                $estado = 'NO BLOQUEAR';
+            } else {
+                $estado = 'VENCIDO';
+            }
+
+            $categoria = $datos['categoria'] ?? '';
+            $descripcion = $datos['descripcion'] ?? '';
+            $conceptoBloqueo = $estado === 'VENCIDO'
+                ? 'VENCIDO'
+                : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
+
+            // --- Guardar en lista para insertar después (orden correcto de columnas) ---
+            $registrosParaInsertar[] = [
+                $ean,                          // ean
+                $descripcion,                  // description
+                $fechaObj->format('Y-m-d'),    // expiration_date
+                $fechaBloqueo,                 // block_date
+                $categoria,                    // category
+                $conceptoBloqueo,              // block_concept
+                $estado,                       // remarks
+                null                           // id_store (nulo siempre)
+            ];
+        } // fin while
+        fclose($handle);
+
+        // --- Decidir si insertar ---
+        if (!empty($errores)) {
+            echo json_encode([
+                'mensaje' => 'Validación finalizada con errores. No se insertó ningún registro.',
+                'insertados' => 0,
+                'errores' => $errores
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        // Insertar todos si no hay errores
+        $insertados = 0;
+        foreach ($registrosParaInsertar as $registro) {
+            $historialModel->insertarRegistro(...$registro);
+            $insertados++;
+        }
+
+        echo json_encode([
+            'mensaje' => 'Validación finalizada sin errores. Registros insertados correctamente.',
+            'insertados' => $insertados,
+            'errores' => []
+        ], JSON_UNESCAPED_UNICODE);
+
+    } catch (\Throwable $e) {
+        echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
     }
+}
     private function parseFechaFlexible($fechaTexto)
     {
         $fechaTexto = trim((string) $fechaTexto);
