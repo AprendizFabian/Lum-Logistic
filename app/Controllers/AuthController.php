@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Controllers;
-
 use App\Models\UserModel;
 
 class AuthController
@@ -13,35 +12,31 @@ class AuthController
         view('Auth/loginView', compact('title', 'layout'));
     }
 
-public function processLogin()
-{
-    session_start(); // imprescindible
+    public function processLogin()
+    {
+        session_start();
 
-    $user = $_POST['user'] ?? '';
-    $password = $_POST['password'] ?? '';
+        $user = $_POST['user'] ?? '';
+        $password = $_POST['password'] ?? '';
 
-    $usuarioModel = new UserModel();
-    $userData = $usuarioModel->verifyUser($user, $password);
+        $usuarioModel = new UserModel();
+        $userData = $usuarioModel->verifyUser($user, $password);
 
-    if ($userData) {
-        // Guardamos siempre los campos uniformes
-        $_SESSION['user'] = $userData;
-
-        // Opcional: depurar
-        // echo '<pre>'; print_r($_SESSION); echo '</pre>';
-
-        header('Location: /catalogo');
-    } else {
-        header('Location: /login?error=1');
+        if ($userData) {
+            $_SESSION['user'] = $userData;
+            $usuarioModel->updateLastLogin($userData['id']);
+            header('Location: /catalogo');
+        } else {
+            header('Location: /login?error=1');
+        }
+        exit;
     }
-    exit;
-}
 
-public function logout()
-{
-    session_start();
-    session_destroy();
-    header('Location: /');
-    exit;
-}
+    public function logout()
+    {
+        session_start();
+        session_destroy();
+        header('Location: /');
+        exit;
+    }
 }

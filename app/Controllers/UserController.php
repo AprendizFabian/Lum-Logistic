@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\UserModel;
-require_once __DIR__ . '/../helpers/SessionHelper.php';
 
 class UserController
 {
@@ -17,10 +16,9 @@ class UserController
         }
 
         $modelo = new UserModel();
-        $usuarios = $modelo->obtenerUsuarios(); // SELECT * FROM users
-        
+        $usuarios = $modelo->obtenerUsuarios();
+
         $tiendas = $modelo->obtenerTiendas();
-        // --- Paginación ---
         $page = $_GET['page'] ?? 1;
         $perPage = 6;
         $total = count($usuarios);
@@ -37,7 +35,6 @@ class UserController
 
         $usuariosPaginados = array_slice($usuarios, $offset, $perPage);
 
-        // --- Edición / Eliminación ---
         $usuarioAEditar = null;
         $usuarioAEliminar = null;
 
@@ -61,9 +58,6 @@ class UserController
         ));
     }
 
- 
-
-
     public function verDetalle()
     {
         session_start();
@@ -73,7 +67,7 @@ class UserController
             exit;
         }
 
-        $id = $_SESSION['username']['id_user']; // PK real
+        $id = $_SESSION['user']['id'];
 
         $modelo = new UserModel();
         $usuario = $modelo->obtenerUsuarioPorId($id);
@@ -84,7 +78,7 @@ class UserController
         }
 
         $title = 'Detalle de Usuario';
-        viewCatalog('Admin/ShowUser', compact('title', 'usuario'));
+        viewCatalog('Admin/ShowDetails', compact('title', 'usuario'));
     }
 
     public function agregarUsuario()
