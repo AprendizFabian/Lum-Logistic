@@ -1,20 +1,15 @@
 <?php
-
 namespace App\Controllers;
-
 use App\Models\UserModel;
-
 class UserController
 {
     public function showUser()
     {
         session_start();
-
         if (!isset($_SESSION['user']) || $_SESSION['user']['id_role'] != 1) {
             header('Location: /login');
             exit;
         }
-
         $modelo = new UserModel();
         $usuarios = $modelo->obtenerUsuarios();
 
@@ -35,15 +30,18 @@ class UserController
 
         $usuariosPaginados = array_slice($usuarios, $offset, $perPage);
 
-        $usuarioAEditar = null;
-        $usuarioAEliminar = null;
+        $tiendaEditar = null;
+        if (isset($_GET['editar_store'])) {
+            $tiendaEditar = $modelo->obtenerTiendaPorId((int) $_GET['editar_store']);
+        }
 
+        $usuarioAEditar = null;
         if (isset($_GET['editar'])) {
             $usuarioAEditar = $modelo->obtenerUsuarioPorId((int) $_GET['editar']);
         }
-
-        if (isset($_GET['eliminar'])) {
-            $usuarioAEliminar = $modelo->obtenerUsuarioPorId((int) $_GET['eliminar']);
+        $usuarioEstado = null;
+        if (isset($_GET['confirmar_toggle']) && is_numeric($_GET['confirmar_toggle'])) {
+            $usuarioEstado = $modelo->obtenerUsuarioPorId($_GET['confirmar_toggle']);
         }
 
         $title = 'Usuarios';
@@ -53,33 +51,39 @@ class UserController
             'page',
             'totalPages',
             'usuarioAEditar',
-            'usuarioAEliminar',
+            'tiendaEditar',
             'tiendasPaginadas'
         ));
     }
 
     public function verDetalle()
-    {
-        session_start();
+{
+    session_start();
 
-        if (!isset($_SESSION['user'])) {
-            header('Location: /login');
-            exit;
-        }
-
-        $id = $_SESSION['user']['id'];
-
-        $modelo = new UserModel();
-        $usuario = $modelo->obtenerUsuarioPorId($id);
-
-        if (!$usuario) {
-            echo "Usuario no encontrado.";
-            exit;
-        }
-
-        $title = 'Detalle de Usuario';
-        viewCatalog('Admin/ShowDetails', compact('title', 'usuario'));
+    if (!isset($_SESSION['user'])) {
+        header('Location: /login');
+        exit;
     }
+
+    $tipo = $_SESSION['user']['type']; // 'user' o 'store'
+    $id   = $_SESSION['user']['id'];
+
+    $modelo = new UserModel();
+
+    if ($tipo === 'user') {
+        $usuario = $modelo->obtenerUsuarioPorId($id);
+    } else {
+        $usuario = $modelo->obtenerTiendaPorId($id);
+    }
+
+    if (!$usuario) {
+        echo "Usuario/Tienda no encontrado.";
+        exit;
+    }
+
+    $title = $tipo === 'user' ? 'Detalle de Usuario' : 'Detalle de Tienda';
+    viewCatalog('Admin/ShowDetails', compact('title', 'usuario'));
+}
 
     public function agregarUsuario()
     {
@@ -113,21 +117,22 @@ class UserController
         }
     }
 
-    public function eliminarUsuario()
+    public function activarUsuario()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $id = $_POST['id_user'];
-
+            $id = $_POST['id_user'] ?? null;
             $modelo = new UserModel();
-            $modelo->eliminarUsuario($id);
-
-            header('Location: /usuarios');
+            $usuario = $modelo->obtenerUsuarioPorId($id);
+            if (!$usuario) {
+                header('Location: /usuarios?error=notfound');
+                exit;
+            }
+            $nuevoEstado = $usuario['is_active'] == 1 ? 0 : 1;
+            $modelo->cambiarEstadoUsuario($id, $nuevoEstado);
+            header('Location: /usuarios?success=estado');
             exit;
         }
     }
-
-
-
     public function agregarTienda()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -146,39 +151,41 @@ class UserController
             exit;
         }
     }
-
     public function editarTienda()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id_store'];
-            $name = $_POST['name'];
-            $address = $_POST['address'];
-            $email = $_POST['email'];
+            $name = $_POST['store_name'];
+            $address = $_POST['store_address'];
+            $email = $_POST['store_email'];
             $id_role = $_POST['id_role'];
 
             $modelo = new UserModel();
             $modelo->editarTienda($id, $name, $address, $email, $id_role);
 
-            header('Location: /tiendas');
+            header('Location: /usuarios?sucess=updated');
             exit;
         }
     }
-
-    public function eliminarTienda()
+    public function cambiarEstadoTienda()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $_POST['id_store'];
 
             $modelo = new UserModel();
-            $modelo->eliminarTienda($id);
+            $tienda = $modelo->obtenerTiendaPorId($id);
 
-            header('Location: /tiendas');
+            if ($tienda) {
+                $nuevoEstado = $tienda['is_active'] == 1 ? 0 : 1;
+                $modelo->cambiarEstadoTienda($id, $nuevoEstado);
+                // Agregar el parámetro success igual que en activarUsuario
+                header('Location: /usuarios?success=estado');
+            } else {
+                // Si no encuentra la tienda, redirigir con error
+                header('Location: /usuarios?error=notfound');
+            }
+
             exit;
         }
     }
 }
-
-
-
-
-

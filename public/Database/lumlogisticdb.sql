@@ -82,7 +82,7 @@ CREATE TABLE `stores` (
   `id_role` INT(10) UNSIGNED NOT NULL DEFAULT 1,
   `google_id` VARCHAR(50) NULL DEFAULT NULL,
   `profile_picture_url` VARCHAR(255) NULL DEFAULT NULL,
-  `provider` ENUM('google') NULL DEFAULT 'google',
+  `provider` ENUM('google', 'local') NULL DEFAULT 'local',
   `created_at` DATETIME NULL DEFAULT CURRENT_TIMESTAMP(),
   `last_login` DATETIME NULL DEFAULT NULL,
   PRIMARY KEY (`id_store`),

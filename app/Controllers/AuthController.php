@@ -12,27 +12,44 @@ class AuthController
         view('Auth/loginView', compact('title', 'layout'));
     }
 
-    public function processLogin()
-    {
-        session_start();
+public function processLogin() {
+    session_start();
 
-        $user = $_POST['user'] ?? '';
-        $password = $_POST['password'] ?? '';
+    $email = trim($_POST['user'] ?? '');
+    $password = trim($_POST['password'] ?? '');
 
-        $usuarioModel = new UserModel();
-        $userData = $usuarioModel->verifyUser($user, $password);
-
-        if ($userData) {
-            $_SESSION['user'] = $userData;
-            $usuarioModel->updateLastLogin($userData['id']);
-            header('Location: /catalogo');
-        } else {
-            header('Location: /login?error=1');
-        }
+    // Validación básica
+    if (empty($email) || empty($password)) {
+        header('Location: /login?error=credentials');
         exit;
     }
 
-    public function logout()
+    $usuarioModel = new UserModel();
+    $userData = $usuarioModel->verifyUser($email, $password);
+
+    if ($userData) {
+        // Guardar la información del usuario/tienda en sesión
+        $_SESSION['user'] = $userData;
+
+        // Guardar id_store para tiendas (importante para validarMasivo)
+        if ($userData['type'] === 'store') {
+            $_SESSION['id_store'] = $userData['id'];
+        } else {
+            $_SESSION['id_store'] = null;
+            // Opcional: actualizar último login de usuarios
+            $usuarioModel->updateLastLogin($userData['id']);
+        }
+
+        header('Location: /catalogo');
+        exit;
+    } else {
+        header('Location: /login?error=credentials');
+        exit;
+    }
+}
+
+
+ public function logout()
     {
         session_start();
         session_destroy();

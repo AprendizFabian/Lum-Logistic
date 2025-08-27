@@ -27,3 +27,5 @@ $router->post('/editarT', [UserController::class, 'editarTienda']);
 $router->post('/validar', [DateController::class, 'validar']);
 $router->post('/validar-masivo', [DateController::class,'validarMasivo']);
 $router->get('/Masivo', [DateController::class, 'MasiveCharge']);
+$router->post('/Activar', [UserController::class, 'activarUsuario']);
+$router->post('/ActivarStore', [UserController::class, 'cambiarEstadoTienda']);

@@ -1,0 +1,123 @@
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+
+=== LOGIN DEBUG 2025-08-25 19:33:04 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+❌ Password incorrecta para tienda
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+
+=== LOGIN DEBUG 2025-08-25 19:34:19 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+❌ Password incorrecta para tienda
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+
+=== LOGIN DEBUG 2025-08-25 19:35:17 ===
+Email: turbomota@lum.com.co
+Password: 1234
+Usuario encontrado: false
+Buscando tienda...
+Tienda encontrada: {"id_store":1,"store_name":"Turbo_chapinero","store_address":"calle123","store_email":"turbomota@lum.com.co","password":"$2y$10$Ler5ppGPr4\/zq4HbrB6ZIeFKYfm\/qMKTmszbXYuzQynsZ68mM5pPG","id_role":3,"google_id":null,"profile_picture_url":null,"provider":null,"created_at":"2025-08-25 11:31:44","last_login":null,"is_active":1,"type":"store"}
+Password verify tienda: FALSE
+Hash tienda: $2y$10$Ler5ppGPr4/zq4HbrB6ZIeFKYfm/qMKTmszbXYuzQynsZ68mM5pPG
+❌ Password incorrecta para tienda

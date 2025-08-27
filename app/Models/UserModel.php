@@ -17,55 +17,44 @@ class UserModel
 
     public function verifyUser($email, $password)
     {
-        $sqlUser = "SELECT u.*, r.id_role, 'user' AS type 
-                FROM users u
-                JOIN roles r ON u.id_role = r.id_role
-                WHERE email = :email LIMIT 1";
+        // Buscar usuario
+        $sqlUser = "SELECT * FROM users WHERE email = :email AND is_active = 1";
         $stmt = $this->pdo->prepare($sqlUser);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email);
         $stmt->execute();
         $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($user) {
-            if (password_verify($password, $user['password'])) {
-                return [
-                    'id' => $user['id_user'],
-                    'username' => $user['username'],
-                    'email' => $user['email'],
-                    'id_role' => $user['id_role'],
-                    'type' => 'user'
-                ];
-            }
-            return null;
+        if ($user && password_verify($password, $user['password'])) {
+            return [
+                'id' => $user['id_user'],
+                'username' => $user['username'],
+                'email' => $user['email'],
+                'id_role' => $user['id_role'],
+                'type' => 'user'
+            ];
         }
 
-
-        $sqlStore = "SELECT s.*, r.id_role, 'store' AS type
-                 FROM stores s
-                 JOIN roles r ON s.id_role = r.id_role
-                 WHERE store_email = :email LIMIT 1";
+        $sqlStore = "SELECT * FROM stores WHERE store_email = :email AND is_active = 1";
         $stmt = $this->pdo->prepare($sqlStore);
-        $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+        $stmt->bindParam(':email', $email);
         $stmt->execute();
         $store = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if ($store) {
-            if (password_verify($password, $user['password'])) {
-                return [
-                    'id' => $store['id_store'],
-                    'username' => $store['store_name'],
-                    'email' => $store['store_email'],
-                    'id_role' => $store['id_role'],
-                    'type' => 'store'
-                ];
-            }
+        if ($store && password_verify($password, $store['password'])) {
+            return [
+                'id' => $store['id_store'],
+                'username' => $store['store_name'],
+                'email' => $store['store_email'],
+                'id_role' => $store['id_role'],
+                'type' => 'store'
+            ];
         }
 
-        return null;
+        return false;
     }
     public function obtenerUsuarios()
     {
-        $sql = "SELECT u.id_user, u.username, u.email, r.role_name AS rol
+        $sql = "SELECT u.id_user, u.username, u.is_active, u.email, r.role_name AS rol
                 FROM users u
                 JOIN roles r ON u.id_role = r.id_role";
         $stmt = $this->pdo->prepare($sql);
@@ -73,29 +62,45 @@ class UserModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerUsuarioPorId($id, $type = 'user')
+    public function obtenerUsuarioPorId($id)
     {
-        if ($type === 'user') {
-            $stmt = $this->pdo->prepare("SELECT u.*, r.role_name AS rol
-                                     FROM users u
-                                     JOIN roles r ON u.id_role = r.id_role
-                                     WHERE u.id_user = ?");
-            $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } elseif ($type === 'store') {
-            $stmt = $this->pdo->prepare("SELECT s.*, r.role_name AS rol
-                                     FROM stores s
-                                     JOIN roles r ON s.id_role = r.id_role
-                                     WHERE s.id_store = ?");
-            $stmt->execute([$id]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        }
-        return null;
+        $stmt = $this->pdo->prepare("
+        SELECT 
+            u.id_user,
+            u.username,
+            u.email,
+            u.is_active,       
+            r.role_name AS rol
+        FROM users u
+        JOIN roles r ON u.id_role = r.id_role
+        WHERE u.id_user = ?
+    ");
+        $stmt->execute([$id]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
+
+ public function obtenerTiendaPorId($id)
+{
+    $stmt = $this->pdo->prepare("
+        SELECT 
+            s.id_store,
+            s.store_name,
+            s.store_address,
+            s.store_email,
+            s.id_role,
+            s.is_active
+        FROM stores s
+        WHERE s.id_store = ?
+    ");
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
 
     public function obtenerTiendas()
     {
-        $sql = "SELECT s.id_store, s.store_name, s.store_email, r.role_name AS rol
+        $sql = "SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.is_active,r.role_name AS rol
                 FROM stores s
                 JOIN roles r ON s.id_role = r.id_role";
         $stmt = $this->pdo->prepare($sql);
@@ -116,11 +121,12 @@ class UserModel
         $stmt->execute(params: [$username, $email, $id_role, $id_user]);
     }
 
-    public function eliminarUsuario($id_user)
+    public function cambiarEstadoUsuario($id_user, $estado)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM users WHERE id_user = ?");
-        $stmt->execute([$id_user]);
+        $stmt = $this->pdo->prepare("UPDATE users SET is_active = ? WHERE id_user = ?");
+        $stmt->execute([$estado, $id_user]);
     }
+
 
     public function agregarTienda($name, $address, $email, $password, $id_role)
     {
@@ -131,16 +137,30 @@ class UserModel
 
     public function editarTienda($id_store, $name, $address, $email, $id_role)
     {
-        $stmt = $this->pdo->prepare("UPDATE stores 
-                                 SET store_name = ?, store_address = ?, store_email = ?, id_role = ?
-                                 WHERE id_store = ?");
+        // Verificar si el email ya está usado por otra tienda
+        $check = $this->pdo->prepare("SELECT COUNT(*) FROM stores WHERE store_email = ? AND id_store <> ?");
+        $check->execute([$email, $id_store]);
+        if ($check->fetchColumn() > 0) {
+            throw new \Exception("El correo $email ya está en uso por otra tienda.");
+        }
+
+        // Si no existe duplicado, actualizar
+        $stmt = $this->pdo->prepare("
+        UPDATE stores 
+        SET store_name = ?, store_address = ?, store_email = ?, id_role = ?
+        WHERE id_store = ?
+    ");
         $stmt->execute([$name, $address, $email, $id_role, $id_store]);
     }
 
-    public function eliminarTienda($id_store)
+
+    public function cambiarEstadoTienda($id, $nuevoEstado)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM stores WHERE id_store = ?");
-        $stmt->execute([$id_store]);
+        $sql = "UPDATE stores SET is_active = :estado WHERE id_store = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindParam(':estado', $nuevoEstado, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        return $stmt->execute();
     }
 
     public function updateLastLogin($userId)

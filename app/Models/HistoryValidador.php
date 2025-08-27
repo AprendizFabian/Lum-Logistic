@@ -53,9 +53,10 @@ class HistoryValidador
         $expirationDate,
         $blockDate,
         $category,
+        $daysLifespan,   // 👈 nuevo campo
         $blockConcept,
         $remarks,
-        $idStore = null
+        $idStore
     ) {
         $stmt = $this->pdo->prepare("
             INSERT INTO validation_history (
@@ -64,12 +65,13 @@ class HistoryValidador
                 expiration_date,
                 block_date,
                 category,
+                days_lifespan,   -- 👈 nuevo campo
                 block_concept,
                 remarks,
                 id_store
             ) VALUES (
                 :ean, :description, :expiration_date, :block_date, 
-                :category, :block_concept, :remarks, :id_store
+                :category, :days_lifespan, :block_concept, :remarks, :id_store
             )
         ");
 
@@ -79,9 +81,10 @@ class HistoryValidador
             ':expiration_date' => $expirationDate,
             ':block_date'      => $blockDate,
             ':category'        => $category,
+            ':days_lifespan'   => $daysLifespan,  // 👈 se envía al insert
             ':block_concept'   => $blockConcept,
             ':remarks'         => $remarks,
-            ':id_store'        => $idStore ?? null
+            ':id_store'        => $idStore
         ]);
     }
 }

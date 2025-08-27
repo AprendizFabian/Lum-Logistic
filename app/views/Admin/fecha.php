@@ -8,21 +8,7 @@
             Fechas de vencimiento
         </h1>
 
-  <div class="flex justify-center w-full mb-4 ml-60">
-    <div class="items-start gap-2">
-        <select name="tienda"
-            class="px-4 py-2 text-sm rounded-xl border border-gray-300 bg-white shadow-md hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEDF00]">
-            <option value="">Tienda</option>
-            <option value="1">Turbo</option>
-            <option value="2">Turbo</option>
-        </select>
-
-        <input type="date" 
-            name="fecha" 
-            class="px-4 py-2 text-sm rounded-lg border border-gray-300 bg-white shadow-sm hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-[#FEDF00]">
-    </div>
-</div>
-        <!-- Menú tres puntos (arriba derecha) -->
+  <!-- Menú tres puntos (arriba derecha) -->
         <div class="absolute top-2 right-5">
             <div class="dropdown dropdown-end">
                 <label tabindex="0" class="btn btn-sm bg-[#404141] text-white hover:bg-[#2f2f2f] rounded-lg">
