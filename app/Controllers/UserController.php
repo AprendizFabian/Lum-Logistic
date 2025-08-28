@@ -65,7 +65,7 @@ class UserController
         exit;
     }
 
-    $tipo = $_SESSION['user']['type']; // 'user' o 'store'
+    $tipo = $_SESSION['user']['type'];
     $id   = $_SESSION['user']['id'];
 
     $modelo = new UserModel();
@@ -90,7 +90,7 @@ class UserController
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'];
             $email = $_POST['email'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // hash seguro
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); 
             $rol = $_POST['id_role'];
 
             $modelo = new UserModel();
@@ -100,7 +100,6 @@ class UserController
             exit;
         }
     }
-
     public function editarUsuario()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -139,7 +138,7 @@ class UserController
             $name = $_POST['store_name'];
             $email = $_POST['store_email'];
             $address = $_POST['store_address'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // hash seguro
+            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
             $id_role = $_POST['id_role'];
 
 
@@ -178,10 +177,8 @@ class UserController
             if ($tienda) {
                 $nuevoEstado = $tienda['is_active'] == 1 ? 0 : 1;
                 $modelo->cambiarEstadoTienda($id, $nuevoEstado);
-                // Agregar el parámetro success igual que en activarUsuario
                 header('Location: /usuarios?success=estado');
             } else {
-                // Si no encuentra la tienda, redirigir con error
                 header('Location: /usuarios?error=notfound');
             }
 

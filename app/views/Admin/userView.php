@@ -8,10 +8,7 @@
     <i class="fas fa-user-plus"></i> Agregar Usuario o tienda
   </a>
 </div>
-
-<!-- Grid combinado -->
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-  <!-- Usuarios -->
   <?php foreach ($usuariosPaginados as $usuario): ?>
     <div
       class="bg-white border border-[#e5e5e5] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition duration-300">
@@ -48,7 +45,6 @@
     </div>
   <?php endforeach; ?>
 
-  <!--Tiendas -->
   <?php foreach (($tiendasPaginadas ?? []) as $tienda): ?>
     <div
       class="bg-white border border-[#e5e5e5] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition duration-300">
@@ -67,13 +63,10 @@
         </p>
       </div>
       <div class="flex justify-center gap-3 pb-4">
-        <!-- Botón Editar -->
         <a href="/usuarios?editar_store=<?= $tienda['id_store'] ?>"
           class="bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1">
           <i class="fas fa-edit"></i> Editar
         </a>
-
-        <!-- Botón Activar/Desactivar -->
         <form method="POST" action="/ActivarStore" class="form-activar">
           <input type="hidden" name="id_store" value="<?= $tienda['id_store'] ?>">
           <button type="submit"
@@ -90,27 +83,22 @@
 
 
 </div>
-<!-- Modal Edición -->
 <?php if ($usuarioAEditar): ?>
   <dialog open class="modal modal-open">
     <div class="modal-box bg-white text-[#404141]">
       <h3 class="font-bold mb-4 text-2xl">Editar Usuario</h3>
       <form method="POST" action="/editar">
-        <!-- ID real en DB -->
         <input type="hidden" name="id_user" value="<?= $usuarioAEditar['id_user'] ?>">
-
         <div class="mb-4">
           <label class="label font-semibold">Usuario</label>
           <input type="text" name="username" value="<?= htmlspecialchars($usuarioAEditar['username']) ?>"
             class="input input-bordered w-full text-[#404141]" required>
         </div>
-
         <div class="mb-4">
           <label class="label font-semibold">Email</label>
           <input type="email" name="email" value="<?= htmlspecialchars($usuarioAEditar['email']) ?>"
             class="input input-bordered w-full text-[#404141]" required>
         </div>
-
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select name="id_role" class="select select-bordered w-full text-[#404141]" required>
@@ -119,7 +107,6 @@
             <option value="1" <?= $usuarioAEditar['rol'] == 3 ? 'selected' : '' ?>>Tienda</option>
           </select>
         </div>
-
         <div class="modal-action">
           <button type="submit"
             class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
@@ -132,7 +119,6 @@
   </dialog>
 <?php endif; ?>
 
-<!-- Modal Edición Tienda -->
 <?php if ($tiendaEditar): ?>
   <dialog open class="modal modal-open">
     <div class="modal-box bg-white text-[#404141]">
@@ -142,19 +128,21 @@
 
         <div class="mb-4">
           <label class="label font-semibold">Nombre Tienda</label>
-          <input type="text" name="store_name" value="<?= htmlspecialchars($tiendaEditar['store_name']) ?>" class="input input-bordered w-full text-[#404141]" required>
+          <input type="text" name="store_name" value="<?= htmlspecialchars($tiendaEditar['store_name']) ?>"
+            class="input input-bordered w-full text-[#404141]" required>
         </div>
 
         <div class="mb-4">
           <label class="label font-semibold">Email</label>
-          <input type="email" name="store_email" value="<?= htmlspecialchars($tiendaEditar['store_email']) ?>" class="input input-bordered w-full text-[#404141]" required>
+          <input type="email" name="store_email" value="<?= htmlspecialchars($tiendaEditar['store_email']) ?>"
+            class="input input-bordered w-full text-[#404141]" required>
         </div>
 
         <div class="mb-4">
           <label class="label font-semibold">Dirección</label>
-          <input type="text" name="store_address" value="<?= htmlspecialchars($tiendaEditar['store_address']) ?>" class="input input-bordered w-full text-[#404141]" required>
+          <input type="text" name="store_address" value="<?= htmlspecialchars($tiendaEditar['store_address']) ?>"
+            class="input input-bordered w-full text-[#404141]" required>
         </div>
-
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select name="id_role" class="select select-bordered w-full text-[#404141]" required>
@@ -163,9 +151,9 @@
             <option value="3" <?= $tiendaEditar['id_role'] == 3 ? 'selected' : '' ?>>Tienda</option>
           </select>
         </div>
-
         <div class="modal-action">
-          <button type="submit" class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
+          <button type="submit"
+            class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
             Guardar
           </button>
           <a href="/usuarios" class="btn">Cancelar</a>
@@ -175,20 +163,15 @@
   </dialog>
 <?php endif; ?>
 
-
-
 <?php if (isset($_GET['success']) && $_GET['success'] === 'estado'): ?>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
-      // Mostrar alerta
       Swal.fire({
         icon: 'success',
         title: 'Usuario actualizado',
         text: 'El estado del usuario fue cambiado con éxito.',
         confirmButtonColor: '#404141'
       });
-
-      // Limpiar URL inmediatamente
       if (window.location.search.includes('success=estado')) {
         window.history.replaceState({}, '', '/usuarios');
       }
@@ -200,58 +183,46 @@
   <dialog open class="modal modal-open">
     <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
       <h3 class="font-bold mb-4 text-2xl">Agregar Usuario o Tienda</h3>
-
       <form method="POST" id="agregarForm" action="/agregar">
-        <!-- Campos para usuarios -->
         <div id="userFields">
           <div class="mb-4">
             <label class="label font-semibold">Usuario</label>
             <input type="text" name="username" placeholder="Nombre de usuario"
               class="input input-bordered w-full text-[#404141]">
           </div>
-
           <div class="mb-4">
             <label class="label font-semibold">Email</label>
             <input type="email" name="email" placeholder="correo@ejemplo.com"
               class="input input-bordered w-full text-[#404141]">
           </div>
-
           <div class="mb-4">
             <label class="label font-semibold">Contraseña</label>
             <input type="password" name="password" placeholder="********"
               class="input input-bordered w-full text-[#404141]">
           </div>
         </div>
-
-        <!-- Campos para tiendas -->
         <div id="storeFields" style="display:none;">
           <div class="mb-4">
             <label class="label font-semibold">Nombre Tienda</label>
             <input type="text" name="store_name" placeholder="Ej: Mi Tienda"
               class="input input-bordered w-full text-[#404141]">
           </div>
-
           <div class="mb-4">
             <label class="label font-semibold">Dirección</label>
             <input type="text" name="store_address" placeholder="Calle 123"
               class="input input-bordered w-full text-[#404141]">
           </div>
-
           <div class="mb-4">
             <label class="label font-semibold">Email Tienda</label>
             <input type="email" name="store_email" placeholder="tienda@ejemplo.com"
               class="input input-bordered w-full text-[#404141]">
           </div>
-
           <div class="mb-4">
             <label class="label font-semibold">Contraseña</label>
-         <input type="password" name="password" placeholder="********"
-
+            <input type="password" name="password" placeholder="********"
               class="input input-bordered w-full text-[#404141]">
           </div>
         </div>
-
-        <!-- Select rol -->
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select id="roleSelect" name="id_role" class="select select-bordered w-full text-[#404141]" required>
@@ -260,7 +231,6 @@
             <option value="3">Tienda</option>
           </select>
         </div>
-
         <div class="modal-action flex justify-end gap-2">
           <button type="submit"
             class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
@@ -275,7 +245,6 @@
     </div>
   </dialog>
 <?php endif; ?>
-
 <script>
   const roleSelect = document.getElementById('roleSelect');
   const userFields = document.getElementById('userFields');
@@ -284,16 +253,13 @@
 
   roleSelect.addEventListener('change', () => {
     if (roleSelect.value === "3") {
-      // Cambiar a formulario de tienda
       userFields.style.display = "none";
       storeFields.style.display = "block";
       form.action = "/agregarT";
     } else {
-      // Formulario de usuario
       userFields.style.display = "block";
       storeFields.style.display = "none";
       form.action = "/agregar";
     }
   });
-
 </script>

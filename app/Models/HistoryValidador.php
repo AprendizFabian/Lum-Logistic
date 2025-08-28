@@ -53,7 +53,7 @@ class HistoryValidador
         $expirationDate,
         $blockDate,
         $category,
-        $daysLifespan,   // 👈 nuevo campo
+        $daysLifespan,   
         $blockConcept,
         $remarks,
         $idStore
