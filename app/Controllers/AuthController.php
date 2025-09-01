@@ -18,7 +18,6 @@ public function processLogin() {
     $email = trim($_POST['user'] ?? '');
     $password = trim($_POST['password'] ?? '');
 
-    // Validación básica
     if (empty($email) || empty($password)) {
         header('Location: /login?error=credentials');
         exit;
@@ -28,15 +27,14 @@ public function processLogin() {
     $userData = $usuarioModel->verifyUser($email, $password);
 
     if ($userData) {
-        // Guardar la información del usuario/tienda en sesión
+
         $_SESSION['user'] = $userData;
 
-        // Guardar id_store para tiendas (importante para validarMasivo)
         if ($userData['type'] === 'store') {
             $_SESSION['id_store'] = $userData['id'];
         } else {
             $_SESSION['id_store'] = null;
-            // Opcional: actualizar último login de usuarios
+        
             $usuarioModel->updateLastLogin($userData['id']);
         }
 
@@ -47,8 +45,6 @@ public function processLogin() {
         exit;
     }
 }
-
-
  public function logout()
     {
         session_start();

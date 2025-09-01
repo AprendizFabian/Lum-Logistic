@@ -7,14 +7,11 @@ class HistoryValidador
 
     public function __construct()
     {
-        // Variables de entorno con valores por defecto
         $host   = getenv('DB_HOST') ?: 'localhost';
-        $port   = getenv('DB_PORT') ?: '3306';   // Puerto MySQL
+        $port   = getenv('DB_PORT') ?: '3306'; 
         $dbname = getenv('DB_NAME') ?: 'lumlogisticdb'; 
-        $user   = getenv('DB_USER') ?: 'root';   // Usuario MySQL
+        $user   = getenv('DB_USER') ?: 'root';   
         $pass   = getenv('DB_PASS') ?: '';
-
-        // DSN para MySQL
         $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
 
         $this->pdo = new \PDO($dsn, $user, $pass, [
@@ -23,30 +20,21 @@ class HistoryValidador
         ]);
     }
 
-    /**
-     * Verifica si ya existe un registro con ese EAN y fecha de bloqueo
-     */
-    public function existeEanOFecha($ean, $blockDate)
-    {
-        $stmt = $this->pdo->prepare("
-            SELECT EXISTS (
-                SELECT 1 
-                FROM validation_history
-                WHERE ean = :ean 
-                AND block_date = :block_date
-            ) AS existe
-        ");
-        $stmt->execute([
-            ':ean'        => $ean,
-            ':block_date' => $blockDate
-        ]);
+public function existeEanOFecha($ean, $blockDate, $idStore)
+{
+    $sql = "SELECT COUNT(*) FROM validation_history
+            WHERE ean = :ean AND block_date = :block_date AND id_store = :id_store";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([
+        ':ean' => $ean,
+        ':block_date' => $blockDate,
+        ':id_store' => $idStore
+    ]);
+    return $stmt->fetchColumn() > 0;
+}
 
-        return (bool) $stmt->fetchColumn();
-    }
 
-    /**
-     * Inserta un nuevo registro en validation_history
-     */
+ 
     public function insertarRegistro(
         $ean,
         $description,
@@ -65,7 +53,7 @@ class HistoryValidador
                 expiration_date,
                 block_date,
                 category,
-                days_lifespan,   -- 👈 nuevo campo
+                days_lifespan,   
                 block_concept,
                 remarks,
                 id_store
@@ -81,7 +69,7 @@ class HistoryValidador
             ':expiration_date' => $expirationDate,
             ':block_date'      => $blockDate,
             ':category'        => $category,
-            ':days_lifespan'   => $daysLifespan,  // 👈 se envía al insert
+            ':days_lifespan'   => $daysLifespan,  
             ':block_concept'   => $blockConcept,
             ':remarks'         => $remarks,
             ':id_store'        => $idStore

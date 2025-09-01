@@ -2,6 +2,7 @@
 namespace App\Controllers;
 use DateTime;
 use DateInterval;
+use App\Models\CatalogModel;
 use App\Models\SheetsModel;
 use App\Models\HistoryValidador;
 use App\Models\StoreModel;
@@ -32,10 +33,10 @@ public function validar()
     }
 
     try {
-        // Determinar la tienda
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
+
         $idStore = null;
         if (isset($_SESSION['user']['type'])) {
             if ($_SESSION['user']['type'] === 'store') {
@@ -49,26 +50,22 @@ public function validar()
             echo json_encode(['error' => 'No se seleccionó ninguna tienda']);
             return;
         }
+        $catalogModel = new \App\models\CatalogModel();
+        $producto = $catalogModel->obtenerProductoPorEan($ean);
 
-        $historialModel = new HistoryValidador();
-        $sheetModel = new SheetsModel();
-        $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
-        if (isset($datos['error'])) {
-            echo json_encode(['error' => $datos['error']]);
+        if (!$producto) {
+            echo json_encode(['error' => "El EAN {$ean} no existe en el catálogo"]);
             return;
         }
-        if (empty($datos) || empty($datos['descripcion']) || empty($datos['diasVidaUtil'])) {
-            echo json_encode(['error' => "El EAN {$ean} no existe en la hoja de cálculo"]);
-            return;
-        }
+        $descripcion = $producto['description'] ?? '';
+        $diasVidaUtil = $producto['shelf_life_duration'] ?? 0; 
+        $categoria = $producto['shelf_life_concept'] ?? 'Sin categoría'; 
 
-        $diasVidaUtil = $datos['diasVidaUtil'];
-        $categoria = $datos['categoria'] ?? null;
-        $descripcion = $datos['descripcion'];
         $conceptoBloqueo = '';
         $fechaBloqueo = '';
         $estado = 'Desconocido';
 
+   
         $fechaBloqueoObj = DateTime::createFromFormat('Y-m-d', $fechaVencimiento);
         if ($fechaBloqueoObj && $diasVidaUtil !== null) {
             $fechaBloqueoObj->sub(new DateInterval("P{$diasVidaUtil}D"));
@@ -87,23 +84,19 @@ public function validar()
             }
         }
 
-        if ($estado === 'VENCIDO') {
-            $conceptoBloqueo = 'VENCIDO';
-        } else {
-            $concepto = $sheetModel->buscarColumnaPorEan($ean, 3);
-            $conceptoBloqueo = $concepto ?? '';
-        }
+        $conceptoBloqueo = $estado === 'VENCIDO' ? 'VENCIDO' : $producto['shelf_life_concept'] ?? '';
 
-        $existe = $historialModel->existeEanOFecha($ean, $fechaBloqueo);
+
+        $historialModel = new HistoryValidador();
+        $existe = $historialModel->existeEanOFecha($ean, $fechaBloqueo, $idStore);
 
         if (!$existe) {
-            // Insertar registro incluyendo la tienda
             $historialModel->insertarRegistro(
                 $ean,
                 $descripcion,
                 $fechaVencimiento,
                 $fechaBloqueo,
-                $categoria,
+                $categoria,        
                 $diasVidaUtil,
                 $conceptoBloqueo,
                 $estado,
@@ -131,171 +124,160 @@ public function validar()
         echo json_encode(['error' => 'Error: ' . $e->getMessage()]);
     }
 }
-    public function validarMasivo()
-    {
-        header('Content-Type: application/json; charset=utf-8');
-        ini_set('display_errors', '0');
-        error_reporting(E_ALL);
 
-        try {
-            if (session_status() === PHP_SESSION_NONE) {
-                session_start();
-            }
-            $idStore = null;
-            if (isset($_SESSION['user']['type'])) {
-                if ($_SESSION['user']['type'] === 'store') {
-                    $idStore = $_SESSION['user']['id'] ?? null;
-                } elseif ($_SESSION['user']['type'] === 'user') {
-                    $idStore = $_POST['id_store'] ?? null;
-                }
-            }
 
-            if (empty($idStore)) {
-                throw new \Exception('No se seleccionó ninguna tienda.');
-            }
+ public function validarMasivo()
+{
+    header('Content-Type: application/json; charset=utf-8');
+    ini_set('display_errors', '0');
+    error_reporting(E_ALL);
 
-            if (!isset($_FILES['archivo'])) {
-                throw new \Exception('No se recibió ningún archivo para validar.');
-            }
-            if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
-                throw new \Exception('Error al subir el archivo. Código: ' . $_FILES['archivo']['error']);
-            }
-
-            $archivoTmp = $_FILES['archivo']['tmp_name'];
-            if (!is_readable($archivoTmp)) {
-                throw new \Exception('El archivo no se pudo leer o está dañado.');
-            }
-
-            $handle = fopen($archivoTmp, 'r');
-            if (!$handle) {
-                throw new \Exception('No se pudo abrir el archivo para lectura.');
-            }
-
-            $historialModel = new HistoryValidador();
-            $sheetModel     = new SheetsModel();
-
-            $errores = [];
-            $linea = 0;
-            $registrosParaInsertar = [];
-
-            while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
-                $linea++;
-
-                if (empty(array_filter($fila))) {
-                    $errores[] = "Línea {$linea}: Fila vacía.";
-                    continue;
-                }
-
-                if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
-                    continue;
-                }
-
-                $ean              = trim($fila[0] ?? '');
-                $fechaVencimiento = trim($fila[1] ?? '');
-
-                if ($ean === '' && $fechaVencimiento === '') {
-                    $errores[] = "Línea {$linea}: No se encontró ni el EAN ni la fecha de vencimiento.";
-                    continue;
-                }
-                if ($ean === '') {
-                    $errores[] = "Línea {$linea}: Falta el EAN.";
-                    continue;
-                }
-                if ($fechaVencimiento === '') {
-                    $errores[] = "Línea {$linea}: Falta la fecha de vencimiento para el EAN {$ean}.";
-                    continue;
-                }
-
-                $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
-                if (!($fechaObj instanceof \DateTime)) {
-                    $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido para el EAN {$ean}.";
-                    continue;
-                }
-
-                $datos = $sheetModel->obtenerDatosDesdeSheets($ean);
-                if (!is_array($datos) || isset($datos['error']) || empty($datos['diasVidaUtil'])) {
-                    $errores[] = "Línea {$linea}: El EAN {$ean} no existe.";
-                    continue;
-                }
-
-                $diasVidaUtil = $datos['diasVidaUtil'];
-                if (!is_numeric($diasVidaUtil)) {
-                    $errores[] = "Línea {$linea}: El valor de 'días de vida útil' para el EAN {$ean} no es numérico ('{$diasVidaUtil}').";
-                    continue;
-                }
-
-                try {
-                    $diasInt = (int)$diasVidaUtil;
-                    $fechaBloqueoObj = clone $fechaObj;
-                    $fechaBloqueoObj->sub(new \DateInterval("P{$diasInt}D"));
-                    $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
-                } catch (\Exception $e) {
-                    $errores[] = "Línea {$linea}: Error calculando fecha de bloqueo para el EAN {$ean} ({$e->getMessage()}).";
-                    continue;
-                }
-
-                if ($historialModel->existeEanOFecha($ean, $fechaBloqueo)) {
-                    $errores[] = "Línea {$linea}: El EAN {$ean} con fecha de bloqueo {$fechaBloqueo} ya existe en la base de datos.";
-                    continue;
-                }
-
-                $hoy = new \DateTime();
-                $hoy->setTime(0, 0);
-                $fechaBloqueoObj->setTime(0, 0);
-
-                if ($fechaBloqueoObj == $hoy) {
-                    $estado = 'BLOQUEAR HOY';
-                } elseif ($fechaBloqueoObj > $hoy) {
-                    $estado = 'NO BLOQUEAR';
-                } else {
-                    $estado = 'VENCIDO';
-                }
-
-                $categoria       = $datos['categoria'] ?? '';
-                $descripcion     = $datos['descripcion'] ?? '';
-                $conceptoBloqueo = $estado === 'VENCIDO'
-                    ? 'VENCIDO'
-                    : ($sheetModel->buscarColumnaPorEan($ean, 3) ?? '');
-
-                $registrosParaInsertar[] = [
-                    $ean,
-                    $descripcion,
-                    $fechaObj->format('Y-m-d'),
-                    $fechaBloqueo,
-                    $categoria,
-                    $diasVidaUtil,
-                    $conceptoBloqueo,
-                    $estado,
-                    $idStore
-                ];
-            }
-            fclose($handle);
-
-            if (!empty($errores)) {
-                echo json_encode([
-                    'mensaje'   => 'Validación finalizada con errores. No se insertó ningún registro.',
-                    'insertados'=> 0,
-                    'errores'   => $errores
-                ], JSON_UNESCAPED_UNICODE);
-                return;
-            }
-
-            $insertados = 0;
-            foreach ($registrosParaInsertar as $registro) {
-                $historialModel->insertarRegistro(...$registro);
-                $insertados++;
-            }
-
-            echo json_encode([
-                'mensaje'   => 'Validación finalizada sin errores. Registros insertados correctamente.',
-                'insertados'=> $insertados,
-                'errores'   => []
-            ], JSON_UNESCAPED_UNICODE);
-
-        } catch (\Throwable $e) {
-            echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
+    try {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
         }
+
+        $idStore = null;
+        if (isset($_SESSION['user']['type'])) {
+            if ($_SESSION['user']['type'] === 'store') {
+                $idStore = $_SESSION['user']['id'] ?? null;
+            } elseif ($_SESSION['user']['type'] === 'user') {
+                $idStore = $_POST['id_store'] ?? null;
+            }
+        }
+
+        if (empty($idStore)) {
+            throw new \Exception('No se seleccionó ninguna tienda.');
+        }
+
+        if (!isset($_FILES['archivo'])) {
+            throw new \Exception('No se recibió ningún archivo para validar.');
+        }
+        if ($_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+            throw new \Exception('Error al subir el archivo. Código: ' . $_FILES['archivo']['error']);
+        }
+
+        $archivoTmp = $_FILES['archivo']['tmp_name'];
+        if (!is_readable($archivoTmp)) {
+            throw new \Exception('El archivo no se pudo leer o está dañado.');
+        }
+
+        $handle = fopen($archivoTmp, 'r');
+        if (!$handle) {
+            throw new \Exception('No se pudo abrir el archivo para lectura.');
+        }
+
+        $historialModel = new HistoryValidador();
+        $catalogModel   = new \App\models\CatalogModel();
+
+        $errores = [];
+        $linea = 0;
+        $registrosParaInsertar = [];
+
+        while (($fila = fgetcsv($handle, 1000, ',')) !== false) {
+            $linea++;
+
+            if (empty(array_filter($fila))) {
+                $errores[] = "Línea {$linea}: Fila vacía.";
+                continue;
+            }
+
+            if ($linea === 1 && isset($fila[0]) && strtolower(trim($fila[0])) === 'ean') {
+                continue;
+            }
+
+            $ean              = trim($fila[0] ?? '');
+            $fechaVencimiento = trim($fila[1] ?? '');
+
+            if ($ean === '' || $fechaVencimiento === '') {
+                $errores[] = "Línea {$linea}: Faltan datos obligatorios (EAN o fecha de vencimiento).";
+                continue;
+            }
+
+            $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
+            if (!($fechaObj instanceof \DateTime)) {
+                $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido.";
+                continue;
+            }
+
+            $producto = $catalogModel->obtenerProductoPorEan($ean);
+            if (!$producto) {
+                $errores[] = "Línea {$linea}: El EAN {$ean} no existe en el catálogo.";
+                continue;
+            }
+
+            $descripcion     = $producto['description'] ?? '';
+            $categoria       = $producto['categoria'] ?? '';
+            $diasVidaUtil    = $producto['shelf_life_duration'] ?? null;
+
+            if (!is_numeric($diasVidaUtil)) {
+                $errores[] = "Línea {$linea}: 'Días de vida útil' para el EAN {$ean} no es numérico.";
+                continue;
+            }
+
+        
+            $fechaBloqueoObj = clone $fechaObj;
+            $fechaBloqueoObj->sub(new \DateInterval("P{$diasVidaUtil}D"));
+            $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
+
+            if ($historialModel->existeEanOFecha($ean, $fechaBloqueo, $idStore)) {
+                $errores[] = "Línea {$linea}: El EAN {$ean} con fecha de bloqueo {$fechaBloqueo} ya existe para esta tienda.";
+                continue;
+            }
+
+            $hoy = new \DateTime();
+            $hoy->setTime(0, 0);
+            $fechaBloqueoObj->setTime(0, 0);
+
+            if ($fechaBloqueoObj == $hoy) {
+                $estado = 'BLOQUEAR HOY';
+            } elseif ($fechaBloqueoObj > $hoy) {
+                $estado = 'NO BLOQUEAR';
+            } else {
+                $estado = 'VENCIDO';
+            }
+
+            $conceptoBloqueo = $estado === 'VENCIDO' ? 'VENCIDO' : ($producto['shelf_life_concept'] ?? '');
+
+            $registrosParaInsertar[] = [
+                $ean,
+                $descripcion,
+                $fechaObj->format('Y-m-d'),
+                $fechaBloqueo,
+                $categoria,
+                $diasVidaUtil,
+                $conceptoBloqueo,
+                $estado,
+                $idStore
+            ];
+        }
+        fclose($handle);
+
+        if (!empty($errores)) {
+            echo json_encode([
+                'mensaje'   => 'Validación finalizada con errores. No se insertó ningún registro.',
+                'insertados'=> 0,
+                'errores'   => $errores
+            ], JSON_UNESCAPED_UNICODE);
+            return;
+        }
+
+        $insertados = 0;
+        foreach ($registrosParaInsertar as $registro) {
+            $historialModel->insertarRegistro(...$registro);
+            $insertados++;
+        }
+
+        echo json_encode([
+            'mensaje'    => 'Validación finalizada sin errores. Registros insertados correctamente.',
+            'insertados' => $insertados,
+            'errores'    => []
+        ], JSON_UNESCAPED_UNICODE);
+
+    } catch (\Throwable $e) {
+        echo json_encode(['error' => $e->getMessage()], JSON_UNESCAPED_UNICODE);
     }
+}
     private function parseFechaFlexible($fechaTexto)
     {
         $fechaTexto = trim((string) $fechaTexto);

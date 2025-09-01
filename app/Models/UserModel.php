@@ -17,7 +17,7 @@ class UserModel
 
     public function verifyUser($email, $password)
     {
-        // Buscar usuario
+     
         $sqlUser = "SELECT * FROM users WHERE email = :email AND is_active = 1";
         $stmt = $this->pdo->prepare($sqlUser);
         $stmt->bindParam(':email', $email);
@@ -78,35 +78,33 @@ class UserModel
         $stmt->execute([$id]);
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
-
- public function obtenerTiendaPorId($id)
+public function obtenerTiendaPorId($id)
 {
     $stmt = $this->pdo->prepare("
-        SELECT 
-            s.id_store,
-            s.store_name,
-            s.store_address,
-            s.store_email,
-            s.id_role,
-            s.is_active
+        SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.created_at, s.is_active,
+               c.city_name, r.role_name AS rol
         FROM stores s
+        LEFT JOIN cities c ON s.city_id = c.id_city
+        LEFT JOIN roles r ON s.id_role = r.id_role
         WHERE s.id_store = ?
     ");
     $stmt->execute([$id]);
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
 
+public function obtenerTiendas()
+{
+    $stmt = $this->pdo->query("
+        SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.created_at, s.is_active,
+               c.city_name, r.role_name AS rol
+        FROM stores s
+        LEFT JOIN cities c ON s.city_id = c.id_city
+        LEFT JOIN roles r ON s.id_role = r.id_role
+        ORDER BY s.id_store DESC
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-
-    public function obtenerTiendas()
-    {
-        $sql = "SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.is_active,r.role_name AS rol
-                FROM stores s
-                JOIN roles r ON s.id_role = r.id_role";
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
 
 
     public function agregarUsuario($username, $email, $password, $id_role)
@@ -128,12 +126,15 @@ class UserModel
     }
 
 
-    public function agregarTienda($name, $address, $email, $password, $id_role)
+public function agregarTienda($name, $address, $email, $password, $id_role, $city_id = null)
     {
-        $stmt = $this->pdo->prepare("INSERT INTO stores (store_name, store_address, store_email, password, id_role) 
-                                 VALUES (?, ?, ?, ?, ?)");
-        $stmt->execute([$name, $address, $email, $password, $id_role]);
+        $stmt = $this->pdo->prepare("
+            INSERT INTO stores (store_name, store_address, store_email, password, id_role, city_id) 
+            VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        $stmt->execute([$name, $address, $email, $password, $id_role, $city_id]);
     }
+
 
     public function editarTienda($id_store, $name, $address, $email, $id_role)
     {

@@ -143,25 +143,21 @@ class SheetsModel
     {
         $service = new Sheets($this->client);
 
-        // === Leer hoja "validador"
         $validadorResponse = $service->spreadsheets_values->get($this->spreadsheetId, 'validador!A1:Z50000');
         $validadorValues = $validadorResponse->getValues();
         if (!$validadorValues)
             return ['error' => 'No se pudo obtener la hoja validador'];
-
-        // Normalizar encabezados
         $headers = array_map('trim', $validadorValues[0]);
         $headersLower = array_map('mb_strtolower', $headers);
 
         $indexEAN = array_search('ean', $headersLower);
         $indexCategoria = array_search('categoría', $headersLower);
-        $indexDescripcion = 2; // Columna C → índice 2 si A=0, B=1, C=2
+        $indexDescripcion = 2; 
 
         if ($indexEAN === false || $indexCategoria === false) {
             return ['error' => 'Encabezados incorrectos en hoja validador'];
         }
 
-        // === Buscar EAN y obtener categoría + descripción
         $categoria = null;
         $descripcion = null;
 
@@ -181,17 +177,15 @@ class SheetsModel
             ];
         }
 
-        // === Leer hoja "V.U"
         $vuResponse = $service->spreadsheets_values->get($this->spreadsheetId, 'V.U!A1:Z30000');
         $vuValues = $vuResponse->getValues();
         if (!$vuValues)
             return ['error' => 'No se pudo obtener la hoja V.U'];
 
-        // Buscar encabezado de columna "SALIDA POR MERMA"
         $headersVU = array_map('trim', $vuValues[0]);
         $headersVULower = array_map('mb_strtolower', $headersVU);
 
-        $indexCategoriaVU = 0; // Categoría en columna A
+        $indexCategoriaVU = 0; 
         $indexDias = array_search('salida por merma', $headersVULower);
 
         if ($indexDias === false) {
@@ -202,7 +196,6 @@ class SheetsModel
             ];
         }
 
-        // === Buscar coincidencia de categoría
         foreach (array_slice($vuValues, 1) as $row) {
             if (!isset($row[$indexCategoriaVU]))
                 continue;
@@ -227,7 +220,6 @@ class SheetsModel
             'descripcion' => $descripcion
         ];
     }
-
     private function normalizarTexto($texto)
     {
         $texto = mb_strtolower(trim($texto), 'UTF-8');
@@ -244,7 +236,7 @@ class SheetsModel
             'ö' => 'o',
             'ü' => 'u'
         ]);
-        $texto = preg_replace('/[^a-z0-9]/', '', $texto); // Elimina símbolos, espacios, guiones
+        $texto = preg_replace('/[^a-z0-9]/', '', $texto); 
         return $texto;
     }
 
@@ -265,7 +257,6 @@ class SheetsModel
                 return $row[$columnaIndice] ?? null;
             }
         }
-
         return null;
     }
 

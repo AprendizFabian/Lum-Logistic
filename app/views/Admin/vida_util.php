@@ -2,8 +2,6 @@
     <div class="flex min-h-screen">
         <main class="flex-1 flex flex-col w-full">
             <section class="flex-1 px-6 py-10 max-w-screen-xl mx-3">
-
-                <!-- Barra de búsqueda -->
                 <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
                     <h1 class="text-4xl font-bold flex items-center gap-2">
                         <i class="fa-solid fa-database text-[#FEDF00]"></i> Vida Útil
@@ -20,7 +18,6 @@
                     </form>
                 </div>
 
-                <!-- Datos -->
                 <?php if (empty($sheetData['data'])): ?>
                     <p class="text-gray-500 text-center">No hay datos disponibles.</p>
                 <?php else: ?>
@@ -42,7 +39,6 @@
                     </div>
                 <?php endif; ?>
 
-                <!-- Paginación -->
                 <?php if ($sheetData['totalPages'] > 1): ?>
                     <div class="mt-10 flex flex-wrap justify-center gap-2">
                         <?php if ($sheetData['currentPage'] > 1): ?>

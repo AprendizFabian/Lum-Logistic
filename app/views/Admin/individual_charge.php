@@ -11,7 +11,6 @@
     </a>
   </div>
 
-  <!-- Sección de formulario y conversor -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
   
     <form id="formValidador" class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-[#FEE000]">
@@ -53,7 +52,6 @@
       </button>
     </form>
 
-    <!-- Conversor Juliano -->
     <div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-[#FEE000]">
       <h2 class="text-2xl font-semibold text-[#404141] mb-4 flex items-center gap-2">
         <i class="fas fa-calendar-alt text-[#FEE000]"></i> Conversor Fecha Juliana
@@ -75,7 +73,6 @@
       </div>
     </div>
   </div>
-  <!-- Modal de validación -->
   <input type="checkbox" id="resultadoModal" class="modal-toggle" />
   <div class="modal">
     <div class="modal-box relative max-w-2xl rounded-2xl shadow-xl p-0 overflow-hidden">
@@ -125,13 +122,11 @@
             <p class="text-xs text-gray-500">Días para vencimiento</p>
             <p id="resDiasRestantes" class="font-medium">—</p>
           </div>
-
         </div>
       </div>
     </div>
   </div>
-
-  <script>
+<script>
   const formValidador = document.getElementById("formValidador");
   const loader = document.getElementById("loader");
   const contenido = document.getElementById("resultadoContenido");
@@ -142,9 +137,7 @@
     loader.classList.remove("hidden");
     contenido.classList.add("hidden");
     modalResultado.checked = true;
-
     const formData = new FormData(formValidador);
-
     try {
       const resp = await fetch("/validar", { method: "POST", body: formData });
       const datos = await resp.json();
@@ -167,24 +160,43 @@
       const hoy = new Date();
       const fechaVenc = new Date(datos.fecha_vencimiento);
       const diffTime = fechaVenc - hoy;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
+      let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      const diasVidaUtil = parseInt(datos.dias_vida_util) || 0;
+      diffDays = diffDays - diasVidaUtil;
       const diasRestantesEl = document.getElementById("resDiasRestantes");
+      const conceptoEl = document.getElementById("resConcepto");
+      const observacionEl = document.getElementById("resObservacion");
+      const pintar = (clase) => {
+        diasRestantesEl.className = `font-medium ${clase}`;
+        conceptoEl.className = `font-medium ${clase}`;
+        observacionEl.className = `font-medium ${clase}`;
+      };
 
       if (isNaN(diffDays)) {
         diasRestantesEl.textContent = "—";
-        diasRestantesEl.className = "font-medium text-gray-400";
+        pintar("text-gray-400");
       } else {
         diasRestantesEl.textContent = diffDays + " días";
 
-        if (diffDays < 0) {
-          diasRestantesEl.className = "font-medium text-red-600";
-        } else if (diffDays <= 30) {
-          diasRestantesEl.className = "font-medium text-yellow-600"; 
-        } else {
-          diasRestantesEl.className = "font-medium text-green-600"; 
+        if (diffDays < 1) {
+          pintar("text-red-600");
+        }
+        else if (
+          datos.fecha_bloqueo &&
+          new Date(datos.fecha_bloqueo).toDateString() === hoy.toDateString()
+        ) {
+          pintar("text-orange-600");
+        }
+
+        else if (diffDays <= diasVidaUtil || diffDays <= 3) {
+          pintar("text-yellow-600");
+        }
+
+        else {
+          pintar("text-green-600");
         }
       }
+
       loader.classList.add("hidden");
       contenido.classList.remove("hidden");
     } catch (err) {
@@ -193,6 +205,7 @@
       Swal.fire({ icon: "error", title: "Error de conexión", text: err.message });
     }
   });
+
   function convertirJuliana() {
     const input = document.getElementById('julianaInput').value;
     const resultadoDiv = document.getElementById('resultadoJuliana');

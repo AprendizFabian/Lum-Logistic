@@ -44,7 +44,6 @@
       </div>
     </div>
   <?php endforeach; ?>
-
   <?php foreach (($tiendasPaginadas ?? []) as $tienda): ?>
     <div
       class="bg-white border border-[#e5e5e5] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition duration-300">
@@ -80,8 +79,6 @@
       </div>
     </div>
   <?php endforeach; ?>
-
-
 </div>
 <?php if ($usuarioAEditar): ?>
   <dialog open class="modal modal-open">
@@ -146,9 +143,9 @@
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select name="id_role" class="select select-bordered w-full text-[#404141]" required>
-            <option value="1" <?= $tiendaEditar['id_role'] == 1 ? 'selected' : '' ?>>Administrador</option>
-            <option value="2" <?= $tiendaEditar['id_role'] == 2 ? 'selected' : '' ?>>Usuario</option>
-            <option value="3" <?= $tiendaEditar['id_role'] == 3 ? 'selected' : '' ?>>Tienda</option>
+            <option value="1" <?= $tiendaEditar['rol'] == 1 ? 'selected' : '' ?>>Administrador</option>
+            <option value="2" <?= $tiendaEditar['rol'] == 2 ? 'selected' : '' ?>>Usuario</option>
+            <option value="3" <?= $tiendaEditar['rol'] == 3 ? 'selected' : '' ?>>Tienda</option>
           </select>
         </div>
         <div class="modal-action">
@@ -184,6 +181,7 @@
     <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
       <h3 class="font-bold mb-4 text-2xl">Agregar Usuario o Tienda</h3>
       <form method="POST" id="agregarForm" action="/agregar">
+        <!-- Campos de usuario -->
         <div id="userFields">
           <div class="mb-4">
             <label class="label font-semibold">Usuario</label>
@@ -201,6 +199,8 @@
               class="input input-bordered w-full text-[#404141]">
           </div>
         </div>
+
+        <!-- Campos de tienda -->
         <div id="storeFields" style="display:none;">
           <div class="mb-4">
             <label class="label font-semibold">Nombre Tienda</label>
@@ -222,7 +222,21 @@
             <input type="password" name="password" placeholder="********"
               class="input input-bordered w-full text-[#404141]">
           </div>
+
+          <!-- Select de ciudad SOLO para tienda -->
+          <div id="cityField" class="mb-4" style="display:none;">
+            <label class="label font-semibold">Ciudad</label>
+            <select name="city_id" class="select select-bordered w-full text-[#404141]">
+              <option value="" disabled selected>Seleccione una ciudad</option>
+              <option value="1">Bogotá</option>
+              <option value="2">Medellín</option>
+              <option value="3">Cali</option>
+              <option value="4">Barranquilla</option>
+            </select>
+          </div>
         </div>
+
+        <!-- Selección de rol -->
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select id="roleSelect" name="id_role" class="select select-bordered w-full text-[#404141]" required>
@@ -231,6 +245,7 @@
             <option value="3">Tienda</option>
           </select>
         </div>
+
         <div class="modal-action flex justify-end gap-2">
           <button type="submit"
             class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
@@ -245,21 +260,28 @@
     </div>
   </dialog>
 <?php endif; ?>
+
 <script>
   const roleSelect = document.getElementById('roleSelect');
   const userFields = document.getElementById('userFields');
   const storeFields = document.getElementById('storeFields');
+  const cityField = document.getElementById('cityField');
   const form = document.getElementById('agregarForm');
 
   roleSelect.addEventListener('change', () => {
     if (roleSelect.value === "3") {
+      // Mostrar tienda + ciudad
       userFields.style.display = "none";
       storeFields.style.display = "block";
+      cityField.style.display = "block";
       form.action = "/agregarT";
     } else {
+      // Mostrar usuario sin ciudad
       userFields.style.display = "block";
       storeFields.style.display = "none";
+      cityField.style.display = "none";
       form.action = "/agregar";
     }
   });
 </script>
+

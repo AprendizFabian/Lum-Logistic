@@ -132,24 +132,37 @@ class UserController
             exit;
         }
     }
-    public function agregarTienda()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST['store_name'];
-            $email = $_POST['store_email'];
-            $address = $_POST['store_address'];
-            $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-            $id_role = $_POST['id_role'];
+   public function agregarTienda()
+{
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $name     = trim($_POST['store_name'] ?? '');
+        $email    = trim($_POST['store_email'] ?? '');
+        $address  = trim($_POST['store_address'] ?? '');
+        $password = $_POST['password'] ?? '';
+        $id_role  = $_POST['id_role'] ?? 3; 
+        $city_id  = $_POST['city_id'] ?? '';
 
-
-
-            $modelo = new UserModel();
-            $modelo->agregarTienda($name, $address, $email, $password, $id_role);
-
-            header('Location: /usuarios');
+        if (empty($name) || empty($email) || empty($address) || empty($password) || empty($city_id)) {
+            header('Location: /usuarios?error=missing_fields');
             exit;
         }
+
+        // Hash de la contraseña
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+
+        // Guardar en el modelo
+        $modelo = new UserModel(); // o UserModel si está en el mismo
+        $modelo->agregarTienda($name, $address, $email, $passwordHash, $id_role, $city_id);
+
+        header('Location: /usuarios?success=store_added');
+        exit;
     }
+
+    // Si no es POST
+    header('Location: /usuarios');
+    exit;
+}
+
     public function editarTienda()
     {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
