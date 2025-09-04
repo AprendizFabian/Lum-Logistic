@@ -1,23 +1,13 @@
 <?php
 namespace App\Models;
-
+use App\Database;
 class HistoryValidador
 {
     private $pdo;
 
-    public function __construct()
+ public function __construct()
     {
-        $host   = getenv('DB_HOST') ?: 'localhost';
-        $port   = getenv('DB_PORT') ?: '3306'; 
-        $dbname = getenv('DB_NAME') ?: 'lumlogisticdb'; 
-        $user   = getenv('DB_USER') ?: 'root';   
-        $pass   = getenv('DB_PASS') ?: '';
-        $dsn = "mysql:host={$host};port={$port};dbname={$dbname};charset=utf8mb4";
-
-        $this->pdo = new \PDO($dsn, $user, $pass, [
-            \PDO::ATTR_ERRMODE => \PDO::ERRMODE_EXCEPTION,
-            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC
-        ]);
+        $this->pdo = Database::getInstance();
     }
 
 public function existeEanOFecha($ean, $blockDate, $idStore)
@@ -32,8 +22,6 @@ public function existeEanOFecha($ean, $blockDate, $idStore)
     ]);
     return $stmt->fetchColumn() > 0;
 }
-
-
  
     public function insertarRegistro(
         $ean,
@@ -62,7 +50,6 @@ public function existeEanOFecha($ean, $blockDate, $idStore)
                 :category, :days_lifespan, :block_concept, :remarks, :id_store
             )
         ");
-
         $stmt->execute([
             ':ean'             => $ean,
             ':description'     => $description,

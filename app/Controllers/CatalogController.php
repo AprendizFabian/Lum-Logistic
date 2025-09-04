@@ -29,7 +29,6 @@ public function showCatalog()
         'total'
     ));
 }
-
     public function showVidaUtil()
     {
         $page = $_GET['page'] ?? 1;

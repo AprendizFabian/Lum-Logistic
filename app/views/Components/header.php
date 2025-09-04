@@ -10,7 +10,6 @@ $rol = $_SESSION['user']['id_role'] ?? 0;
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <div class="flex min-h-screen">
-    <!-- Sidebar -->
     <aside id="sidebar"
         class="bg-neutral text-neutral-content w-64 p-6 space-y-6 fixed top-0 left-0 bottom-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full overflow-y-auto">
 
@@ -30,12 +29,13 @@ $rol = $_SESSION['user']['id_role'] ?? 0;
 
             <?php if ($rol == 1): ?>
                 <li><a href="/usuarios" class="hover:text-warning"><i class="fa-solid fa-users"></i> Usuarios</a></li>
+
+                 <li><a href="/stock" class="hover:text-warning"><i class="fa-solid fa-upload"></i></i> Stock tiendas</a></li>
+
             <?php endif; ?>
 
             <li><a href="/fecha" class="hover:text-warning"><i class="fa-solid fa-calendar"></i> Fechas</a></li>
         </nav>
-
-        <!-- Menú usuario -->
         <div class="border-t border-gray-600 pt-4">
             <details class="w-full">
                 <summary
@@ -59,23 +59,18 @@ $rol = $_SESSION['user']['id_role'] ?? 0;
             </details>
         </div>
     </aside>
-
-    <!-- Botón tipo pestaña -->
     <button id="sidebarToggle"
         class="fixed top-1/2 -translate-y-1/2 left-0 z-50 bg-neutral text-neutral-content p-2 rounded-r-lg shadow-lg hover:bg-warning hover:text-black transition block lg:hidden">
         <i id="sidebarIcon" class="fa-solid fa-arrow-right"></i>
     </button>
-    <!-- Contenido -->
     <main id="mainContent" class="flex-1 p-2 lg:ml-64 transition-all duration-300 overflow-y-auto">
         <?php if (isset($view_path))
             require_once $view_path; ?>
     </main>
 </div>
-
 <script>
     const tiempoExpira = 60 * 60 * 1000;
     let timeout;
-
     function resetTimer() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
@@ -91,7 +86,6 @@ $rol = $_SESSION['user']['id_role'] ?? 0;
             });
         }, tiempoExpira);
     }
-
     window.onload = resetTimer;
     document.onmousemove = resetTimer;
     document.onkeypress = resetTimer;

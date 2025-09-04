@@ -69,7 +69,8 @@ class UserModel
             u.id_user,
             u.username,
             u.email,
-            u.is_active,       
+            u.is_active,
+            u.id_role,       
             r.role_name AS rol
         FROM users u
         JOIN roles r ON u.id_role = r.id_role
@@ -81,7 +82,7 @@ class UserModel
 public function obtenerTiendaPorId($id)
 {
     $stmt = $this->pdo->prepare("
-        SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.created_at, s.is_active,
+        SELECT s.id_store, s.store_name, s.store_address, s.store_email, s.created_at, s.is_active, s.id_role,
                c.city_name, r.role_name AS rol
         FROM stores s
         LEFT JOIN cities c ON s.city_id = c.id_city
@@ -102,6 +103,11 @@ public function obtenerTiendas()
         LEFT JOIN roles r ON s.id_role = r.id_role
         ORDER BY s.id_store DESC
     ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+public function obtenerCiudades()
+{
+    $stmt = $this->pdo->query("SELECT id_city, city_name FROM cities ORDER BY city_name ASC");
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -138,14 +144,12 @@ public function agregarTienda($name, $address, $email, $password, $id_role, $cit
 
     public function editarTienda($id_store, $name, $address, $email, $id_role)
     {
-        // Verificar si el email ya está usado por otra tienda
         $check = $this->pdo->prepare("SELECT COUNT(*) FROM stores WHERE store_email = ? AND id_store <> ?");
         $check->execute([$email, $id_store]);
         if ($check->fetchColumn() > 0) {
             throw new \Exception("El correo $email ya está en uso por otra tienda.");
         }
 
-        // Si no existe duplicado, actualizar
         $stmt = $this->pdo->prepare("
         UPDATE stores 
         SET store_name = ?, store_address = ?, store_email = ?, id_role = ?
@@ -153,8 +157,6 @@ public function agregarTienda($name, $address, $email, $password, $id_role, $cit
     ");
         $stmt->execute([$name, $address, $email, $id_role, $id_store]);
     }
-
-
     public function cambiarEstadoTienda($id, $nuevoEstado)
     {
         $sql = "UPDATE stores SET is_active = :estado WHERE id_store = :id";

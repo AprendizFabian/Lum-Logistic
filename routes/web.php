@@ -5,6 +5,7 @@ use App\Controllers\AuthController;
 use App\Controllers\DateController;
 use App\Controllers\CatalogController;
 use App\Controllers\UserController;
+use App\Controllers\StockController;
 
 
 $router->get("/", [PageController::class, 'showView']);
@@ -29,3 +30,5 @@ $router->post('/validar-masivo', [DateController::class,'validarMasivo']);
 $router->get('/Masivo', [DateController::class, 'MasiveCharge']);
 $router->post('/Activar', [UserController::class, 'activarUsuario']);
 $router->post('/ActivarStore', [UserController::class, 'cambiarEstadoTienda']);
+$router->get('/stock', [StockController::class, 'showUploadForm']);
+$router->post('/stock/subir', [StockController::class, 'subirStock']);

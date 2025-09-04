@@ -80,80 +80,73 @@
     </div>
   <?php endforeach; ?>
 </div>
-<?php if ($usuarioAEditar): ?>
+<?php if ($entidadEditar): ?>
   <dialog open class="modal modal-open">
-    <div class="modal-box bg-white text-[#404141]">
-      <h3 class="font-bold mb-4 text-2xl">Editar Usuario</h3>
-      <form method="POST" action="/editar">
-        <input type="hidden" name="id_user" value="<?= $usuarioAEditar['id_user'] ?>">
-        <div class="mb-4">
-          <label class="label font-semibold">Usuario</label>
-          <input type="text" name="username" value="<?= htmlspecialchars($usuarioAEditar['username']) ?>"
-            class="input input-bordered w-full text-[#404141]" required>
+    <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
+      <h3 class="font-bold mb-4 text-2xl">
+        Editar <?= $entidadEditar['id_role'] == 3 ? 'Tienda' : 'Usuario' ?>
+      </h3>
+      <form method="POST" action="<?= $entidadEditar['id_role'] == 3 ? '/editarT' : '/editarU' ?>">
+        <?php if ($entidadEditar['id_role'] == 3): ?>
+          <input type="hidden" name="id_store" value="<?= $entidadEditar['id_store'] ?>">
+        <?php else: ?>
+          <input type="hidden" name="id_user" value="<?= $entidadEditar['id_user'] ?>">
+        <?php endif; ?>
+        <div id="userFields" style="<?= $entidadEditar['id_role'] == 3 ? 'display:none;' : '' ?>">
+          <div class="mb-4">
+            <label class="label font-semibold">Usuario</label>
+            <input type="text" name="username" value="<?= htmlspecialchars($entidadEditar['username'] ?? '') ?>"
+              class="input input-bordered w-full text-[#404141]">
+          </div>
+          <div class="mb-4">
+            <label class="label font-semibold">Email</label>
+            <input type="email" name="email" value="<?= htmlspecialchars($entidadEditar['email'] ?? '') ?>"
+              class="input input-bordered w-full text-[#404141]">
+          </div>
         </div>
-        <div class="mb-4">
-          <label class="label font-semibold">Email</label>
-          <input type="email" name="email" value="<?= htmlspecialchars($usuarioAEditar['email']) ?>"
-            class="input input-bordered w-full text-[#404141]" required>
+
+        <div id="storeFields" style="<?= $entidadEditar['id_role'] == 3 ? '' : 'display:none;' ?>">
+          <div class="mb-4">
+            <label class="label font-semibold">Nombre Tienda</label>
+            <input type="text" name="store_name" value="<?= htmlspecialchars($entidadEditar['store_name'] ?? '') ?>"
+              class="input input-bordered w-full text-[#404141]">
+          </div>
+          <div class="mb-4">
+            <label class="label font-semibold">Dirección</label>
+            <input type="text" name="store_address"
+              value="<?= htmlspecialchars($entidadEditar['store_address'] ?? '') ?>"
+              class="input input-bordered w-full text-[#404141]">
+          </div>
+          <div class="mb-4">
+            <label class="label font-semibold">Ciudad</label>
+            <select name="city_id" class="select select-bordered w-full text-[#404141]">
+              <?php foreach ($ciudades as $ciudad): ?>
+                <option value="<?= $ciudad['id_city'] ?>"
+                  <?= isset($entidadEditar['city_id']) && $entidadEditar['city_id'] == $ciudad['id_city'] ? 'selected' : '' ?>>
+                  <?= htmlspecialchars($ciudad['city_name']) ?>
+                </option>
+              <?php endforeach; ?>
+            </select>
+          </div>
         </div>
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
-          <select name="id_role" class="select select-bordered w-full text-[#404141]" required>
-            <option value="2" <?= $usuarioAEditar['rol'] == 2 ? 'selected' : '' ?>>Usuario</option>
-            <option value="1" <?= $usuarioAEditar['rol'] == 1 ? 'selected' : '' ?>>Administrador</option>
-            <option value="1" <?= $usuarioAEditar['rol'] == 3 ? 'selected' : '' ?>>Tienda</option>
+          <select id="roleSelectEdit" name="id_role" class="select select-bordered w-full text-[#404141]" required>
+            <option value="1" <?= $entidadEditar['id_role'] == 1 ? 'selected' : '' ?>>Administrador</option>
+            <option value="2" <?= $entidadEditar['id_role'] == 2 ? 'selected' : '' ?>>Usuario</option>
+            <option value="3" <?= $entidadEditar['id_role'] == 3 ? 'selected' : '' ?>>Tienda</option>
           </select>
         </div>
-        <div class="modal-action">
+
+        <div class="modal-action flex justify-end gap-2">
           <button type="submit"
             class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
             Guardar
           </button>
-          <a href="/usuarios" class="btn">Cancelar</a>
-        </div>
-      </form>
-    </div>
-  </dialog>
-<?php endif; ?>
-
-<?php if ($tiendaEditar): ?>
-  <dialog open class="modal modal-open">
-    <div class="modal-box bg-white text-[#404141]">
-      <h3 class="font-bold mb-4 text-2xl">Editar Tienda</h3>
-      <form method="POST" action="/editarT">
-        <input type="hidden" name="id_store" value="<?= $tiendaEditar['id_store'] ?>">
-
-        <div class="mb-4">
-          <label class="label font-semibold">Nombre Tienda</label>
-          <input type="text" name="store_name" value="<?= htmlspecialchars($tiendaEditar['store_name']) ?>"
-            class="input input-bordered w-full text-[#404141]" required>
-        </div>
-
-        <div class="mb-4">
-          <label class="label font-semibold">Email</label>
-          <input type="email" name="store_email" value="<?= htmlspecialchars($tiendaEditar['store_email']) ?>"
-            class="input input-bordered w-full text-[#404141]" required>
-        </div>
-
-        <div class="mb-4">
-          <label class="label font-semibold">Dirección</label>
-          <input type="text" name="store_address" value="<?= htmlspecialchars($tiendaEditar['store_address']) ?>"
-            class="input input-bordered w-full text-[#404141]" required>
-        </div>
-        <div class="mb-4">
-          <label class="label font-semibold">Rol</label>
-          <select name="id_role" class="select select-bordered w-full text-[#404141]" required>
-            <option value="1" <?= $tiendaEditar['rol'] == 1 ? 'selected' : '' ?>>Administrador</option>
-            <option value="2" <?= $tiendaEditar['rol'] == 2 ? 'selected' : '' ?>>Usuario</option>
-            <option value="3" <?= $tiendaEditar['rol'] == 3 ? 'selected' : '' ?>>Tienda</option>
-          </select>
-        </div>
-        <div class="modal-action">
-          <button type="submit"
-            class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
-            Guardar
-          </button>
-          <a href="/usuarios" class="btn">Cancelar</a>
+          <a href="/usuarios"
+            class="px-5 py-2 bg-gray-300 text-[#404141] font-semibold rounded-lg hover:bg-gray-400 transition">
+            Cancelar
+          </a>
         </div>
       </form>
     </div>
@@ -176,13 +169,13 @@
   </script>
 <?php endif; ?>
 
+
 <?php if (isset($_GET['agregar'])): ?>
   <dialog open class="modal modal-open">
     <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
       <h3 class="font-bold mb-4 text-2xl">Agregar Usuario o Tienda</h3>
       <form method="POST" id="agregarForm" action="/agregar">
-        <!-- Campos de usuario -->
-        <div id="userFields">
+        <div id="userFieldsAdd">
           <div class="mb-4">
             <label class="label font-semibold">Usuario</label>
             <input type="text" name="username" placeholder="Nombre de usuario"
@@ -200,8 +193,7 @@
           </div>
         </div>
 
-        <!-- Campos de tienda -->
-        <div id="storeFields" style="display:none;">
+        <div id="storeFieldsAdd" style="display:none;">
           <div class="mb-4">
             <label class="label font-semibold">Nombre Tienda</label>
             <input type="text" name="store_name" placeholder="Ej: Mi Tienda"
@@ -223,26 +215,25 @@
               class="input input-bordered w-full text-[#404141]">
           </div>
 
-          <!-- Select de ciudad SOLO para tienda -->
-          <div id="cityField" class="mb-4" style="display:none;">
+          <div class="mb-4">
             <label class="label font-semibold">Ciudad</label>
             <select name="city_id" class="select select-bordered w-full text-[#404141]">
               <option value="" disabled selected>Seleccione una ciudad</option>
-              <option value="1">Bogotá</option>
-              <option value="2">Medellín</option>
-              <option value="3">Cali</option>
-              <option value="4">Barranquilla</option>
+              <?php foreach ($ciudades as $ciudad): ?>
+                <option value="<?= $ciudad['id_city'] ?>">
+                  <?= htmlspecialchars($ciudad['city_name']) ?>
+                </option>
+              <?php endforeach; ?>
             </select>
           </div>
         </div>
 
-        <!-- Selección de rol -->
         <div class="mb-4">
           <label class="label font-semibold">Rol</label>
           <select id="roleSelect" name="id_role" class="select select-bordered w-full text-[#404141]" required>
-            <option value="2">Usuario</option>
-            <option value="1">Administrador</option>
-            <option value="3">Tienda</option>
+          <option value="1">Administrador</option>  
+          <option value="2">Usuario</option>
+          <option value="3">Tienda</option>
           </select>
         </div>
 
@@ -263,25 +254,32 @@
 
 <script>
   const roleSelect = document.getElementById('roleSelect');
-  const userFields = document.getElementById('userFields');
-  const storeFields = document.getElementById('storeFields');
-  const cityField = document.getElementById('cityField');
+  const userFieldsAdd = document.getElementById('userFieldsAdd');
+  const storeFieldsAdd = document.getElementById('storeFieldsAdd');
   const form = document.getElementById('agregarForm');
 
   roleSelect.addEventListener('change', () => {
     if (roleSelect.value === "3") {
-      // Mostrar tienda + ciudad
-      userFields.style.display = "none";
-      storeFields.style.display = "block";
-      cityField.style.display = "block";
+      userFieldsAdd.style.display = "none";
+      storeFieldsAdd.style.display = "block";
       form.action = "/agregarT";
     } else {
-      // Mostrar usuario sin ciudad
-      userFields.style.display = "block";
-      storeFields.style.display = "none";
-      cityField.style.display = "none";
+      userFieldsAdd.style.display = "block";
+      storeFieldsAdd.style.display = "none";
       form.action = "/agregar";
     }
   });
-</script>
+   const roleSelectEdit = document.getElementById('roleSelectEdit');
+  const userFields = document.getElementById('userFields');
+  const storeFields = document.getElementById('storeFields');
 
+  roleSelectEdit?.addEventListener('change', () => {
+    if (roleSelectEdit.value === "3") {
+      userFields.style.display = "none";
+      storeFields.style.display = "block";
+    } else {
+      userFields.style.display = "block";
+      storeFields.style.display = "none";
+    }
+  });
+</script>

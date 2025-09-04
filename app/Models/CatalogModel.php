@@ -85,5 +85,12 @@ class CatalogModel
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+public function existeProductoPorSyncId($syncId)
+{
+    $sql = "SELECT id_product FROM catalog WHERE sync_id = :sync_id LIMIT 1";
+    $stmt = $this->pdo->prepare($sql);
+    $stmt->execute([':sync_id' => $syncId]);
+    return $stmt->fetch(PDO::FETCH_ASSOC); 
+}
 
 }

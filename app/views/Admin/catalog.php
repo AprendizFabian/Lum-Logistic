@@ -2,8 +2,6 @@
     <div class="flex min-h-screen">
         <main class="flex-1 flex flex-col w-full">
             <section class="flex-1 px-6 py-10 max-w-screen-xl mx-auto">
-
-                <!-- Barra de búsqueda -->
                 <div class="flex justify-between items-center mb-8 flex-wrap gap-4">
                     <h1 class="text-4xl font-bold flex items-center gap-2">
                         <i class="fa-solid fa-box-open text-[#FEDF00]"></i> Catálogo
@@ -19,7 +17,6 @@
                         </button>
                     </form>
                 </div>
-
                 <div class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                     <?php if (empty($productos)): ?>
                         <div class="col-span-full text-center mt-10 p-6 bg-red-100 text-red-600 rounded-xl shadow-md">
@@ -67,9 +64,8 @@
                                 <i class="fa-solid fa-arrow-left"></i> Anterior
                             </a>
                         <?php endif; ?>
-
                         <?php
-                        $rango = 2; // cantidad de páginas visibles a la izquierda/derecha
+                        $rango = 2;
                         $start = max(1, $page - $rango);
                         $end = min($totalPages, $page + $rango);
 
@@ -97,14 +93,11 @@
                                 Siguiente <i class="fa-solid fa-arrow-right"></i>
                             </a>
                         <?php endif; ?>
-
                     </div>
                 <?php endif; ?>
-
             </section>
         </main>
     </div>
-
     <style>
         @keyframes fadeIn {
             from {
@@ -117,7 +110,6 @@
                 transform: translateY(0);
             }
         }
-
         .animate-fadeIn {
             animation: fadeIn 0.5s ease-in-out;
         }
