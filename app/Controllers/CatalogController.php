@@ -55,7 +55,7 @@ public function showCatalog()
         $sheetData = $sheetModel->getVidaUtil($page, 9, $search);
 
         $title = 'Vida Útil';
-        viewCatalog('Admin/vida_util', compact('title', 'sheetData'));
+        view('Admin/vida_util', compact('title', 'sheetData'));
     }
 
     public function ShowDate()
@@ -67,6 +67,6 @@ public function showCatalog()
         $perPage = 6;
         $fechasData = $modelo->getFechasDesdeOtroArchivo('Fechas!A:B', $page, $perPage, $buscar);
         $layout = '';
-        viewCatalog('Admin/fecha', compact('title', 'fechasData', 'layout'));
+        view('Admin/fecha', compact('title', 'fechasData', 'layout'));
     }
 }

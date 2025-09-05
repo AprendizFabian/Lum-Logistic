@@ -13,19 +13,19 @@ class StockController
             exit;
         }
         $title = "Subir Stock";
-        viewCatalog("Admin/ChargeStock", compact("title"));
+        view("Admin/ChargeStock", compact("title"));
     }
     public function subirStock()
     {
         $title = "Subir Stock";
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            viewCatalog("Admin/ChargeStock", compact("title"));
+            view("Admin/ChargeStock", compact("title"));
             return;
         }
 
         if (!isset($_FILES['archivo_stock']) || $_FILES['archivo_stock']['error'] !== UPLOAD_ERR_OK) {
             $errores = ["No se recibió un archivo válido."];
-            viewCatalog("Admin/ChargeStock", compact("title", "errores"));
+            view("Admin/ChargeStock", compact("title", "errores"));
             return;
         }
 

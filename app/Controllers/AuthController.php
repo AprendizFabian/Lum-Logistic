@@ -1,10 +1,16 @@
 <?php
-
 namespace App\Controllers;
-use App\Models\UserModel;
+use App\Models\MemberModel;
+use Exception;
+use PDOException;
 
 class AuthController
 {
+    private $memberModel;
+    public function __construct()
+    {
+        $this->memberModel = new MemberModel();
+    }
     public function showLogin()
     {
         $title = "Inicio de Sesión";
@@ -12,44 +18,59 @@ class AuthController
         view('Auth/loginView', compact('title', 'layout'));
     }
 
-public function processLogin() {
-    session_start();
-
-    $email = trim($_POST['user'] ?? '');
-    $password = trim($_POST['password'] ?? '');
-
-    if (empty($email) || empty($password)) {
-        header('Location: /login?error=credentials');
-        exit;
-    }
-
-    $usuarioModel = new UserModel();
-    $userData = $usuarioModel->verifyUser($email, $password);
-
-    if ($userData) {
-
-        $_SESSION['user'] = $userData;
-
-        if ($userData['type'] === 'store') {
-            $_SESSION['id_store'] = $userData['id'];
-        } else {
-            $_SESSION['id_store'] = null;
-        
-            $usuarioModel->updateLastLogin($userData['id']);
-        }
-
-        header('Location: /catalogo');
-        exit;
-    } else {
-        header('Location: /login?error=credentials');
-        exit;
-    }
-}
- public function logout()
+    public function processLogin()
     {
-        session_start();
-        session_destroy();
-        header('Location: /');
-        exit;
+        try {
+            $identifier = $_POST['user'] ?? '';
+            $password = $_POST['password'] ?? '';
+
+            if (empty($identifier) || empty($password)) {
+                header('Location: /auth/login?error=empty_fields');
+                exit;
+            }
+
+            if (!filter_var($identifier, FILTER_VALIDATE_EMAIL)) {
+                header('Location: /auth/login?error=invalid_email');
+                exit;
+            }
+
+            $account = $this->memberModel->verifyAccount($identifier, $password, 'user');
+
+            if (!$account) {
+                $account = $this->memberModel->verifyAccount($identifier, $password, 'store');
+            }
+
+            if (!$account) {
+                header('Location: /auth/login?error=credentials');
+                exit;
+            }
+
+            if ((int) ($account['status']) === 0) {
+                header('Location: /auth/login?error=inactive');
+                exit;
+            }
+
+            if ($account) {
+                $_SESSION['auth'] = $account;
+                $this->memberModel->updateLastLogin($account['id'], $account['type']);
+                header('Location: /auth/login?success=login');
+                exit;
+            }
+
+        } catch (PDOException $error) {
+            throw new Exception("Error al procesar el inicio de sesión: " . $error->getMessage());
+        }
+    }
+
+    public function logout()
+    {
+        try {
+            $_SESSION['user'] = null;
+            session_destroy();
+            header('Location: /');
+            exit;
+        } catch (PDOException $error) {
+            throw new Exception("Error al cerrar sesión: " . $error->getMessage());
+        }
     }
 }

@@ -5,14 +5,24 @@ namespace App;
 class Router
 {
     protected array $routes = [];
+    protected string $currentPrefix = '';
+
+    public function group(string $prefix, callable $routes): void
+    {
+        $originalPrefix = $this->currentPrefix;
+        $this->currentPrefix .= $prefix;
+        $routes($this);
+        $this->currentPrefix = $originalPrefix;
+    }
 
     public function addRoute(string $method, string $uri, array $action): void
     {
-        $this->routes[$method][$uri] = $action;
+        $prefix = $this->currentPrefix ?? '';
+        $this->routes[$method][$prefix . $uri] = $action;
     }
     public function post($uri, $action)
     {
-        $this->routes['POST'][$uri] = $action;
+        $this->addRoute('POST', $uri, $action);
     }
 
     public function get(string $uri, array $action): void
