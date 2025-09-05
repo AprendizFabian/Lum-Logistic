@@ -6,7 +6,7 @@ class PageController
     public function showView()
     {
         $title = "Inicio";
-        $layout = 'guest';
+        $layout = 'main';
 
         view('Landing/mainView', compact('title', 'layout'));
     }

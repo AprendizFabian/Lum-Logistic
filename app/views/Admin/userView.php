@@ -1,285 +1,268 @@
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<div class="flex justify-between items-center mb-8 flex-wrap gap-4 px-6 pt-4">
-  <h1 class="text-3xl font-bold flex items-center gap-2">
-    <i class="fas fa-users text-[#FEDF00]"></i> Lista de Usuarios
+<div class="flex justify-between items-center mb-10 flex-wrap gap-4 px-6 pt-6">
+  <h1 class="text-3xl font-bold flex items-center gap-3 text-[#404141]">
+    <i class="fas fa-users text-[#FEDF00] text-4xl"></i> <?= htmlspecialchars($title) ?>
   </h1>
-  <a href="/usuarios?agregar=1"
-    class="bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] font-semibold px-4 py-2 rounded-xl shadow-lg flex items-center gap-2 transition">
-    <i class="fas fa-user-plus"></i> Agregar Usuario o tienda
+  <a href="#" onclick="document.getElementById('agregarUsuarioModal').showModal()"
+    class="btn bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-2xl shadow-md px-6 py-2 flex items-center gap-2">
+    <i class="fas fa-user-plus"></i> Agregar Usuario o Tienda
   </a>
 </div>
-<div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
-  <?php foreach ($usuariosPaginados as $usuario): ?>
-    <div
-      class="bg-white border border-[#e5e5e5] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-      <div class="bg-[#FEDF00] h-20 flex items-center justify-center relative">
-        <img class="w-20 h-20 rounded-full border-4 border-white shadow-md absolute -bottom-10 object-cover"
-          src="https://static.vecteezy.com/system/resources/previews/008/302/557/non_2x/eps10-yellow-user-solid-icon-or-logo-in-simple-flat-trendy-modern-style-isolated-on-white-background-free-vector.jpg"
-          alt="Usuario">
-      </div>
-      <div class="pt-12 pb-4 px-4 text-center">
-        <h3 class="text-lg font-bold text-[#404141]"><?= htmlspecialchars($usuario['username']) ?></h3>
-        <p class="text-sm text-gray-600">Rol: <?= htmlspecialchars($usuario['rol']) ?></p>
-        <p class="text-sm text-gray-600">
-          Estado:
-          <span class="<?= $usuario['is_active'] == 1 ? 'text-green-600' : 'text-red-600' ?>">
-            <?= $usuario['is_active'] == 1 ? 'Activo' : 'Inactivo' ?>
-          </span>
-        </p>
-      </div>
-      <div class="flex justify-center gap-3 pb-4">
-        <a href="/usuarios?editar=<?= $usuario['id_user'] ?>"
-          class="bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1">
-          <i class="fas fa-edit"></i> Editar
-        </a>
-        <form method="POST" action="/Activar" class="form-activar">
-          <input type="hidden" name="id_user" value="<?= $usuario['id_user'] ?>">
-          <button type="submit"
-            class="btn-estado px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1
-      <?= $usuario['is_active'] == 1 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white' ?>">
-            <i class="fas <?= $usuario['is_active'] == 1 ? 'fa-user-slash' : 'fa-user-check' ?>"></i>
-            <?= $usuario['is_active'] == 1 ? 'Desactivar' : 'Activar' ?>
-          </button>
-        </form>
-      </div>
-    </div>
-  <?php endforeach; ?>
-  <?php foreach (($tiendasPaginadas ?? []) as $tienda): ?>
-    <div
-      class="bg-white border border-[#e5e5e5] rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl hover:-translate-y-1 transition duration-300">
-      <div class="bg-[#FEDF00] h-20 flex items-center justify-center relative">
-        <img class="w-20 h-20 rounded-full border-4 border-white shadow-md absolute -bottom-10 object-cover"
-          src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Tienda">
-      </div>
-      <div class="pt-12 pb-4 px-4 text-center">
-        <h3 class="text-lg font-bold text-[#404141]"><?= htmlspecialchars($tienda['store_name'] ?? 'Sin nombre') ?></h3>
-        <p class="text-sm text-gray-600">Rol: <?= htmlspecialchars($tienda['rol'] ?? 'Sin rol') ?></p>
-        <p class="text-sm text-gray-600">
-          Estado:
-          <span class="<?= $tienda['is_active'] == 1 ? 'text-green-600' : 'text-red-600' ?>">
-            <?= $tienda['is_active'] == 1 ? 'Activo' : 'Inactivo' ?>
-          </span>
-        </p>
-      </div>
-      <div class="flex justify-center gap-3 pb-4">
-        <a href="/usuarios?editar_store=<?= $tienda['id_store'] ?>"
-          class="bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1">
-          <i class="fas fa-edit"></i> Editar
-        </a>
-        <form method="POST" action="/ActivarStore" class="form-activar">
-          <input type="hidden" name="id_store" value="<?= $tienda['id_store'] ?>">
-          <button type="submit"
-            class="px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1
-      <?= $tienda['is_active'] == 1 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white' ?>">
-            <i class="fas <?= $tienda['is_active'] == 1 ? 'fa-store-slash' : 'fa-store' ?>"></i>
-            <?= $tienda['is_active'] == 1 ? 'Desactivar' : 'Activar' ?>
-          </button>
-        </form>
 
+<div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
+  <?php foreach ($membersPaginated['items'] as $member): ?>
+    <div
+      class="card border border-[#e5e5e5] rounded-2xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition duration-300 bg-white">
+      <div class="bg-[#FEDF00] h-24 flex items-center justify-center relative">
+        <?php if ($member['type'] === 'store'): ?>
+          <img class="w-20 h-20 rounded-full border-4 border-white shadow-md absolute -bottom-10 object-cover"
+            src="https://cdn-icons-png.flaticon.com/512/891/891462.png" alt="Tienda">
+        <?php else: ?>
+          <img class="w-20 h-20 rounded-full border-4 border-white shadow-md absolute -bottom-10 object-cover"
+            src="https://static.vecteezy.com/system/resources/previews/008/302/557/non_2x/eps10-yellow-user-solid-icon-or-logo-in-simple-flat-trendy-modern-style-isolated-on-white-background-free-vector.jpg"
+            alt="Usuario">
+        <?php endif; ?>
+      </div>
+      <div class="card-body items-center text-center pt-12">
+        <h3 class="text-xl font-bold text-[#404141]"><?= htmlspecialchars($member['username']) ?></h3>
+        <p class="text-sm text-gray-600 flex items-center gap-2">
+          <i class="fas fa-envelope text-[#404141]"></i> <?= htmlspecialchars($member['email'] ?? 'Sin correo') ?>
+        </p>
+        <p class="text-sm text-gray-600 flex items-center gap-2">
+          <i class="fas fa-user-tag text-[#404141]"></i> <?= htmlspecialchars($member['rol']) ?>
+        </p>
+      </div>
+      <div class="card-actions justify-center gap-3 pb-6">
+        <button
+          class="btn btn-sm bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-lg shadow-md flex items-center gap-2"
+          onclick="openEditModal(this)" data-id="<?= $member['id'] ?>"
+          data-username="<?= htmlspecialchars($member['username']) ?>"
+          data-email="<?= htmlspecialchars($member['email']) ?>" data-rol="<?= $member['id_role'] ?>"
+          data-type="<?= htmlspecialchars($member['type']) ?>"
+          data-address="<?= htmlspecialchars($member['address'] ?? '') ?>">
+          <i class="fas fa-edit"></i> Editar
+        </button>
+        <form method="POST" action="/users/changeStatus" class="form-activar">
+          <?php if ($member['type'] === 'user'): ?>
+            <input type="hidden" name="id_user" value="<?= $member['id'] ?>">
+            <input type="hidden" name="type" value="user">
+          <?php elseif ($member['type'] === 'store'): ?>
+            <input type="hidden" name="id_store" value="<?= $member['id'] ?>">
+            <input type="hidden" name="type" value="store">
+          <?php endif; ?>
+
+          <input type="hidden" name="status" value="<?= $member['status'] == 1 ? 0 : 1 ?>">
+
+          <button type="submit"
+            class="btn btn-sm btn-estado px-3 py-1 rounded-md text-sm shadow-sm transition flex items-center gap-1
+            <?= $member['status'] == 1 ? 'bg-red-600 hover:bg-red-700 text-white' : 'bg-green-600 hover:bg-green-700 text-white' ?>">
+            <i class="fas <?= $member['status'] == 1 ? 'fa-user-slash' : 'fa-user-check' ?>"></i>
+            <?= $member['status'] == 1 ? 'Desactivar' : 'Activar' ?>
+          </button>
+        </form>
       </div>
     </div>
   <?php endforeach; ?>
 </div>
-<?php if ($entidadEditar): ?>
-  <dialog open class="modal modal-open">
-    <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
-      <h3 class="font-bold mb-4 text-2xl">
-        Editar <?= $entidadEditar['id_role'] == 3 ? 'Tienda' : 'Usuario' ?>
-      </h3>
-      <form method="POST" action="<?= $entidadEditar['id_role'] == 3 ? '/editarT' : '/editarU' ?>">
-        <?php if ($entidadEditar['id_role'] == 3): ?>
-          <input type="hidden" name="id_store" value="<?= $entidadEditar['id_store'] ?>">
-        <?php else: ?>
-          <input type="hidden" name="id_user" value="<?= $entidadEditar['id_user'] ?>">
-        <?php endif; ?>
-        <div id="userFields" style="<?= $entidadEditar['id_role'] == 3 ? 'display:none;' : '' ?>">
-          <div class="mb-4">
-            <label class="label font-semibold">Usuario</label>
-            <input type="text" name="username" value="<?= htmlspecialchars($entidadEditar['username'] ?? '') ?>"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Email</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($entidadEditar['email'] ?? '') ?>"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-        </div>
 
-        <div id="storeFields" style="<?= $entidadEditar['id_role'] == 3 ? '' : 'display:none;' ?>">
-          <div class="mb-4">
-            <label class="label font-semibold">Nombre Tienda</label>
-            <input type="text" name="store_name" value="<?= htmlspecialchars($entidadEditar['store_name'] ?? '') ?>"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Dirección</label>
-            <input type="text" name="store_address"
-              value="<?= htmlspecialchars($entidadEditar['store_address'] ?? '') ?>"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Ciudad</label>
-            <select name="city_id" class="select select-bordered w-full text-[#404141]">
-              <?php foreach ($ciudades as $ciudad): ?>
-                <option value="<?= $ciudad['id_city'] ?>"
-                  <?= isset($entidadEditar['city_id']) && $entidadEditar['city_id'] == $ciudad['id_city'] ? 'selected' : '' ?>>
-                  <?= htmlspecialchars($ciudad['city_name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
-        </div>
-        <div class="mb-4">
-          <label class="label font-semibold">Rol</label>
-          <select id="roleSelectEdit" name="id_role" class="select select-bordered w-full text-[#404141]" required>
-            <option value="1" <?= $entidadEditar['id_role'] == 1 ? 'selected' : '' ?>>Administrador</option>
-            <option value="2" <?= $entidadEditar['id_role'] == 2 ? 'selected' : '' ?>>Usuario</option>
-            <option value="3" <?= $entidadEditar['id_role'] == 3 ? 'selected' : '' ?>>Tienda</option>
-          </select>
-        </div>
+<div class="flex justify-center gap-2 my-8">
+  <?php if ($membersPaginated['page'] > 1): ?>
+    <a href="?page=<?= $membersPaginated['page'] - 1 ?>"
+      class="px-4 py-2 rounded-lg shadow-md transition text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-[#404141] flex items-center gap-1">
+      <i class="fas fa-chevron-left"></i> Anterior
+    </a>
+  <?php endif; ?>
 
-        <div class="modal-action flex justify-end gap-2">
-          <button type="submit"
-            class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
-            Guardar
-          </button>
-          <a href="/usuarios"
-            class="px-5 py-2 bg-gray-300 text-[#404141] font-semibold rounded-lg hover:bg-gray-400 transition">
-            Cancelar
-          </a>
-        </div>
-      </form>
+  <?php for ($i = 1; $i <= $membersPaginated['totalPages']; $i++): ?>
+    <a href="?page=<?= $i ?>"
+      class="px-4 py-2 rounded-lg shadow-md transition text-sm font-semibold 
+        <?= $i == $membersPaginated['page'] ? 'bg-[#404141] text-[#FEDF00]' : 'bg-gray-200 hover:bg-gray-300 text-[#404141]' ?>">
+      <?= $i ?>
+    </a>
+  <?php endfor; ?>
+
+  <?php if ($membersPaginated['page'] < $membersPaginated['totalPages']): ?>
+    <a href="?page=<?= $membersPaginated['page'] + 1 ?>"
+      class="px-4 py-2 rounded-lg shadow-md transition text-sm font-semibold bg-gray-200 hover:bg-gray-300 text-[#404141] flex items-center gap-1">
+      Siguiente <i class="fas fa-chevron-right"></i>
+    </a>
+  <?php endif; ?>
+</div>
+
+<dialog class="modal" id="agregarUsuarioModal">
+  <div class="modal-box bg-white text-[#404141] rounded-2xl shadow-xl p-6 w-full max-w-2xl">
+    <div class="flex items-center gap-3 mb-4">
+      <i class="fas fa-user-plus text-[#FEDF00] text-xl"></i>
+      <h3 class="font-bold text-2xl">Agregar Usuario o Tienda</h3>
     </div>
-  </dialog>
-<?php endif; ?>
 
-<?php if (isset($_GET['success']) && $_GET['success'] === 'estado'): ?>
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      Swal.fire({
-        icon: 'success',
-        title: 'Usuario actualizado',
-        text: 'El estado del usuario fue cambiado con éxito.',
-        confirmButtonColor: '#404141'
-      });
-      if (window.location.search.includes('success=estado')) {
-        window.history.replaceState({}, '', '/usuarios');
-      }
-    });
-  </script>
-<?php endif; ?>
-
-
-<?php if (isset($_GET['agregar'])): ?>
-  <dialog open class="modal modal-open">
-    <div class="modal-box bg-white text-[#404141] w-full max-w-lg">
-      <h3 class="font-bold mb-4 text-2xl">Agregar Usuario o Tienda</h3>
-      <form method="POST" id="agregarForm" action="/agregar">
-        <div id="userFieldsAdd">
-          <div class="mb-4">
-            <label class="label font-semibold">Usuario</label>
-            <input type="text" name="username" placeholder="Nombre de usuario"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Email</label>
-            <input type="email" name="email" placeholder="correo@ejemplo.com"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Contraseña</label>
-            <input type="password" name="password" placeholder="********"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
+    <form method="POST" id="agregarForm" action="/users/addMember" class="space-y-4">
+      <div id="userFields" class="space-y-4">
+        <div>
+          <label class="label font-semibold"><i class="fas fa-user"></i>Usuario</label>
+          <input type="text" name="username" placeholder="Nombre de usuario"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
         </div>
 
-        <div id="storeFieldsAdd" style="display:none;">
-          <div class="mb-4">
-            <label class="label font-semibold">Nombre Tienda</label>
-            <input type="text" name="store_name" placeholder="Ej: Mi Tienda"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Dirección</label>
-            <input type="text" name="store_address" placeholder="Calle 123"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Email Tienda</label>
-            <input type="email" name="store_email" placeholder="tienda@ejemplo.com"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-          <div class="mb-4">
-            <label class="label font-semibold">Contraseña</label>
-            <input type="password" name="password" placeholder="********"
-              class="input input-bordered w-full text-[#404141]">
-          </div>
-
-          <div class="mb-4">
-            <label class="label font-semibold">Ciudad</label>
-            <select name="city_id" class="select select-bordered w-full text-[#404141]">
-              <option value="" disabled selected>Seleccione una ciudad</option>
-              <?php foreach ($ciudades as $ciudad): ?>
-                <option value="<?= $ciudad['id_city'] ?>">
-                  <?= htmlspecialchars($ciudad['city_name']) ?>
-                </option>
-              <?php endforeach; ?>
-            </select>
-          </div>
+        <div>
+          <label class="label font-semibold"><i class="fas fa-envelope"></i>Email</label>
+          <input type="email" name="email" placeholder="correo@ejemplo.com"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
         </div>
 
-        <div class="mb-4">
-          <label class="label font-semibold">Rol</label>
-          <select id="roleSelect" name="id_role" class="select select-bordered w-full text-[#404141]" required>
-          <option value="1">Administrador</option>  
+        <div>
+          <label class="label font-semibold"><i class="fas fa-lock"></i>Contraseña</label>
+          <input type="password" name="password" placeholder="********"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+        </div>
+      </div>
+
+      <div id="storeFields" class="hidden space-y-4">
+        <div>
+          <label class="label font-semibold"><i class="fas fa-store"></i>Nombre Tienda</label>
+          <input type="text" name="store_name" placeholder="Ej: Mi Tienda"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+        </div>
+
+        <div>
+          <label class="label font-semibold"><i class="fas fa-map-marker-alt"></i>Dirección</label>
+          <input type="text" name="store_address" placeholder="Calle 123"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+        </div>
+
+        <div>
+          <label class="label font-semibold"><i class="fas fa-envelope"></i>Email Tienda</label>
+          <input type="email" name="store_email" placeholder="tienda@ejemplo.com"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+        </div>
+
+        <div>
+          <label class="label font-semibold"><i class="fas fa-lock"></i>Contraseña</label>
+          <input type="password" name="password" placeholder="********"
+            class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+        </div>
+      </div>
+
+      <div>
+        <label class="label font-semibold"><i class="fas fa-user-shield"></i>Rol</label>
+        <select id="roleSelect" name="id_role"
+          class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+          <option value="1">Administrador</option>
           <option value="2">Usuario</option>
           <option value="3">Tienda</option>
-          </select>
-        </div>
+        </select>
+      </div>
 
-        <div class="modal-action flex justify-end gap-2">
-          <button type="submit"
-            class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-lg hover:bg-yellow-400 transition">
-            Agregar
-          </button>
-          <a href="/usuarios"
-            class="px-5 py-2 bg-gray-300 text-[#404141] font-semibold rounded-lg hover:bg-gray-400 transition">
-            Cancelar
-          </a>
-        </div>
-      </form>
+      <div class="modal-action flex justify-end gap-2">
+        <button type="submit"
+          class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-xl hover:bg-yellow-400 transition shadow-md flex items-center gap-2">
+          <i class="fas fa-plus-circle"></i> Agregar
+        </button>
+        <a href="/users/"
+          class="px-5 py-2 bg-gray-200 text-[#404141] font-semibold rounded-xl hover:bg-gray-300 transition shadow-md flex items-center gap-2">
+          <i class="fas fa-times"></i> Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</dialog>
+
+<dialog class="modal" id="editarUsuarioModal">
+  <div class="modal-box bg-white text-[#404141] rounded-2xl shadow-xl p-6 w-full max-w-2xl">
+    <div class="flex items-center gap-3 mb-4">
+      <i class="fas fa-user-edit text-[#FEDF00] text-xl"></i>
+      <h3 id="modalTitle" class="font-bold text-2xl">Editar Usuario</h3>
     </div>
-  </dialog>
-<?php endif; ?>
+
+    <form method="POST" action="/users/editMember" class="space-y-4">
+      <input type="hidden" name="id_user" id="modalUserId">
+      <input type="hidden" name="id_store" id="modalStoreId">
+
+      <div>
+        <label class="label font-semibold">Usuario</label>
+        <input type="text" name="username" id="modalUsername"
+          class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+      </div>
+
+      <div>
+        <label class="label font-semibold">Email</label>
+        <input type="email" name="email" id="modalEmail"
+          class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+      </div>
+
+      <div class="hidden" id="addressField">
+        <label class="label font-semibold">Dirección</label>
+        <input type="text" name="store_address" id="modalAddress"
+          class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
+      </div>
+
+      <div>
+        <label class="label font-semibold">Rol</label>
+        <select name="id_role" id="modalRol"
+          class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+          <option value="1">Administrador</option>
+          <option value="2">Usuario</option>
+          <option value="3">Tienda</option>
+        </select>
+      </div>
+
+      <div class="modal-action flex justify-end gap-2">
+        <button type="submit"
+          class="px-5 py-2 bg-[#FEDF00] text-[#404141] font-semibold rounded-xl hover:bg-yellow-400 transition shadow-md flex items-center gap-2">
+          <i class="fas fa-save"></i> Guardar
+        </button>
+        <button type="button" class="btn rounded-xl bg-gray-200 text-[#404141] hover:bg-gray-300"
+          onclick="document.getElementById('editarUsuarioModal').close()">
+          <i class="fas fa-times"></i> Cancelar
+        </button>
+      </div>
+    </form>
+  </div>
+</dialog>
 
 <script>
-  const roleSelect = document.getElementById('roleSelect');
-  const userFieldsAdd = document.getElementById('userFieldsAdd');
-  const storeFieldsAdd = document.getElementById('storeFieldsAdd');
-  const form = document.getElementById('agregarForm');
+  function openEditModal(button) {
+    const modal = document.getElementById("editarUsuarioModal");
 
-  roleSelect.addEventListener('change', () => {
-    if (roleSelect.value === "3") {
-      userFieldsAdd.style.display = "none";
-      storeFieldsAdd.style.display = "block";
-      form.action = "/agregarT";
+    const id = button.dataset.id;
+    const username = button.dataset.username;
+    const email = button.dataset.email;
+    const rol = button.dataset.rol;
+    const type = button.dataset.type;
+    const address = button.dataset.address;
+
+    document.getElementById("modalUserId").value = id;
+    document.getElementById("modalUsername").value = username;
+    document.getElementById("modalEmail").value = email;
+    document.getElementById("modalRol").value = rol;
+
+    if (type === "store") {
+      document.getElementById("modalTitle").innerText = "Editar Tienda";
+      document.getElementById("addressField").classList.remove("hidden");
+      document.getElementById("modalAddress").value = address;
+
+      document.getElementById("modalUserId").value = ""; // limpiar
+      document.getElementById("modalStoreId").value = id; // asignar store
     } else {
-      userFieldsAdd.style.display = "block";
-      storeFieldsAdd.style.display = "none";
-      form.action = "/agregar";
+      document.getElementById("modalTitle").innerText = "Editar Usuario";
+      document.getElementById("addressField").classList.add("hidden");
+
+      document.getElementById("modalUserId").value = id; // asignar user
+      document.getElementById("modalStoreId").value = ""; // limpiar
     }
-  });
-   const roleSelectEdit = document.getElementById('roleSelectEdit');
-  const userFields = document.getElementById('userFields');
-  const storeFields = document.getElementById('storeFields');
 
-  roleSelectEdit?.addEventListener('change', () => {
-    if (roleSelectEdit.value === "3") {
-      userFields.style.display = "none";
-      storeFields.style.display = "block";
+    modal.showModal();
+  }
+
+  document.getElementById("roleSelect").addEventListener("change", function () {
+    const userFields = document.getElementById("userFields");
+    const storeFields = document.getElementById("storeFields");
+
+    if (this.value === "3") { // Tienda
+      userFields.classList.add("hidden");
+      storeFields.classList.remove("hidden");
     } else {
-      userFields.style.display = "block";
-      storeFields.style.display = "none";
+      userFields.classList.remove("hidden");
+      storeFields.classList.add("hidden");
     }
   });
 </script>

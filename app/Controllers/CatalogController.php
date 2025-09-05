@@ -4,31 +4,31 @@ use App\Models\SheetsModel;
 use App\Models\CatalogModel;
 class CatalogController
 {
-public function showCatalog()
-{
-    $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 
-        ? (int)$_GET['page'] 
-        : 1;
-    $search = trim($_GET['search'] ?? '');
-    $perPage = 8;
-    $catalogModel = new CatalogModel();
-    $total = $catalogModel->contarProductos($search);
-    $totalPages = max(1, ceil($total / $perPage)); 
-    if ($page > $totalPages) {
-        $page = $totalPages;
+    public function showCatalog()
+    {
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0
+            ? (int) $_GET['page']
+            : 1;
+        $search = trim($_GET['search'] ?? '');
+        $perPage = 8;
+        $catalogModel = new CatalogModel();
+        $total = $catalogModel->contarProductos($search);
+        $totalPages = max(1, ceil($total / $perPage));
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+        $offset = ($page - 1) * $perPage;
+        $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
+        $title = 'Catálogo';
+        view('Admin/catalog', compact(
+            'title',
+            'productos',
+            'page',
+            'totalPages',
+            'search',
+            'total'
+        ));
     }
-    $offset = ($page - 1) * $perPage;
-    $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
-    $title = 'Catálogo';
-    viewCatalog('Admin/catalog', compact(
-        'title',
-        'productos',
-        'page',
-        'totalPages',
-        'search',
-        'total'
-    ));
-}
     public function showVidaUtil()
     {
         $page = $_GET['page'] ?? 1;
@@ -38,7 +38,7 @@ public function showCatalog()
         $sheetData = $sheetModel->getVidaUtil($page, 9, $search);
 
         $title = 'Vida Útil';
-        viewCatalog('Admin/vida_util', compact('title', 'sheetData'));
+        view('Admin/vida_util', compact('title', 'sheetData'));
     }
 
     public function ShowDate()
@@ -50,6 +50,6 @@ public function showCatalog()
         $perPage = 6;
         $fechasData = $modelo->getFechasDesdeOtroArchivo('Fechas!A:B', $page, $perPage, $buscar);
         $layout = '';
-        viewCatalog('Admin/fecha', compact('title', 'fechasData', 'layout'));
+        view('Admin/fecha', compact('title', 'fechasData', 'layout'));
     }
 }
