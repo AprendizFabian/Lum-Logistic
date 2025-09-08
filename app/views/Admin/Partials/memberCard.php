@@ -18,6 +18,19 @@
         <p class="text-sm text-gray-600 flex items-center gap-2">
             <i class="fas fa-user-tag text-[#404141]"></i> <?= htmlspecialchars($member['rol']) ?>
         </p>
+        <p class="mt-2">
+            <?php if ($member['status'] == 1): ?>
+                <span
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-semibold shadow">
+                    <i class="fas fa-check-circle"></i> Activo
+                </span>
+            <?php else: ?>
+                <span
+                    class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-semibold shadow">
+                    <i class="fas fa-times-circle"></i> Inactivo
+                </span>
+            <?php endif; ?>
+        </p>
     </div>
     <div class="card-actions justify-center gap-3 pb-6">
         <button

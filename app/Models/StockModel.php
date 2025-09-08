@@ -48,9 +48,9 @@ class StockModel
         return $exists ? 'actualizado' : 'insertado';
     }
 
-   public function obtenerStockPorTienda($idStore)
-{
-    $sql = "
+    public function obtenerStockPorTienda($idStore)
+    {
+        $sql = "
         SELECT ss.id_stock, ss.total_stock, ss.chipperprice, ss.sync_id,
                c.id_product, c.ean, c.description, c.image_url,
                s.concept AS shelf_life_concept,
@@ -61,10 +61,10 @@ class StockModel
         WHERE ss.id_store = :id_store
     ";
 
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute([':id_store' => $idStore]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id_store' => $idStore]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     public function contarStockPorTienda($idStore, $search = '')
     {
         $sql = "SELECT COUNT(*) 

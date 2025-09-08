@@ -2,13 +2,13 @@
 namespace App\Controllers;
 use App\Models\CatalogModel;
 use App\Models\StockModel;
-use App\Models\UserModel;
+use App\Models\MemberModel;
 class StockController
 {
     public function showUploadForm()
     {
-            session_start();
-        if (!isset($_SESSION['user']) || $_SESSION['user']['id_role'] != 1) {
+        
+        if (!isset($_SESSION['auth']) || $_SESSION['auth']['id_role'] != 1) {
             header('Location: /login');
             exit;
         }
@@ -32,12 +32,12 @@ class StockController
         $tmp = $_FILES['archivo_stock']['tmp_name'];
         if (!is_readable($tmp)) {
             $errores = ["No se puede leer el archivo."];
-            viewCatalog("Admin/ChargeStock", compact("title", "errores"));
+            view("Admin/ChargeStock", compact("title", "errores"));
             return;
         }
 
         $stockModel = new StockModel();
-        $userModel = new UserModel();
+        $userModel = new MemberModel();
         $catalogModel = new CatalogModel();
 
         $errores = [];
@@ -123,7 +123,7 @@ class StockController
                 $priceVal = (int) $priceRaw;
             }
 
-            $tienda = $userModel->obtenerTiendaPorId($idStore);
+            $tienda = $userModel->getMembers('store');
             if (!$tienda) {
                 $errores[] = "Fila {$row}: la tienda ID {$idStore} no existe.";
                 continue;
@@ -146,23 +146,6 @@ class StockController
         }
         fclose($handle);
 
-        viewCatalog("Admin/ChargeStock", compact("title", "errores", "resumen"));
-    }
-    public function ver()
-    {
-        if (!isset($_GET['id_store'])) {
-            header("Location: /usuarios");
-            exit;
-        }
-
-        $idStore = (int) $_GET['id_store'];
-        $stockModel = new StockModel();
-        $userModel = new UserModel();
-
-        $tienda = $userModel->obtenerTiendaPorId($idStore);
-        $productos = $stockModel->obtenerStockPorTienda($idStore);
-
-        $title = "Stock de " . $tienda['store_name'];
-        viewCatalog("Stock/verStockView", compact("title", "tienda", "productos"));
+        view("Admin/ChargeStock", compact("title", "errores", "resumen"));
     }
 }

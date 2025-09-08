@@ -5,6 +5,7 @@ use App\helpers\Controller;
 use Exception;
 use PDOException;
 
+
 class MemberController
 {
     private $memberModel;
@@ -38,7 +39,7 @@ class MemberController
     public function showMembers()
     {
         try {
-            $this->requireAuth(1); // solo admin
+            $this->requireAuth(1); 
 
             $page = $_GET['page'] ?? 1;
             $perPage = 6;
@@ -46,7 +47,7 @@ class MemberController
             $members = $this->memberModel->getMembers(null);
             $cities = $this->memberModel->getCities();
             $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
-
+            $ciudades = $this->memberModel->getCities();
             view('Admin/userView', [
                 'title' => "Usuarios",
                 'layout' => "main",
@@ -87,7 +88,7 @@ class MemberController
                 return;
             }
 
-            $type = $_POST['id_role'] == 3 ? 'store' : 'user';
+    $type = $_POST['id_role'] == 3 ? 'store' : 'user';
 
             if ($type === 'store') {
                 $data = [
@@ -115,12 +116,10 @@ class MemberController
     }
 
 
-    public function editMember()
-    {
-        try {
-            $type = !empty($_POST['id_user']) ? 'user' : (!empty($_POST['id_store']) ? 'store' : null);
-            if (!$type)
-                throw new Exception("Tipo de miembro no especificado.");
+public function editMember()
+{
+    $type = !empty($_POST['id_user']) ? 'user' : (!empty($_POST['id_store']) ? 'store' : null);
+    if (!$type) throw new Exception("Tipo de miembro no especificado.");
 
             $data = [
                 'id_user' => $_POST['id_user'] ?? null,
@@ -134,12 +133,10 @@ class MemberController
                 'id_role' => $_POST['id_role'],
             ];
 
-            $this->memberModel->editMember($data, $type);
-            $this->redirect('/users/');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
-    }
+    $this->memberModel->editMember($data, $type);
+    $this->redirect('/users/');
+}
+
 
     public function changeStatus()
     {
@@ -160,4 +157,5 @@ class MemberController
             throw new Exception("Error: " . $e->getMessage());
         }
     }
+
 }

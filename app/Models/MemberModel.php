@@ -97,7 +97,7 @@ class MemberModel
 
             if ($type === 'user') {
                 $sql = "INSERT INTO {$c['table']} (username, email, password, id_role) 
-                        VALUES (:username, :email, :password, :id_role)";
+                    VALUES (:username, :email, :password, :id_role)";
                 $stmt = $this->pdo->prepare($sql);
                 $stmt->execute([
                     ':username' => $data['username'],
@@ -112,6 +112,7 @@ class MemberModel
                 $stmt->execute([
                     ':store_name' => $data['store_name'],
                     ':store_address' => $data['store_address'],
+                    ':store_city' => $data['store_city'], 
                     ':store_email' => $data['store_email'],
                     ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
                     ':city_id' => $data['city_id'],
@@ -130,8 +131,8 @@ class MemberModel
         try {
             if ($type === 'user') {
                 $sql = "UPDATE users 
-                        SET username = :username, email = :email, id_role = :id_role
-                        WHERE id_user = :id";
+                    SET username = :username, email = :email, id_role = :id_role
+                    WHERE id_user = :id";
                 $stmt = $this->pdo->prepare($sql);
                 $stmt->execute([
                     ':username' => $data['username'],
@@ -147,6 +148,7 @@ class MemberModel
                 $stmt->execute([
                     ':store_name' => $data['store_name'],
                     ':store_address' => $data['store_address'],
+                    ':store_city' => $data['store_city'],
                     ':store_email' => $data['store_email'],
                     ':id_role' => $data['id_role'],
                     ':city_id' => $data['city_id'],
@@ -158,6 +160,7 @@ class MemberModel
             throw new \Exception("Database Error: " . $error->getMessage());
         }
     }
+
 
     public function toggleMemberStatus(int $id, string $type, int $status)
     {
@@ -198,7 +201,7 @@ class MemberModel
             $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
             if ($account && password_verify($password, $account['password'])) {
-                unset($account['password']); // no guardamos el hash en sesión
+                unset($account['password']);
                 return $account;
             }
             return null;

@@ -4,7 +4,7 @@ use App\Controllers\PageController;
 use App\Controllers\AuthController;
 use App\Controllers\DateController;
 use App\Controllers\CatalogController;
-use App\Controllers\UserController;
+
 use App\Controllers\MemberController;
 use App\Controllers\StockController;
 
@@ -35,8 +35,6 @@ $router->get('/Masivo', [DateController::class, 'MasiveCharge']);
 $router->get('/catalogo', [CatalogController::class, 'showCatalog']);
 $router->get('/vida-util', [CatalogController::class, 'showVidaUtil']);
 $router->get('/fecha', [CatalogController::class, 'ShowDate']);
-$router->post('/eliminarT', [UserController::class, 'eliminarTienda']);
-$router->post('/agregarT', [UserController::class, 'agregarTienda']);
-$router->post('/editarT', [UserController::class, 'editarTienda']);
+
 $router->get('/stock', [StockController::class, 'showUploadForm']);
 $router->post('/stock/subir', [StockController::class, 'subirStock']);
