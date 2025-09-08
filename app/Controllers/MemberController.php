@@ -98,6 +98,11 @@ class MemberController
                     'password' => $_POST['password'] ?? null,
                     'id_role' => $_POST['id_role'],
                 ];
+
+                if (!filter_var($data['store_email'], FILTER_VALIDATE_EMAIL)) {
+                    $this->redirect('/users/?error=invalid_email');
+                }
+
             } else {
                 $data = [
                     'username' => $_POST['username'] ?? null,
@@ -105,10 +110,15 @@ class MemberController
                     'password' => $_POST['password'] ?? null,
                     'id_role' => $_POST['id_role'],
                 ];
+
+                if (!filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+                    $this->redirect('/users/?error=invalid_email');
+                }
+
             }
 
             $this->memberModel->addMember($data, $type);
-            $this->redirect('/users/');
+            $this->redirect('/users/?success=added');
         } catch (PDOException $e) {
             throw new Exception("Error: " . $e->getMessage());
         }
@@ -135,7 +145,7 @@ class MemberController
             ];
 
             $this->memberModel->editMember($data, $type);
-            $this->redirect('/users/');
+            $this->redirect('/users/?success=updated');
         } catch (PDOException $e) {
             throw new Exception("Error: " . $e->getMessage());
         }
@@ -161,3 +171,4 @@ class MemberController
         }
     }
 }
+

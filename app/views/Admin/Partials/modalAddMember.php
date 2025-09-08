@@ -36,8 +36,7 @@
                 <div>
                     <label class="label font-semibold">Ciudad</label>
                     <select name="city_id" id="modalCity"
-                        class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]"
-                        required>
+                        class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
                         <option value="">Seleccione una ciudad</option>
                         <?php foreach ($cities as $city): ?>
                             <option value="<?= htmlspecialchars($city['id_city']) ?>" name="city_id">

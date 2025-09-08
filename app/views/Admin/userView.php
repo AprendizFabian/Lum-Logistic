@@ -24,3 +24,76 @@
 <?php include __DIR__ . '/Partials/modalAddMember.php'; ?>
 
 <?php include __DIR__ . '/Partials/modalEditMember.php'; ?>
+
+<?php
+$errorMessages = [
+  'missing_fields' => 'Por favor completa todos los campos requeridos.',
+  'invalid_email' => 'Por favor ingresa un correo electrónico válido.',
+];
+
+$successMessages = [
+  'updated' => 'Miembro actualizado con éxito.',
+  'added' => 'Miembro agregado con éxito.',
+];
+
+$errorType = $_GET['error'] ?? null;
+$errorMessage = $errorMessages[$errorType] ?? null;
+
+$successType = $_GET['success'] ?? null;
+$successMessage = $successMessages[$successType] ?? null;
+?>
+
+<?php if ($successMessage): ?>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      Swal.fire({
+        icon: 'success',
+        title: 'Proceso exitoso',
+        html: '<?= addslashes($successMessage) ?>',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'Entendido'
+      }).then(() => {
+        window.location.href = '/users/';
+      });
+    });
+  </script>
+<?php elseif ($errorMessage): ?>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      Swal.fire({
+        icon: 'error',
+        title: 'Proceso fallido',
+        html: '<?= addslashes($errorMessage) ?>',
+        confirmButtonColor: '#FFD700',
+        confirmButtonText: 'Entendido'
+      }).then(() => {
+        window.history.replaceState({}, '', '/users/');
+      });
+    });
+  </script>
+<?php endif; ?>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".form-activar").forEach(form => {
+      form.addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        Swal.fire({
+          title: '¿Estás seguro?',
+          text: "Este cambio modificará el estado del miembro.",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#404141',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Sí, confirmar',
+          cancelButtonText: 'Cancelar'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            form.submit();
+          }
+        });
+      });
+    });
+  });
+</script>

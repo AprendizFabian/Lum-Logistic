@@ -1,5 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <div
   class="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-yellow-500 px-4 py-10">
   <div class="w-full max-w-sm bg-white rounded-3xl shadow-2xl overflow-hidden p-8 space-y-4.5">

@@ -39,24 +39,26 @@ document.getElementById("roleSelect").addEventListener("change", function () {
     const userFields = document.getElementById("userFields");
     const storeFields = document.getElementById("storeFields");
 
-    if (this.value === "3") {
-        storeFields.classList.remove("hidden");
+    if (this.value == "3") {
         userFields.classList.add("hidden");
+        storeFields.classList.remove("hidden");
+
+        storeFields
+            .querySelectorAll("input, select")
+            .forEach((el) => (el.required = true));
         userFields
             .querySelectorAll("input")
-            .forEach((i) => (i.disabled = true));
-        storeFields
-            .querySelectorAll("input", "select")
-            .forEach((i) => (i.disabled = false));
+            .forEach((el) => (el.required = false));
     } else {
         userFields.classList.remove("hidden");
         storeFields.classList.add("hidden");
-        storeFields
-            .querySelectorAll("input, select")
-            .forEach((i) => (i.disabled = true));
+
         userFields
             .querySelectorAll("input")
-            .forEach((i) => (i.disabled = false));
+            .forEach((el) => (el.required = true));
+        storeFields
+            .querySelectorAll("input, select")
+            .forEach((el) => (el.required = false));
     }
 });
 
