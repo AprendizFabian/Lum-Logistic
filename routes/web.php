@@ -35,6 +35,5 @@ $router->get('/Masivo', [DateController::class, 'MasiveCharge']);
 $router->get('/catalogo', [CatalogController::class, 'showCatalog']);
 $router->get('/vida-util', [CatalogController::class, 'showVidaUtil']);
 $router->get('/fecha', [CatalogController::class, 'ShowDate']);
-
 $router->get('/stock', [StockController::class, 'showUploadForm']);
 $router->post('/stock/subir', [StockController::class, 'subirStock']);
