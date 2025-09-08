@@ -39,33 +39,54 @@ class MemberModel
         return $this->config[$type];
     }
 
-    public function getMembers(?string $type = null): array
-    {
-        try {
-            $results = [];
-
-            $types = $type ? [$type] : array_keys($this->config);
-
-            foreach ($types as $t) {
-                $c = $this->getConfig($t);
-                $sql = "SELECT {$c['columns']}
-                        FROM {$c['table']} {$c['join_alias']}
-                        JOIN roles r ON {$c['join_alias']}.id_role = r.id_role";
-
-                if ($t === 'store') {
-                    $sql .= " JOIN cities c ON {$c['join_alias']}.city_id = c.id_city";
-                }
-
-                $stmt = $this->pdo->query($sql);
-                $results = array_merge($results, $stmt->fetchAll(PDO::FETCH_ASSOC));
+public function getMembers(?string $type = null, ?string $search = null): array 
+{
+    try {
+        $results = [];
+        $types = $type ? [$type] : array_keys($this->config);
+        
+        foreach ($types as $t) {
+            $c = $this->getConfig($t);
+            
+            $sql = "SELECT {$c['columns']}
+                    FROM {$c['table']} {$c['join_alias']}
+                    JOIN roles r ON {$c['join_alias']}.id_role = r.id_role";
+            
+            if ($t === 'store') {
+                $sql .= " JOIN cities c ON {$c['join_alias']}.city_id = c.id_city";
             }
-
-            return $results;
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
+            
+            if (!empty($search)) {
+                if ($t === 'user') {
+                    $sql .= " WHERE ({$c['join_alias']}.username LIKE ? OR {$c['join_alias']}.email LIKE ?)";
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute(["%{$search}%", "%{$search}%"]);
+                } elseif ($t === 'store') {
+                    $sql .= " WHERE ({$c['join_alias']}.store_name LIKE ? OR {$c['join_alias']}.store_email LIKE ?)";
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute(["%{$search}%", "%{$search}%"]);
+                } else {
+                    $stmt = $this->pdo->prepare($sql);
+                    $stmt->execute();
+                }
+            } else {
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute();
+            }
+            $typeResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            foreach ($typeResults as $result) {
+                $result['member_type'] = $t;
+                $results[] = $result;
+            }
         }
+        
+        return $results;
+        
+    } catch (PDOException $e) {
+        error_log("Database Error in getMembers: " . $e->getMessage());
+        throw new \Exception("Error retrieving members: " . $e->getMessage());
     }
-
+}
     public function getMemberById($id): ?array
     {
         try {
@@ -209,7 +230,6 @@ class MemberModel
             throw new \Exception("Database Error: " . $error->getMessage());
         }
     }
-
 
     public function updateLastLogin(int $id, string $type)
     {

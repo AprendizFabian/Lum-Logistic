@@ -35,27 +35,32 @@ class MemberController
         exit;
     }
 
-    public function showMembers()
-    {
-        try {
-            $this->requireAuth(1);
+public function showMembers()
+{
+    try {
+        $this->requireAuth(1);
+        $page   = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
+        $perPage = 6;
+        $search  = trim($_GET['search'] ?? '');
+        $filter  = $_GET['filter'] ?? null; 
+        $members = $this->memberModel->getMembers($filter, $search);      
+        $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
+        $cities = $this->memberModel->getCities();
 
-            $page = $_GET['page'] ?? 1;
-            $perPage = 6;
-
-            $members = $this->memberModel->getMembers(null);
-            $cities = $this->memberModel->getCities();
-            $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
-            view('Admin/userView', [
-                'title' => "Usuarios",
-                'layout' => "main",
-                'membersPaginated' => $membersPaginated,
-                'cities' => $cities
-            ]);
-        } catch (PDOException $error) {
-            throw new Exception("Error: " . $error->getMessage());
-        }
+        view('Admin/userView', [
+            'title'             => "Usuarios",
+            'layout'            => "main",
+            'membersPaginated'  => $membersPaginated,
+            'cities'            => $cities,
+            'search'            => $search,
+            'filter'            => $filter
+        ]);
+    } catch (Exception $error) {
+        echo "<div style='padding:20px; background:#fee; color:#900; border:1px solid #900;'>
+                <strong>Error:</strong> " . htmlspecialchars($error->getMessage()) . "
+              </div>";
     }
+}
 
     public function showDetails()
     {

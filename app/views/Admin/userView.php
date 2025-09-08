@@ -2,7 +2,32 @@
   <h1 class="text-3xl font-bold flex items-center gap-3 text-[#404141]">
     <i class="fas fa-users text-[#FEDF00] text-4xl"></i> <?= htmlspecialchars($title) ?>
   </h1>
+  <form method="GET" class="flex flex-wrap items-center gap-3 bg-white p-3 rounded-2xl shadow-md border border-gray-200">
+  <!-- Buscador -->
+  <input 
+    type="text" 
+    name="search" 
+    value="<?= htmlspecialchars($search ?? '') ?>" 
+    placeholder="Buscar usuario o correo..."
+    class="flex-1 min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#FEDF00] focus:outline-none"
+  >
 
+  <!-- Filtro -->
+  <select 
+    name="filter"
+    class="px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#FEDF00] focus:outline-none"
+  >
+    <option value="">Todos</option>
+    <option value="user" <?= ($filter ?? '') === 'user' ? 'selected' : '' ?>>Usuarios</option>
+    <option value="store" <?= ($filter ?? '') === 'store' ? 'selected' : '' ?>>Tiendas</option>
+  </select>
+
+  <!-- Botón -->
+  <button type="submit"
+    class="px-5 py-2 bg-[#404141] text-[#FEDF00] font-semibold rounded-xl hover:bg-[#2f2f2f] transition flex items-center gap-2">
+    <i class="fas fa-search"></i> Buscar
+  </button>
+</form>
   <button type="button" onclick="document.getElementById('agregarUsuarioModal').showModal()"
     class="group flex items-center gap-2 bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-full shadow-md px-4 py-2 transition-all duration-300 overflow-hidden w-12 hover:w-60">
     <i class="fas fa-user-plus text-lg"></i>
