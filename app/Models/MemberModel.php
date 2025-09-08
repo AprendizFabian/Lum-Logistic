@@ -25,7 +25,7 @@ class MemberModel
                 'table' => 'stores',
                 'id_field' => 'id_store',
                 'identifier_field' => 'store_email',
-                'columns' => 's.id_store AS id, s.store_name AS username, s.store_email AS email, s.store_address AS address, s.is_active AS status, r.role_name AS rol, s.id_role, "store" AS type',
+                'columns' => 's.id_store AS id, s.store_name AS username, s.store_email AS email, s.store_address AS address, s.is_active AS status, r.role_name AS rol, c.city_name AS city, s.city_id, s.id_role, "store" AS type',
                 'join_alias' => 's',
             ]
         ];
@@ -51,6 +51,11 @@ class MemberModel
                 $sql = "SELECT {$c['columns']}
                         FROM {$c['table']} {$c['join_alias']}
                         JOIN roles r ON {$c['join_alias']}.id_role = r.id_role";
+
+                if ($t === 'store') {
+                    $sql .= " JOIN cities c ON {$c['join_alias']}.city_id = c.id_city";
+                }
+
                 $stmt = $this->pdo->query($sql);
                 $results = array_merge($results, $stmt->fetchAll(PDO::FETCH_ASSOC));
             }
@@ -101,14 +106,15 @@ class MemberModel
                     ':id_role' => $data['id_role'],
                 ]);
             } elseif ($type === 'store') {
-                $sql = "INSERT INTO {$c['table']} (store_name, store_address, store_email, password, id_role)
-                        VALUES (:store_name, :store_address, :store_email, :password, :id_role)";
+                $sql = "INSERT INTO {$c['table']} (store_name, store_address, store_email, password, city_id, id_role)
+                        VALUES (:store_name, :store_address, :store_email, :password, :city_id, :id_role)";
                 $stmt = $this->pdo->prepare($sql);
                 $stmt->execute([
                     ':store_name' => $data['store_name'],
                     ':store_address' => $data['store_address'],
                     ':store_email' => $data['store_email'],
                     ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
+                    ':city_id' => $data['city_id'],
                     ':id_role' => $data['id_role'],
                 ]);
             }
@@ -135,7 +141,7 @@ class MemberModel
                 ]);
             } elseif ($type === 'store') {
                 $sql = "UPDATE stores 
-                        SET store_name = :store_name, store_address = :store_address, store_email = :store_email, id_role = :id_role
+                        SET store_name = :store_name, store_address = :store_address, store_email = :store_email, id_role = :id_role, city_id = :city_id
                         WHERE id_store = :id";
                 $stmt = $this->pdo->prepare($sql);
                 $stmt->execute([
@@ -143,6 +149,7 @@ class MemberModel
                     ':store_address' => $data['store_address'],
                     ':store_email' => $data['store_email'],
                     ':id_role' => $data['id_role'],
+                    ':city_id' => $data['city_id'],
                     ':id' => $data['id_store'],
                 ]);
             }
@@ -211,6 +218,17 @@ class MemberModel
             $stmt->execute([':id' => $id]);
 
             return true;
+        } catch (PDOException $error) {
+            throw new \Exception("Database Error: " . $error->getMessage());
+        }
+    }
+
+    public function getCities()
+    {
+        try {
+            $sql = "SELECT * FROM cities";
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $error) {
             throw new \Exception("Database Error: " . $error->getMessage());
         }

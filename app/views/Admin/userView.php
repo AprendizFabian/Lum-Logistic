@@ -2,10 +2,13 @@
   <h1 class="text-3xl font-bold flex items-center gap-3 text-[#404141]">
     <i class="fas fa-users text-[#FEDF00] text-4xl"></i> <?= htmlspecialchars($title) ?>
   </h1>
-  <a href="#" onclick="document.getElementById('agregarUsuarioModal').showModal()"
-    class="btn bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-2xl shadow-md px-6 py-2 flex items-center gap-2">
-    <i class="fas fa-user-plus"></i> Agregar Usuario o Tienda
-  </a>
+
+  <button type="button" onclick="document.getElementById('agregarUsuarioModal').showModal()"
+    class="group flex items-center gap-2 bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-full shadow-md px-4 py-2 transition-all duration-300 overflow-hidden w-12 hover:w-60">
+    <i class="fas fa-user-plus text-lg"></i>
+    <span class="whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300">Agregar Usuario o
+      Tienda</span>
+  </button>
 </div>
 
 <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 px-6">
@@ -38,7 +41,8 @@
           data-username="<?= htmlspecialchars($member['username']) ?>"
           data-email="<?= htmlspecialchars($member['email']) ?>" data-rol="<?= $member['id_role'] ?>"
           data-type="<?= htmlspecialchars($member['type']) ?>"
-          data-address="<?= htmlspecialchars($member['address'] ?? '') ?>">
+          data-address="<?= htmlspecialchars($member['address'] ?? '') ?>"
+          data-city="<?= htmlspecialchars($member['city_id'] ?? '') ?>">
           <i class="fas fa-edit"></i> Editar
         </button>
         <form method="POST" action="/users/changeStatus" class="form-activar">
@@ -124,6 +128,19 @@
         </div>
 
         <div>
+          <label class="label font-semibold">Ciudad</label>
+          <select name="city_id" id="modalCity"
+            class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+            <option value="">Seleccione una ciudad</option>
+            <?php foreach ($cities as $city): ?>
+              <option value="<?= htmlspecialchars($city['id_city']) ?>" name="city_id">
+                <?= htmlspecialchars($city['city_name']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <div>
           <label class="label font-semibold"><i class="fas fa-map-marker-alt"></i>Dirección</label>
           <input type="text" name="store_address" placeholder="Calle 123"
             class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
@@ -195,10 +212,23 @@
           class="input input-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
       </div>
 
+      <div class="hidden" id="cityField">
+        <label class="label font-semibold">Ciudad</label>
+        <select name="city_id" id="modalCity"
+          class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+          <option value="">Seleccione una ciudad</option>
+          <?php foreach ($cities as $city): ?>
+            <option value="<?= htmlspecialchars($city['id_city']) ?>" <?= isset($member['city_id']) && $member['city_id'] == $city['id_city'] ? 'selected' : '' ?> name="city_id">
+              <?= htmlspecialchars($city['city_name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+
       <div>
         <label class="label font-semibold">Rol</label>
         <select name="id_role" id="modalRol"
-          class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]" required>
+          class="select select-bordered w-full text-[#404141] rounded-xl focus:ring-2 focus:ring-[#FEDF00]">
           <option value="1">Administrador</option>
           <option value="2">Usuario</option>
           <option value="3">Tienda</option>
@@ -229,6 +259,7 @@
     const rol = button.dataset.rol;
     const type = button.dataset.type;
     const address = button.dataset.address;
+    const city = button.dataset.city;
 
     document.getElementById("modalUserId").value = id;
     document.getElementById("modalUsername").value = username;
@@ -238,31 +269,40 @@
     if (type === "store") {
       document.getElementById("modalTitle").innerText = "Editar Tienda";
       document.getElementById("addressField").classList.remove("hidden");
+      document.getElementById("cityField").classList.remove("hidden");
       document.getElementById("modalAddress").value = address;
+      document.getElementById("modalCity").value = city;
 
-      document.getElementById("modalUserId").value = ""; // limpiar
-      document.getElementById("modalStoreId").value = id; // asignar store
+      document.getElementById("modalUserId").value = "";
+      document.getElementById("modalStoreId").value = id;
     } else {
       document.getElementById("modalTitle").innerText = "Editar Usuario";
       document.getElementById("addressField").classList.add("hidden");
 
-      document.getElementById("modalUserId").value = id; // asignar user
-      document.getElementById("modalStoreId").value = ""; // limpiar
+      document.getElementById("modalUserId").value = id;
+      document.getElementById("modalStoreId").value = "";
     }
 
     modal.showModal();
   }
 
   document.getElementById("roleSelect").addEventListener("change", function () {
+    const roleSelect = document.getElementById('roleSelect');
     const userFields = document.getElementById("userFields");
     const storeFields = document.getElementById("storeFields");
 
-    if (this.value === "3") { // Tienda
-      userFields.classList.add("hidden");
+    if (this.value === "3") {
       storeFields.classList.remove("hidden");
+      userFields.classList.add("hidden");
+      userFields.querySelectorAll('input').forEach(i => i.disabled = true);
+      storeFields.querySelectorAll('input', 'select').forEach(i => i.disabled = false);
     } else {
       userFields.classList.remove("hidden");
       storeFields.classList.add("hidden");
+      storeFields.querySelectorAll('input, select').forEach(i => i.disabled = true);
+      userFields.querySelectorAll('input').forEach(i => i.disabled = false);
     }
   });
+
+  roleSelect.dispatchEvent(new Event('change'));
 </script>

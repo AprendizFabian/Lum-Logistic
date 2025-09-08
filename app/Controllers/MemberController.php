@@ -43,13 +43,15 @@ class MemberController
             $page = $_GET['page'] ?? 1;
             $perPage = 6;
 
-            $members = $this->memberModel->getMembers();
+            $members = $this->memberModel->getMembers(null);
+            $cities = $this->memberModel->getCities();
             $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
 
             view('Admin/userView', [
                 'title' => "Usuarios",
                 'layout' => "main",
-                'membersPaginated' => $membersPaginated
+                'membersPaginated' => $membersPaginated,
+                'cities' => $cities
             ]);
         } catch (PDOException $error) {
             throw new Exception("Error: " . $error->getMessage());
@@ -68,7 +70,7 @@ class MemberController
                 throw new Exception("Usuario no encontrado.");
             }
 
-            view('Admin/ShowDetails', [
+            view('Admin/showDetails', [
                 'title' => "Detalles del Usuario",
                 'layout' => "main",
                 'member' => $member
@@ -81,20 +83,29 @@ class MemberController
     public function addMember()
     {
         try {
-            if ($_SERVER['REQUEST_METHOD'] !== 'POST')
+            if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 return;
+            }
 
             $type = $_POST['id_role'] == 3 ? 'store' : 'user';
 
-            $data = [
-                'username' => $_POST['username'] ?? null,
-                'email' => $_POST['email'] ?? null,
-                'password' => $_POST['password'] ?? null,
-                'store_name' => $_POST['store_name'] ?? null,
-                'store_address' => $_POST['store_address'] ?? null,
-                'store_email' => $_POST['store_email'] ?? null,
-                'id_role' => $_POST['id_role'],
-            ];
+            if ($type === 'store') {
+                $data = [
+                    'store_name' => $_POST['store_name'] ?? null,
+                    'store_address' => $_POST['store_address'] ?? null,
+                    'store_email' => $_POST['store_email'] ?? null,
+                    'city_id' => $_POST['city_id'] ?? null,
+                    'password' => $_POST['password'] ?? null,
+                    'id_role' => $_POST['id_role'],
+                ];
+            } else {
+                $data = [
+                    'username' => $_POST['username'] ?? null,
+                    'email' => $_POST['email'] ?? null,
+                    'password' => $_POST['password'] ?? null,
+                    'id_role' => $_POST['id_role'],
+                ];
+            }
 
             $this->memberModel->addMember($data, $type);
             $this->redirect('/users/');
@@ -102,6 +113,7 @@ class MemberController
             throw new Exception("Error: " . $e->getMessage());
         }
     }
+
 
     public function editMember()
     {
@@ -118,6 +130,7 @@ class MemberController
                 'store_name' => $_POST['username'] ?? null,
                 'store_email' => $_POST['email'] ?? null,
                 'store_address' => $_POST['store_address'] ?? null,
+                'city_id' => $_POST['city_id'] ?? null,
                 'id_role' => $_POST['id_role'],
             ];
 

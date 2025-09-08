@@ -1,50 +1,54 @@
 <?php
 namespace App\Controllers;
-use App\Models\SheetsModel;
+
 use App\Models\CatalogModel;
 use App\Models\StockModel;
 class CatalogController
 {
-public function showCatalog()
-{
-    session_start();
-
-    $page   = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 
-        ? (int)$_GET['page'] 
-        : 1;
-    $search = trim($_GET['search'] ?? '');
-    $perPage = 8;
-
-    $catalogModel = new CatalogModel();
-    $stockModel   = new StockModel();
-    $idStore = $_SESSION['id_store'] ?? null;
-
-    if (!empty($idStore)) {
-        $productos = $stockModel->obtenerStockPorTienda($idStore);
-        $total = count($productos);
-        $totalPages = 1;
-        $page = 1;
-    } else {
-        // 🌍 Admin o usuario normal → catálogo nacional
-        $total = $catalogModel->contarProductos($search);
-        $totalPages = max(1, ceil($total / $perPage));
-        if ($page > $totalPages) {
-            $page = $totalPages;
-        }
-        $offset = ($page - 1) * $perPage;
-        $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
+    private $catalogModel;
+    
+    public function __construct()
+    {
+        
     }
+    public function showCatalog()
+    {
+        $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0
+            ? (int) $_GET['page']
+            : 1;
+        $search = trim($_GET['search'] ?? '');
+        $perPage = 8;
 
-    $title = 'Catálogo';
-    viewCatalog('Admin/catalog', compact(
-        'title',
-        'productos',
-        'page',
-        'totalPages',
-        'search',
-        'total'
-    ));
-}
+        $catalogModel = new CatalogModel();
+        $stockModel = new StockModel();
+        $idStore = $_SESSION['id_store'] ?? null;
+
+        if (!empty($idStore)) {
+            $productos = $stockModel->obtenerStockPorTienda($idStore);
+            $total = count($productos);
+            $totalPages = 1;
+            $page = 1;
+        } else {
+            // 🌍 Admin o usuario normal → catálogo nacional
+            $total = $catalogModel->contarProductos($search);
+            $totalPages = max(1, ceil($total / $perPage));
+            if ($page > $totalPages) {
+                $page = $totalPages;
+            }
+            $offset = ($page - 1) * $perPage;
+            $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
+        }
+
+        $title = 'Catálogo';
+        view('Admin/catalog', compact(
+            'title',
+            'productos',
+            'page',
+            'totalPages',
+            'search',
+            'total'
+        ));
+    }
 
     public function showVidaUtil()
     {

@@ -1,15 +1,36 @@
-<div class="max-w-2xl mx-auto mt-8 bg-white p-6 rounded-lg shadow-md">
-    <h2 class="text-2xl font-bold mb-4"><?= htmlspecialchars($title) ?></h2>
-
-    <div class="space-y-3">
-        <p><?= htmlspecialchars($_SESSION['auth']['id']) ?></p>
-        <?= var_dump($_SESSION['auth']) ?>
-        <p><strong>Usuario:</strong> <?= htmlspecialchars($_SESSION['auth']['username']) ?></p>
-        <p><strong>Rol:</strong> <?= htmlspecialchars($_SESSION['auth']['id_role']) == 1 ? 'Administrador' : 'Usuario' ?></p>
-        <p><strong>Correo:</strong> <?= htmlspecialchars($_SESSION['auth']['email']) ?></p>
-    </div>
-
-    <div class="mt-6">
-        <a href="/catalogo" class="text-blue-500 hover:underline">← Volver a la lista de usuarios</a>
+<div class="max-w-2xl mx-auto mt-10">
+    <!-- Card -->
+    <div class="card bg-white shadow-xl rounded-2xl border border-gray-100">
+        <!-- Header -->
+        <div class="card-body">
+            <h2 class="card-title text-3xl font-bold text-[#14519A] flex items-center gap-3">
+                <i class="fas fa-user-circle text-4xl text-[#14519A]"></i>
+                <?= htmlspecialchars($title) ?>
+            </h2>
+            <div class="mt-6 space-y-4">
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-user text-gray-500 w-6"></i>
+                    <span class="text-gray-700 font-medium">Usuario:</span>
+                    <span class="text-gray-900"><?= htmlspecialchars($_SESSION['auth']['username']) ?></span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-user-shield text-gray-500 w-6"></i>
+                    <span class="text-gray-700 font-medium">Rol:</span>
+                    <span class="badge <?= $_SESSION['auth']['id_role'] == 1 ? 'badge-primary' : 'badge-secondary' ?>">
+                        <?= $_SESSION['auth']['id_role'] == 1 ? 'Administrador' : 'Usuario' ?>
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <i class="fas fa-envelope text-gray-500 w-6"></i>
+                    <span class="text-gray-700 font-medium">Correo:</span>
+                    <span class="text-gray-900"><?= htmlspecialchars($_SESSION['auth']['email']) ?></span>
+                </div>
+            </div>
+            <div class="mt-8">
+                <a href="/catalogo" class="btn btn-outline btn-primary gap-2">
+                    <i class="fas fa-arrow-left"></i> Volver al Catalogo
+                </a>
+            </div>
+        </div>
     </div>
 </div>
