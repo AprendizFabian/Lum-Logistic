@@ -12,12 +12,13 @@
 
 <body class="bg-white text-gray-900">
     <?php
-        require __DIR__ . '/components/header.php';
+    require __DIR__ . '/components/header.php';
     ?>
     <main>
         <?php require_once $view_path; ?>
     </main>
 
+    <script src="/js/users.js"></script>
 </body>
 
 </html>
