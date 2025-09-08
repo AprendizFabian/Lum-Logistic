@@ -17,21 +17,21 @@
       <span class="text-sm text-gray-500">(solo .csv )</span>
     </h2>
     <form id="formCargueMasivo" enctype="multipart/form-data">
-      <?php if ($_SESSION['user']['type'] === 'user'): ?>
+      <?php if ($_SESSION['auth']['type'] === 'user'): ?>
         <div class="mb-4">
           <label class="block text-gray-700 font-semibold mb-4">Selecciona la tienda en la que estas antes de subir el
             archivo</label>
           <select name="id_store" class="select select-bordered w-full text-[#404141]" required>
             <option value="">-- Selecciona una tienda --</option>
             <?php foreach ($tiendas as $t): ?>
-              <option value="<?= $t['id_store'] ?>">
-                <?= htmlspecialchars($t['store_name']) ?>
+              <option value="<?= $t['id'] ?>">
+                <?= htmlspecialchars($t['username']) ?>
               </option>
             <?php endforeach; ?>
           </select>
         </div>
       <?php else: ?>
-        <input type="hidden" name="id_store" value="<?= $_SESSION['user']['id'] ?>">
+        <input type="hidden" name="id_store" value="<?= $_SESSION['auth']['id'] ?>">
       <?php endif; ?>
       <div id="dropArea"
         class="flex flex-col items-center justify-center border-2 border-dashed border-gray-400 rounded-xl p-8 text-center cursor-pointer transition hover:border-[#FEE000] hover:bg-yellow-50 mb-4">

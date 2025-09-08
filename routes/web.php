@@ -24,8 +24,8 @@ $router->group('/auth', function ($router) {
     $router->post("/processLogin", [AuthController::class, 'processLogin']);
 });
 
-$router->group('/Date', function ($router) {
-    $router->get('/DateJuliana', [DateController::class, 'showFormDate']);
+$router->group('/date', function ($router) {
+    $router->get('/dateJuliana', [DateController::class, 'showFormDate']);
 
 });
 $router->post('/convertir-fecha', [DateController::class, 'convert']);

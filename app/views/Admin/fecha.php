@@ -41,7 +41,7 @@
             </button>
         </form>
         <div class="flex items-center gap-3 flex-wrap">
-            <a href="/fecha-juliana"
+            <a href="/date/dateJuliana"
                 class="px-4 py-2 bg-[#404141] text-white rounded-lg text-sm hover:bg-[#2f2f2f] flex items-center gap-2">
                 <i class="fa-solid fa-upload"></i> Cargue Individual
             </a>

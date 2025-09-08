@@ -11,14 +11,14 @@ class DateController
     {
         $title = 'Cargue individual, Validador';
         $StoreModel = new MemberModel();
-        $tiendas = $StoreModel->getMembers('stores');
+        $tiendas = $StoreModel->getMembers('store');
         view('Admin/individual_charge', compact('title', 'tiendas'));
     }
     public function MasiveCharge()
     {
         $title = 'Cargue masivo';
         $storeModel = new MemberModel();
-        $tiendas = $storeModel->getMembers('stores');
+        $tiendas = $storeModel->getMembers('store');
         view('Admin/MasiveCharge', compact('title', 'tiendas'));
     }
     public function validar()
@@ -37,14 +37,14 @@ class DateController
                 session_start();
             }
 
-            $idStore = null;
-            if (isset($_SESSION['user']['type'])) {
-                if ($_SESSION['user']['type'] === 'store') {
-                    $idStore = $_SESSION['user']['id'] ?? null;
-                } elseif ($_SESSION['user']['type'] === 'user') {
-                    $idStore = $_POST['id_store'] ?? null;
-                }
-            }
+     $idStore = null;
+if (isset($_SESSION['auth']['type'])) {
+    if ($_SESSION['auth']['type'] === 'store') {
+        $idStore = $_SESSION['auth']['id'] ?? null;
+    } elseif ($_SESSION['auth']['type'] === 'user') {
+        $idStore = $_POST['id_store'] ?? null;
+    }
+}
 
             if (empty($idStore)) {
                 echo json_encode(['error' => 'No se seleccionó ninguna tienda']);
@@ -139,10 +139,10 @@ class DateController
             }
 
             $idStore = null;
-            if (isset($_SESSION['user']['type'])) {
-                if ($_SESSION['user']['type'] === 'store') {
-                    $idStore = $_SESSION['user']['id'] ?? null;
-                } elseif ($_SESSION['user']['type'] === 'user') {
+            if (isset($_SESSION['auth']['type'])) {
+                if ($_SESSION['auth']['type'] === 'store') {
+                    $idStore = $_SESSION['auth']['id'] ?? null;
+                } elseif ($_SESSION['auth']['type'] === 'user') {
                     $idStore = $_POST['id_store'] ?? null;
                 }
             }
@@ -196,7 +196,7 @@ class DateController
                 }
 
                 $fechaObj = $this->parseFechaFlexible($fechaVencimiento);
-                if (!($fechaObj instanceof \DateTime)) {
+                if (!($fechaObj instanceof DateTime)) {
                     $errores[] = "Línea {$linea}: La fecha '{$fechaVencimiento}' no tiene un formato válido.";
                     continue;
                 }
@@ -216,13 +216,11 @@ class DateController
                     continue;
                 }
 
-                // Calcular fecha de bloqueo
                 $fechaBloqueoObj = clone $fechaObj;
-                $fechaBloqueoObj->sub(new \DateInterval("P{$diasVidaUtil}D"));
+                $fechaBloqueoObj->sub(new DateInterval("P{$diasVidaUtil}D"));
                 $fechaBloqueo = $fechaBloqueoObj->format('Y-m-d');
 
-                // Estado
-                $hoy = new \DateTime();
+                $hoy = new DateTime();
                 $hoy->setTime(0, 0);
                 $fechaBloqueoObj->setTime(0, 0);
 
@@ -305,7 +303,7 @@ class DateController
             'm/d/y'
         ];
         foreach ($formatos as $formato) {
-            $date = \DateTime::createFromFormat($formato, $fechaTexto);
+            $date = DateTime::createFromFormat($formato, $fechaTexto);
             if ($date && $date->format($formato) === $fechaTexto) {
                 $year = (int) $date->format('Y');
                 if ($year < 1900 || $year > (int) date('Y') + 5) {
@@ -315,7 +313,7 @@ class DateController
             }
         }
         try {
-            $date = new \DateTime($fechaTexto);
+            $date = new DateTime($fechaTexto);
             $year = (int) $date->format('Y');
             if ($year < 1900 || $year > (int) date('Y') + 5) {
                 return false;
