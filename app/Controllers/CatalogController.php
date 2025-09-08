@@ -1,54 +1,52 @@
 <?php
 namespace App\Controllers;
-
+use App\Models\SheetsModel;
 use App\Models\CatalogModel;
 use App\Models\StockModel;
 class CatalogController
 {
-    private $catalogModel;
-    
-    public function __construct()
-    {
-        
-    }
-    public function showCatalog()
-    {
-        $page = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0
-            ? (int) $_GET['page']
-            : 1;
-        $search = trim($_GET['search'] ?? '');
-        $perPage = 8;
+public function showCatalog()
+{
+ 
 
-        $catalogModel = new CatalogModel();
-        $stockModel = new StockModel();
-        $idStore = $_SESSION['id_store'] ?? null;
+    $page   = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 
+        ? (int)$_GET['page'] 
+        : 1;
+    $search = trim($_GET['search'] ?? '');
+    $perPage = 8;
 
-        if (!empty($idStore)) {
-            $productos = $stockModel->obtenerStockPorTienda($idStore);
-            $total = count($productos);
-            $totalPages = 1;
-            $page = 1;
-        } else {
-            // 🌍 Admin o usuario normal → catálogo nacional
-            $total = $catalogModel->contarProductos($search);
-            $totalPages = max(1, ceil($total / $perPage));
-            if ($page > $totalPages) {
-                $page = $totalPages;
-            }
-            $offset = ($page - 1) * $perPage;
-            $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
+    $catalogModel = new CatalogModel();
+    $stockModel   = new StockModel();
+
+    $type    = $_SESSION['auth']['type'] ?? 'user'; 
+    $idStore = ($type === 'store') ? ($_SESSION['auth']['id'] ?? null) : null;
+
+    if (!empty($idStore)) {
+        $productos = $stockModel->obtenerStockPorTienda($idStore);
+        $total = count($productos);
+        $totalPages = 1;
+        $page = 1;
+    } else {
+
+        $total = $catalogModel->contarProductos($search);
+        $totalPages = max(1, ceil($total / $perPage));
+        if ($page > $totalPages) {
+            $page = $totalPages;
         }
-
-        $title = 'Catálogo';
-        view('Admin/catalog', compact(
-            'title',
-            'productos',
-            'page',
-            'totalPages',
-            'search',
-            'total'
-        ));
+        $offset = ($page - 1) * $perPage;
+        $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
     }
+
+    $title = 'Catálogo';
+    view('Admin/catalog', compact(
+        'title',
+        'productos',
+        'page',
+        'totalPages',
+        'search',
+        'total'
+    ));
+}
 
     public function showVidaUtil()
     {
