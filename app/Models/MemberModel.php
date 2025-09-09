@@ -39,152 +39,151 @@ class MemberModel
         return $this->config[$type];
     }
 
-    public function getMembers(?string $type = null): array
+    public function getMembers(?string $type = null, ?string $search = null): array
     {
-        try {
-            $results = [];
+        $results = [];
+        $types = $type ? [$type] : array_keys($this->config);
 
-            $types = $type ? [$type] : array_keys($this->config);
+        foreach ($types as $t) {
+            $c = $this->getConfig($t);
 
-            foreach ($types as $t) {
-                $c = $this->getConfig($t);
-                $sql = "SELECT {$c['columns']}
-                        FROM {$c['table']} {$c['join_alias']}
-                        JOIN roles r ON {$c['join_alias']}.id_role = r.id_role";
-
-                if ($t === 'store') {
-                    $sql .= " JOIN cities c ON {$c['join_alias']}.city_id = c.id_city";
-                }
-
-                $stmt = $this->pdo->query($sql);
-                $results = array_merge($results, $stmt->fetchAll(PDO::FETCH_ASSOC));
+            $sql = "SELECT {$c['columns']}
+                    FROM {$c['table']} {$c['join_alias']}
+                    JOIN roles r ON {$c['join_alias']}.id_role = r.id_role";
+            if ($t === 'store') {
+                $sql .= " JOIN cities c ON {$c['join_alias']}.city_id = c.id_city";
             }
 
-            return $results;
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
+            $params = [];
+            if (!empty($search)) {
+                if ($t === 'user') {
+                    $sql .= " WHERE ({$c['join_alias']}.username LIKE ? 
+                               OR {$c['join_alias']}.email LIKE ?)";
+                    $params = ["%{$search}%", "%{$search}%"];
+                } elseif ($t === 'store') {
+                    $sql .= " WHERE ({$c['join_alias']}.store_name LIKE ? 
+                               OR {$c['join_alias']}.store_email LIKE ?)";
+                    $params = ["%{$search}%", "%{$search}%"];
+                }
+            }
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute($params);
+
+            $typeResults = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            foreach ($typeResults as $result) {
+                $result['member_type'] = $t;
+                $results[] = $result;
+            }
         }
+
+        return $results;
     }
+
 
     public function getMemberById($id): ?array
     {
-        try {
-            foreach ($this->config as $type => $c) {
-                $sql = "SELECT t.*, r.role_name AS rol, :type AS type
+        foreach ($this->config as $type => $c) {
+            $sql = "SELECT t.*, r.role_name AS rol, :type AS type
                         FROM {$c['table']} t
                         JOIN roles r ON t.id_role = r.id_role
                         WHERE t.{$c['id_field']} = :id
                         LIMIT 1";
 
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([':id' => $id, ':type' => $type]);
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':id' => $id, ':type' => $type]);
 
-                if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
-                    return $result;
-                }
+            if ($result = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                return $result;
             }
-
-            return null;
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
         }
+
+        return null;
     }
 
     public function addMember(array $data, string $type)
     {
-        try {
-            $c = $this->getConfig($type);
+        $c = $this->getConfig($type);
 
-            if ($type === 'user') {
-                $sql = "INSERT INTO {$c['table']} (username, email, password, id_role) 
+        if ($type === 'user') {
+            $sql = "INSERT INTO {$c['table']} (username, email, password, id_role) 
                     VALUES (:username, :email, :password, :id_role)";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    ':username' => $data['username'],
-                    ':email' => $data['email'],
-                    ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
-                    ':id_role' => $data['id_role'],
-                ]);
-            } elseif ($type === 'store') {
-                $sql = "INSERT INTO {$c['table']} (store_name, store_address, store_email, password, city_id, id_role)
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':username' => $data['username'],
+                ':email' => $data['email'],
+                ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
+                ':id_role' => $data['id_role'],
+            ]);
+        } elseif ($type === 'store') {
+            $sql = "INSERT INTO {$c['table']} (store_name, store_address, store_email, password, city_id, id_role)
                         VALUES (:store_name, :store_address, :store_email, :password, :city_id, :id_role)";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    ':store_name' => $data['store_name'],
-                    ':store_address' => $data['store_address'],
-                    ':store_city' => $data['store_city'], 
-                    ':store_email' => $data['store_email'],
-                    ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
-                    ':city_id' => $data['city_id'],
-                    ':id_role' => $data['id_role'],
-                ]);
-            }
-
-            return $this->pdo->lastInsertId();
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':store_name' => $data['store_name'],
+                ':store_address' => $data['store_address'],
+                ':store_city' => $data['store_city'],
+                ':store_email' => $data['store_email'],
+                ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
+                ':city_id' => $data['city_id'],
+                ':id_role' => $data['id_role'],
+            ]);
         }
+
+        return $this->pdo->lastInsertId();
     }
 
     public function editMember(array $data, string $type)
     {
-        try {
-            if ($type === 'user') {
-                $sql = "UPDATE users 
+        if ($type === 'user') {
+            $sql = "UPDATE users 
                     SET username = :username, email = :email, id_role = :id_role
                     WHERE id_user = :id";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    ':username' => $data['username'],
-                    ':email' => $data['email'],
-                    ':id_role' => $data['id_role'],
-                    ':id' => $data['id_user'],
-                ]);
-            } elseif ($type === 'store') {
-                $sql = "UPDATE stores 
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':username' => $data['username'],
+                ':email' => $data['email'],
+                ':id_role' => $data['id_role'],
+                ':id' => $data['id_user'],
+            ]);
+        } elseif ($type === 'store') {
+            $sql = "UPDATE stores 
                         SET store_name = :store_name, store_address = :store_address, store_email = :store_email, id_role = :id_role, city_id = :city_id
                         WHERE id_store = :id";
-                $stmt = $this->pdo->prepare($sql);
-                $stmt->execute([
-                    ':store_name' => $data['store_name'],
-                    ':store_address' => $data['store_address'],
-                    ':store_city' => $data['store_city'],
-                    ':store_email' => $data['store_email'],
-                    ':id_role' => $data['id_role'],
-                    ':city_id' => $data['city_id'],
-                    ':id' => $data['id_store'],
-                ]);
-            }
-            return $stmt->rowCount();
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                ':store_name' => $data['store_name'],
+                ':store_address' => $data['store_address'],
+                ':store_city' => $data['store_city'],
+                ':store_email' => $data['store_email'],
+                ':id_role' => $data['id_role'],
+                ':city_id' => $data['city_id'],
+                ':id' => $data['id_store'],
+            ]);
         }
+        return $stmt->rowCount();
     }
 
 
     public function toggleMemberStatus(int $id, string $type, int $status)
     {
-        try {
-            $c = $this->getConfig($type);
+        $c = $this->getConfig($type);
 
-            $sql = "UPDATE {$c['table']} SET is_active = :status WHERE {$c['id_field']} = :id";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([':status' => $status, ':id' => $id]);
+        $sql = "UPDATE {$c['table']} SET is_active = :status WHERE {$c['id_field']} = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':status' => $status, ':id' => $id]);
 
-            return $stmt->rowCount();
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
-        }
+        return $stmt->rowCount();
     }
 
     public function verifyAccount(string $identifier, string $password, string $type = 'user')
     {
-        try {
-            $c = $this->getConfig($type);
+        $c = $this->getConfig($type);
 
-            $nameField = $type === 'user' ? 'username' : 'store_name';
+        $nameField = $type === 'user' ? 'username' : 'store_name';
 
-            $sql = "SELECT 
+        $sql = "SELECT 
                     {$c['id_field']} AS id, 
                     {$c['identifier_field']} AS email, 
                     {$nameField} AS username,
@@ -196,44 +195,35 @@ class MemberModel
                 WHERE {$c['identifier_field']} = :identifier
                 LIMIT 1";
 
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([':identifier' => $identifier]);
-            $account = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':identifier' => $identifier]);
+        $account = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if ($account && password_verify($password, $account['password'])) {
-                unset($account['password']);
-                return $account;
-            }
-            return null;
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
+        if ($account && password_verify($password, $account['password'])) {
+            unset($account['password']);
+            return $account;
         }
+        return null;
     }
 
 
     public function updateLastLogin(int $id, string $type)
     {
-        try {
-            $c = $this->getConfig($type);
+        $c = $this->getConfig($type);
 
-            $sql = "UPDATE {$c['table']} SET last_login = NOW() WHERE {$c['id_field']} = :id";
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([':id' => $id]);
+        $sql = "UPDATE {$c['table']} SET last_login = NOW() WHERE {$c['id_field']} = :id";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':id' => $id]);
 
-            return true;
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
-        }
+        return true;
     }
 
     public function getCities()
     {
-        try {
-            $sql = "SELECT * FROM cities";
-            $stmt = $this->pdo->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (PDOException $error) {
-            throw new \Exception("Database Error: " . $error->getMessage());
-        }
+        $sql = "SELECT * FROM cities";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 }

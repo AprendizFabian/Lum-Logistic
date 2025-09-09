@@ -26,6 +26,7 @@ function openEditModal(button) {
     } else {
         document.getElementById("modalTitle").innerText = "Editar Usuario";
         document.getElementById("addressField").classList.add("hidden");
+        document.getElementById("cityField").classList.add("hidden");
 
         document.getElementById("modalUserId").value = id;
         document.getElementById("modalStoreId").value = "";

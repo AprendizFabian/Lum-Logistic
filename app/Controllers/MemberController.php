@@ -1,9 +1,9 @@
 <?php
 namespace App\Controllers;
+use App\Middleware\ErrorHandler;
 use App\Models\MemberModel;
-use App\helpers\Controller;
+use App\Helpers\Controller;
 use Exception;
-use PDOException;
 
 class MemberController
 {
@@ -37,29 +37,30 @@ class MemberController
 
     public function showMembers()
     {
-        try {
+        return ErrorHandler::handle(function () {
             $this->requireAuth(1);
 
             $page = $_GET['page'] ?? 1;
             $perPage = 6;
+            $search = $_GET['search'] ?? null;
+            $filter = $_GET['filter'] ?? null;
 
-            $members = $this->memberModel->getMembers(null);
+            $members = $this->memberModel->getMembers($filter, $search);
             $cities = $this->memberModel->getCities();
             $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
+
             view('Admin/userView', [
                 'title' => "Usuarios",
                 'layout' => "main",
                 'membersPaginated' => $membersPaginated,
                 'cities' => $cities
             ]);
-        } catch (PDOException $error) {
-            throw new Exception("Error: " . $error->getMessage());
-        }
+        });
     }
 
     public function showDetails()
     {
-        try {
+        return ErrorHandler::handle(function () {
             $this->requireAuth();
 
             $id = $_SESSION['auth']['id'];
@@ -74,14 +75,12 @@ class MemberController
                 'layout' => "main",
                 'member' => $member
             ]);
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 
     public function addMember()
     {
-        try {
+        return ErrorHandler::handle(function () {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 return;
             }
@@ -118,15 +117,12 @@ class MemberController
 
             $this->memberModel->addMember($data, $type);
             $this->redirect('/users/?success=added');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
-
 
     public function editMember()
     {
-        try {
+        return ErrorHandler::handle(function () {
             $type = !empty($_POST['id_user']) ? 'user' : (!empty($_POST['id_store']) ? 'store' : null);
             if (!$type) {
                 throw new Exception("Tipo de miembro no especificado.");
@@ -146,14 +142,12 @@ class MemberController
 
             $this->memberModel->editMember($data, $type);
             $this->redirect('/users/?success=updated');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 
     public function changeStatus()
     {
-        try {
+        return ErrorHandler::handle(function () {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST')
                 return;
 
@@ -166,8 +160,6 @@ class MemberController
 
             $this->memberModel->toggleMemberStatus($id, $type, $status);
             $this->redirect('/users/');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 }
