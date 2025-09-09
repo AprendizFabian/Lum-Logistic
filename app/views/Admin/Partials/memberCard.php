@@ -23,7 +23,7 @@
         <div class="flex gap-3">
             <span
                 class="px-3 py-1 text-xs font-semibold rounded-full 
-                <?= $member['rol'] === 'Administrador' ? 'bg-red-100 text-red-700' : ($member['rol'] === 'Usuario' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700') ?>">
+                <?= ['Administrador' => 'bg-red-100 text-red-700', 'Usuario' => 'bg-blue-100 text-blue-700'][$member['rol']] ?? 'bg-orange-100 text-orange-700' ?>">
                 <i class="fas fa-user-tag"></i> <?= htmlspecialchars($member['rol']) ?>
             </span>
             <span class="px-3 py-1 text-xs font-semibold rounded-full 

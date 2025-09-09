@@ -56,9 +56,7 @@ public function showMembers()
             'filter'            => $filter
         ]);
     } catch (Exception $error) {
-        echo "<div style='padding:20px; background:#fee; color:#900; border:1px solid #900;'>
-                <strong>Error:</strong> " . htmlspecialchars($error->getMessage()) . "
-              </div>";
+        throw new Exception("Error: " . $error->getMessage());
     }
 }
 
