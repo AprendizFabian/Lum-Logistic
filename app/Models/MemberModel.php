@@ -206,7 +206,6 @@ class MemberModel
         return null;
     }
 
-
     public function updateLastLogin(int $id, string $type)
     {
         $c = $this->getConfig($type);
