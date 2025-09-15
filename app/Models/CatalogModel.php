@@ -1,20 +1,18 @@
 <?php
-namespace App\models;
-
+namespace App\Models;
 use App\Database;
 use PDO;
 
-class CatalogModel 
+class CatalogModel
 {
     private $pdo;
-    protected $table = 'catalog';
 
     public function __construct()
     {
         $this->pdo = Database::getInstance();
     }
 
-    public function obtenerProductos($search = '', $limit = 10, $offset = 0)
+    public function getProducts($search = '')
     {
         $sql = "SELECT 
                     c.id_product, 
@@ -27,75 +25,66 @@ class CatalogModel
                     c.id_shelf_life, 
                     s.concept AS shelf_life_concept,
                     s.duration AS shelf_life_duration
-                FROM {$this->table} c
+                FROM catalog c
                 LEFT JOIN shelf_life s ON c.id_shelf_life = s.id_shelf_life";
-        
-        if (!empty($search)) {
-            $sql .= " WHERE c.ean LIKE :search1 OR c.description LIKE :search2";
-        }
-
-        $sql .= " ORDER BY c.id_product ASC LIMIT :limit OFFSET :offset";
-
-        $stmt = $this->pdo->prepare($sql);
 
         if (!empty($search)) {
-            $stmt->bindValue(':search1', "%$search%", PDO::PARAM_STR);
-            $stmt->bindValue(':search2', "%$search%", PDO::PARAM_STR);
+            $sql .= " WHERE c.description LIKE :search1 OR c.ean LIKE :search2 ORDER BY c.id_product ASC";
+            $search = '%' . $search . '%';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':search1', $search, PDO::PARAM_STR);
+            $stmt->bindValue(':search2', $search, PDO::PARAM_STR);
+        } else {
+            $stmt = $this->pdo->prepare($sql);
         }
-        $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
-        $stmt->bindValue(':offset', (int)$offset, PDO::PARAM_INT);
 
         $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
 
-    public function contarProductos($search = '')
+    public function getShelfLife($search = '')
     {
-        $sql = "SELECT COUNT(*) as total 
-                FROM {$this->table} c
-                LEFT JOIN shelf_life s ON c.id_shelf_life = s.id_shelf_life";
-        
-        if (!empty($search)) {
-            $sql .= " WHERE c.ean LIKE :search1 OR c.description LIKE :search2";
-        }
-
-        $stmt = $this->pdo->prepare($sql);
+        $sql = "SELECT * FROM shelf_life";
 
         if (!empty($search)) {
-            $stmt->bindValue(':search1', "%$search%", PDO::PARAM_STR);
-            $stmt->bindValue(':search2', "%$search%", PDO::PARAM_STR);
+            $sql .= " WHERE concept LIKE :search";
+            $search = '%' . $search . '%';
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->bindValue(':search', $search, PDO::PARAM_STR);
+        } else {
+            $stmt = $this->pdo->prepare($sql);
         }
 
         $stmt->execute();
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row['total'] ?? 0;
+        $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        return $result;
     }
-public function obtenerProductoPorEan($ean)
-{
-    $sql = "SELECT 
-                c.id_product, 
-                c.ean, 
-                c.description, 
-                c.sync_id,  
-                s.concept AS shelf_life_concept, 
-                s.duration AS shelf_life_duration
-            FROM {$this->table} c
-            LEFT JOIN shelf_life s ON c.id_shelf_life = s.id_shelf_life
-            WHERE c.ean = :ean
-            LIMIT 1";
 
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->bindValue(':ean', $ean, PDO::PARAM_STR);
-    $stmt->execute();
-    return $stmt->fetch(PDO::FETCH_ASSOC);
-}
+    public function getProductByEan($ean)
+    {
+        $sql = "SELECT c.id_product, c.ean, c.description, 
+                   s.concept AS shelf_life_concept, 
+                   s.duration AS shelf_life_duration
+                FROM catalog c
+                LEFT JOIN shelf_life s ON c.id_shelf_life = s.id_shelf_life
+                WHERE c.ean = :ean
+                LIMIT 1";
 
-public function existeProductoPorSyncId($syncId)
-{
-    $sql = "SELECT id_product FROM catalog WHERE sync_id = :sync_id LIMIT 1";
-    $stmt = $this->pdo->prepare($sql);
-    $stmt->execute([':sync_id' => $syncId]);
-    return $stmt->fetch(PDO::FETCH_ASSOC); 
-}
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':ean', $ean, PDO::PARAM_STR);
+        $stmt->execute();
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
+
+    public function existsProductBySyncId($syncId)
+    {
+        $sql = "SELECT id_product FROM catalog WHERE sync_id = :sync_id LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':sync_id' => $syncId]);
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $result;
+    }
 
 }

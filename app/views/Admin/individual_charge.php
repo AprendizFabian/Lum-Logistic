@@ -17,7 +17,7 @@
       <h2 class="text-2xl font-semibold text-[#404141] mb-4 flex items-center gap-2">
         <i class="fas fa-barcode text-[#FEE000]"></i> Ingresar Datos
       </h2>
-      <?php if ($_SESSION['auth']['type'] === 'user'): ?>
+      <?php if ($_SESSION['user']['type'] === 'user'): ?>
   <div class="mb-4">
     <label class="block text-gray-700 font-semibold mb-1">
       Selecciona la tienda antes de validar el producto
@@ -26,8 +26,8 @@
       class="w-full border border-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#FEE000] text-[#404141]">
       <option value="">-- Selecciona una tienda --</option>
       <?php foreach ($tiendas as $t): ?>
-        <option value="<?= $t['id'] ?>">
-          <?= htmlspecialchars($t['username']) ?>
+        <option value="<?= $t['id_store'] ?>">
+          <?= htmlspecialchars($t['store_name']) ?>
         </option>
       <?php endforeach; ?>
     </select>

@@ -1,9 +1,10 @@
 <?php
 namespace App\Controllers;
+use App\Middleware\ErrorHandler;
+use App\Middleware\AuthMiddleware;
 use App\Models\MemberModel;
-use App\helpers\Controller;
+use App\Helpers\Controller;
 use Exception;
-use PDOException;
 
 class MemberController
 {
@@ -16,54 +17,39 @@ class MemberController
         $this->controllerHelper = new Controller();
     }
 
-    private function requireAuth(?int $role = null)
-    {
-        if (empty($_SESSION['auth'])) {
-            header('Location: /auth/login');
-            exit;
-        }
-
-        if ($role !== null && $_SESSION['auth']['id_role'] != $role) {
-            header('Location: /auth/login');
-            exit;
-        }
-    }
-
     private function redirect(string $path)
     {
         header("Location: $path");
         exit;
     }
 
-public function showMembers()
-{
-    try {
-        $this->requireAuth(1);
-        $page   = isset($_GET['page']) && is_numeric($_GET['page']) ? (int)$_GET['page'] : 1;
-        $perPage = 6;
-        $search  = trim($_GET['search'] ?? '');
-        $filter  = $_GET['filter'] ?? null; 
-        $members = $this->memberModel->getMembers($filter, $search);      
-        $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
-        $cities = $this->memberModel->getCities();
+    public function showMembers()
+    {
+        return ErrorHandler::handle(function () {
+            AuthMiddleware::requireAuth();
 
-        view('Admin/userView', [
-            'title'             => "Usuarios",
-            'layout'            => "main",
-            'membersPaginated'  => $membersPaginated,
-            'cities'            => $cities,
-            'search'            => $search,
-            'filter'            => $filter
-        ]);
-    } catch (Exception $error) {
-        throw new Exception("Error: " . $error->getMessage());
+            $page = $_GET['page'] ?? 1;
+            $perPage = 6;
+            $search = $_GET['search'] ?? null;
+            $filter = $_GET['filter'] ?? null;
+
+            $members = $this->memberModel->getMembers($filter, $search);
+            $cities = $this->memberModel->getCities();
+            $membersPaginated = $this->controllerHelper->paginate($members, $page, $perPage);
+
+            view('Admin/userView', [
+                'title' => "Usuarios",
+                'layout' => "main",
+                'membersPaginated' => $membersPaginated,
+                'cities' => $cities
+            ]);
+        });
     }
-}
 
     public function showDetails()
     {
-        try {
-            $this->requireAuth();
+        return ErrorHandler::handle(function () {
+            AuthMiddleware::requireAuth();
 
             $id = $_SESSION['auth']['id'];
             $member = $this->memberModel->getMemberById($id);
@@ -77,14 +63,12 @@ public function showMembers()
                 'layout' => "main",
                 'member' => $member
             ]);
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 
     public function addMember()
     {
-        try {
+        return ErrorHandler::handle(function () {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 return;
             }
@@ -121,15 +105,12 @@ public function showMembers()
 
             $this->memberModel->addMember($data, $type);
             $this->redirect('/users/?success=added');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
-
 
     public function editMember()
     {
-        try {
+        return ErrorHandler::handle(function () {
             $type = !empty($_POST['id_user']) ? 'user' : (!empty($_POST['id_store']) ? 'store' : null);
             if (!$type) {
                 throw new Exception("Tipo de miembro no especificado.");
@@ -149,14 +130,12 @@ public function showMembers()
 
             $this->memberModel->editMember($data, $type);
             $this->redirect('/users/?success=updated');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 
     public function changeStatus()
     {
-        try {
+        return ErrorHandler::handle(function () {
             if ($_SERVER['REQUEST_METHOD'] !== 'POST')
                 return;
 
@@ -169,8 +148,6 @@ public function showMembers()
 
             $this->memberModel->toggleMemberStatus($id, $type, $status);
             $this->redirect('/users/');
-        } catch (PDOException $e) {
-            throw new Exception("Error: " . $e->getMessage());
-        }
+        });
     }
 }

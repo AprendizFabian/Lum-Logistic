@@ -39,7 +39,8 @@
             class="btn btn-sm bg-[#404141] hover:bg-[#2f2f2f] text-[#FEDF00] border-0 rounded-lg shadow-md flex items-center gap-2 px-4"
             onclick="openEditModal(this)" data-id="<?= $member['id'] ?>"
             data-username="<?= htmlspecialchars($member['username']) ?>"
-            data-email="<?= htmlspecialchars($member['email']) ?>" data-rol="<?= $member['id_role'] ?>"
+            data-email="<?= htmlspecialchars($member['email']) ?>" 
+            data-rol="<?= $member['id_role'] ?>"
             data-type="<?= htmlspecialchars($member['type']) ?>"
             data-address="<?= htmlspecialchars($member['address'] ?? '') ?>"
             data-city="<?= htmlspecialchars($member['city_id'] ?? '') ?>">

@@ -67,7 +67,7 @@ $successMessage = $successMessages[$successType] ?? null;
         confirmButtonColor: '#FFD700',
         confirmButtonText: 'Entendido'
       }).then(() => {
-        window.location.href = '/catalogo';
+        window.location.href = '/products/';
       });
     });
   </script>

@@ -11,14 +11,14 @@ class DateController
     {
         $title = 'Cargue individual, Validador';
         $StoreModel = new MemberModel();
-        $tiendas = $StoreModel->getMembers('store');
+        $tiendas = $StoreModel->getMembers('stores');
         view('Admin/individual_charge', compact('title', 'tiendas'));
     }
     public function MasiveCharge()
     {
         $title = 'Cargue masivo';
         $storeModel = new MemberModel();
-        $tiendas = $storeModel->getMembers('store');
+        $tiendas = $storeModel->getMembers('stores');
         view('Admin/MasiveCharge', compact('title', 'tiendas'));
     }
 public function validar()
@@ -333,7 +333,7 @@ public function validar()
             'm/d/y'
         ];
         foreach ($formatos as $formato) {
-            $date = DateTime::createFromFormat($formato, $fechaTexto);
+            $date = \DateTime::createFromFormat($formato, $fechaTexto);
             if ($date && $date->format($formato) === $fechaTexto) {
                 $year = (int) $date->format('Y');
                 if ($year < 1900 || $year > (int) date('Y') + 5) {
@@ -343,7 +343,7 @@ public function validar()
             }
         }
         try {
-            $date = new DateTime($fechaTexto);
+            $date = new \DateTime($fechaTexto);
             $year = (int) $date->format('Y');
             if ($year < 1900 || $year > (int) date('Y') + 5) {
                 return false;
