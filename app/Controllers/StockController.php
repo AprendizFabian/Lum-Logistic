@@ -89,10 +89,10 @@ class StockController
                 continue;
             }
 
-            $idStoreRaw = trim((string) ($data[0] ?? ''));
-            $syncIdRaw = trim((string) ($data[1] ?? ''));
-            $stockRaw = trim((string) ($data[2] ?? ''));
-            $priceRaw = trim((string) ($data[3] ?? ''));
+            $idStoreRaw = trim((string) ($data[0] ?? '.'));
+            $syncIdRaw = trim((string) ($data[1] ?? '.'));
+            $stockRaw = trim((string) ($data[2] ?? '.'));
+            $priceRaw = trim((string) ($data[3] ?? '.'));
 
             if ($idStoreRaw === '' || !ctype_digit($idStoreRaw)) {
                 $errores[] = "Fila {$row}: id_store inválido («{$idStoreRaw}»).";

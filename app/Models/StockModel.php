@@ -2,6 +2,9 @@
 namespace App\Models;
 use App\Database;
 use PDO;
+ini_set('max_execution_time', 0);
+set_time_limit(0);
+
 class StockModel
 {
     private $pdo;
