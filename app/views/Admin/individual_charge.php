@@ -122,6 +122,10 @@
             <p class="text-xs text-gray-500">Días para vencimiento</p>
             <p id="resDiasRestantes" class="font-medium">—</p>
           </div>
+           <div class="bg-gray-50 p-3 rounded-lg border">
+            <p class="text-xs text-gray-500">sincid de este producto</p>
+            <p id="resSincid" class="font-medium">—</p>
+          </div>
         </div>
       </div>
     </div>
@@ -156,6 +160,7 @@
       document.getElementById("resBloqueo").textContent = datos.fecha_bloqueo ?? "—";
       document.getElementById("resConcepto").textContent = datos.concepto_bloqueo ?? "—";
       document.getElementById("resObservacion").textContent = datos.observacion ?? "—";
+      document.getElementById("resSincid").textContent = datos.sync_id ?? "—";
 
       const hoy = new Date();
       const fechaVenc = new Date(datos.fecha_vencimiento);

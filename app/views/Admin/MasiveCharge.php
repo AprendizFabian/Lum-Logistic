@@ -14,7 +14,7 @@
   <div class="bg-white rounded-2xl shadow-xl p-6 border-t-4 border-[#FEE000]">
     <h2 class="text-2xl font-semibold text-[#404141] mb-4 flex items-center gap-2">
       <i class="fas fa-upload text-[#FEE000]"></i> Subir Archivo
-      <span class="text-sm text-gray-500">(solo .csv )</span>
+      <span class="text-sm text-gray-500">(solo archivos en formato .csv)</span>
     </h2>
     <form id="formCargueMasivo" enctype="multipart/form-data">
       <?php if ($_SESSION['auth']['type'] === 'user'): ?>
@@ -53,7 +53,7 @@
   const archivoInput = document.getElementById('archivoMasivo');
   const fileNameDisplay = document.getElementById('fileName');
   const dropArea = document.getElementById('dropArea');
-  const urlPlantilla = '/plantillas/plantilla.xlsx';
+  const urlPlantilla = '/templates/plantilla.xlsx';
   archivoInput.addEventListener('click', async function handler(e) {
     e.preventDefault();
     const resultado = await Swal.fire({
@@ -101,7 +101,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Formato no permitido',
-          text: 'Solo se aceptan archivos .csv o .xlsx',
+          text: 'Solo se aceptan archivos .csv',
           confirmButtonColor: '#d33'
         });
         archivoInput.value = "";
@@ -136,7 +136,7 @@
         Swal.fire({
           icon: 'error',
           title: 'Formato no permitido',
-          text: 'Solo se aceptan archivos .csv o .xlsx',
+          text: 'Solo se aceptan archivos .csv ',
           confirmButtonColor: '#d33'
         });
         return;

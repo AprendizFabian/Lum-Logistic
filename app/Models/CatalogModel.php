@@ -70,11 +70,15 @@ class CatalogModel
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['total'] ?? 0;
     }
-    public function obtenerProductoPorEan($ean)
+public function obtenerProductoPorEan($ean)
 {
-    $sql = "SELECT c.id_product, c.ean, c.description, 
-                   s.concept AS shelf_life_concept, 
-                   s.duration AS shelf_life_duration
+    $sql = "SELECT 
+                c.id_product, 
+                c.ean, 
+                c.description, 
+                c.sync_id,  
+                s.concept AS shelf_life_concept, 
+                s.duration AS shelf_life_duration
             FROM {$this->table} c
             LEFT JOIN shelf_life s ON c.id_shelf_life = s.id_shelf_life
             WHERE c.ean = :ean
@@ -85,6 +89,7 @@ class CatalogModel
     $stmt->execute();
     return $stmt->fetch(PDO::FETCH_ASSOC);
 }
+
 public function existeProductoPorSyncId($syncId)
 {
     $sql = "SELECT id_product FROM catalog WHERE sync_id = :sync_id LIMIT 1";
