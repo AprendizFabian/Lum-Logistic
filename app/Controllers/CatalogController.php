@@ -72,10 +72,12 @@ class CatalogController
         return ErrorHandler::handle(function () {
             AuthMiddleware::requireAuth();
 
+            $page = $_GET['page'] ?? 1;
             $search = $_GET['search'] ?? '';
+            $perPage = 9;
 
             $dates = $this->sheetModel->getDatesFromSheets('Fechas!A:B', $search);
-            $datesPaginated = $this->controllerHelper->paginate($dates['data']);
+            $datesPaginated = $this->controllerHelper->paginate($dates['data'], $page, $perPage);
 
             view('Admin/dateView', [
                 'title' => "Fechas",
