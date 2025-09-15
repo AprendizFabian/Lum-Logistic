@@ -7,18 +7,15 @@
   <div class="flex gap-4 items-center w-full lg:w-auto justify-between lg:justify-end ">
     <form method="GET"
       class="flex flex-col sm:flex-row flex-wrap items-stretch gap-3 bg-white p-3 rounded-2xl shadow-md border border-gray-200 w-full lg:w-auto">
-
       <input type="text" name="search" value="<?= htmlspecialchars($search ?? '') ?>"
         placeholder="Buscar usuario o correo..."
-        class="flex-1 min-w-[200px] px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#FEDF00] focus:outline-none">
-
+        class="flex-1 min-w-[200px] px-4 py-2 rounded-xl bg-[#f9f9f9] border border-gray-300 focus:ring-2 focus:ring-[#FEDF00] focus:outline-none">
       <select name="filter"
         class="px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#FEDF00] focus:outline-none">
         <option value="">Todos</option>
         <option value="user" <?= ($filter ?? '') === 'user' ? 'selected' : '' ?>>Usuarios</option>
         <option value="store" <?= ($filter ?? '') === 'store' ? 'selected' : '' ?>>Tiendas</option>
       </select>
-
       <button type="submit"
         class="flex items-center gap-2 px-5 py-2 bg-[#404141] text-[#FEDF00] font-semibold rounded-xl hover:bg-[#2f2f2f] transition">
         <i class="fas fa-search"></i>
@@ -43,7 +40,7 @@
   <?php endforeach; ?>
 </div>
 
-<div class="flex justify-center gap-2 my-8">
+<div class="flex justify-center gap-2 my-5">
   <?php include __DIR__ . '/Partials/pagination.php'; ?>
 </div>
 

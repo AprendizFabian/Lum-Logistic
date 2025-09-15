@@ -24,16 +24,19 @@ $router->group('/auth', function ($router) {
     $router->post("/processLogin", [AuthController::class, 'processLogin']);
 });
 
-$router->group('/Date', function ($router) {
-    $router->get('/DateJuliana', [DateController::class, 'showFormDate']);
-
+$router->group('/dates', function ($router) {
+    $router->get('/', [CatalogController::class, 'ShowDate']);
+    $router->get('/dateJuliana', [DateController::class, 'showFormDate']);
 });
+
+$router->group('/products', function ($router) {
+    $router->get('/', [CatalogController::class, 'showCatalog']);
+    $router->get('/shelfLife', [CatalogController::class, 'showVidaUtil']);
+});
+
 $router->post('/convertir-fecha', [DateController::class, 'convert']);
 $router->post('/validar-masivo', [DateController::class, 'validarMasivo']);
 $router->post('/validar', [DateController::class, 'validar']);
 $router->get('/Masivo', [DateController::class, 'MasiveCharge']);
-$router->get('/catalogo', [CatalogController::class, 'showCatalog']);
-$router->get('/vida-util', [CatalogController::class, 'showVidaUtil']);
-$router->get('/fecha', [CatalogController::class, 'ShowDate']);
 $router->get('/stock', [StockController::class, 'showUploadForm']);
 $router->post('/stock/subir', [StockController::class, 'subirStock']);

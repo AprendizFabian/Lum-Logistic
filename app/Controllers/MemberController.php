@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 use App\Middleware\ErrorHandler;
+use App\Middleware\AuthMiddleware;
 use App\Models\MemberModel;
 use App\Helpers\Controller;
 use Exception;
@@ -16,19 +17,6 @@ class MemberController
         $this->controllerHelper = new Controller();
     }
 
-    private function requireAuth(?int $role = null)
-    {
-        if (empty($_SESSION['auth'])) {
-            header('Location: /auth/login');
-            exit;
-        }
-
-        if ($role !== null && $_SESSION['auth']['id_role'] != $role) {
-            header('Location: /auth/login');
-            exit;
-        }
-    }
-
     private function redirect(string $path)
     {
         header("Location: $path");
@@ -38,7 +26,7 @@ class MemberController
     public function showMembers()
     {
         return ErrorHandler::handle(function () {
-            $this->requireAuth(1);
+            AuthMiddleware::requireAuth();
 
             $page = $_GET['page'] ?? 1;
             $perPage = 6;
@@ -61,7 +49,7 @@ class MemberController
     public function showDetails()
     {
         return ErrorHandler::handle(function () {
-            $this->requireAuth();
+            AuthMiddleware::requireAuth();
 
             $id = $_SESSION['auth']['id'];
             $member = $this->memberModel->getMemberById($id);

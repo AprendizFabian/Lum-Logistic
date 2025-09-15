@@ -123,7 +123,6 @@ class MemberModel
             $stmt->execute([
                 ':store_name' => $data['store_name'],
                 ':store_address' => $data['store_address'],
-                ':store_city' => $data['store_city'],
                 ':store_email' => $data['store_email'],
                 ':password' => password_hash($data['password'], PASSWORD_BCRYPT),
                 ':city_id' => $data['city_id'],
@@ -155,7 +154,6 @@ class MemberModel
             $stmt->execute([
                 ':store_name' => $data['store_name'],
                 ':store_address' => $data['store_address'],
-                ':store_city' => $data['store_city'],
                 ':store_email' => $data['store_email'],
                 ':id_role' => $data['id_role'],
                 ':city_id' => $data['city_id'],

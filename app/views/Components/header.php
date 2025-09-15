@@ -1,11 +1,4 @@
-<?php
-$nombre_usuario = htmlspecialchars($_SESSION['auth']['username'] ?? 'Usuario');
-$rol = $_SESSION['auth']['id_role'] ?? 0;
-?>
-
 <?php if (isset($_SESSION['auth'])): ?>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     <div class="flex min-h-screen">
         <aside id="sidebar"
             class="bg-neutral text-neutral-content w-64 p-6 space-y-6 fixed top-0 left-0 bottom-0 z-50 transform transition-transform duration-300 ease-in-out lg:translate-x-0 -translate-x-full overflow-y-auto">
@@ -17,17 +10,18 @@ $rol = $_SESSION['auth']['id_role'] ?? 0;
             <!-- Menú principal -->
             <h1 class="text-2xl font-bold border-b border-gray-600 pb-4">Menú</h1>
             <nav class="menu text-lg space-y-2">
-                <li><a href="/catalogo" class="hover:text-warning"><i class="fa-solid fa-boxes-stacked"></i> Catálogo</a>
+                <li><a href="/products/" class="hover:text-warning"><i class="fa-solid fa-boxes-stacked"></i> Catálogo</a>
                 </li>
-                <li><a href="/vida-util" class="hover:text-warning"><i class="fa-solid fa-clock"></i> Vida Útil</a>
+                <li><a href="/products/shelfLife" class="hover:text-warning"><i class="fa-solid fa-clock"></i> Vida Útil</a>
                 </li>
 
-                <?php if ($rol == 1): ?>
+                <?php if ($_SESSION['auth']['id_role'] == 1): ?>
                     <li><a href="/users/" class="hover:text-warning"><i class="fa-solid fa-users"></i> Usuarios</a></li>
-                    <li><a href="/stock" class="hover:text-warning"><i class="fa-solid fa-upload"></i></i> Stock tiendas</a></li>
+                    <li><a href="/stock" class="hover:text-warning"><i class="fa-solid fa-upload"></i></i> Stock tiendas</a>
+                    </li>
                 <?php endif; ?>
 
-                <li><a href="/fecha" class="hover:text-warning"><i class="fa-solid fa-calendar"></i> Fechas</a></li>
+                <li><a href="/dates/" class="hover:text-warning"><i class="fa-solid fa-calendar"></i> Fechas</a></li>
             </nav>
 
             <div class="border-t border-gray-600 pt-4">
@@ -35,7 +29,7 @@ $rol = $_SESSION['auth']['id_role'] ?? 0;
                     <summary
                         class="flex items-center gap-2 px-3 py-2 cursor-pointer hover:bg-warning hover:text-black rounded-lg transition-colors">
                         <i class="fa-solid fa-user"></i>
-                        <span><?= $nombre_usuario ?></span>
+                        <span><?= $_SESSION['auth']['username'] ?></span>
                         <i class="fa-solid fa-caret-down ml-auto"></i>
                     </summary>
                     <ul class="mt-2 pl-6 space-y-2 text-base">

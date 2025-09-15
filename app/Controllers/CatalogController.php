@@ -1,74 +1,87 @@
 <?php
 namespace App\Controllers;
+use App\Middleware\ErrorHandler;
+use App\Middleware\AuthMiddleware;
+use App\Helpers\Controller;
 use App\Models\SheetsModel;
 use App\Models\CatalogModel;
 use App\Models\StockModel;
+
 class CatalogController
 {
-public function showCatalog()
-{
- 
+    private $catalogModel;
+    private $stockModel;
+    private $sheetModel;
+    private $controllerHelper;
 
-    $page   = isset($_GET['page']) && is_numeric($_GET['page']) && $_GET['page'] > 0 
-        ? (int)$_GET['page'] 
-        : 1;
-    $search = trim($_GET['search'] ?? '');
-    $perPage = 8;
-
-    $catalogModel = new CatalogModel();
-    $stockModel   = new StockModel();
-
-    $type    = $_SESSION['auth']['type'] ?? 'user'; 
-    $idStore = ($type === 'store') ? ($_SESSION['auth']['id'] ?? null) : null;
-
-    if (!empty($idStore)) {
-        $productos = $stockModel->obtenerStockPorTienda($idStore);
-        $total = count($productos);
-        $totalPages = 1;
-        $page = 1;
-    } else {
-
-        $total = $catalogModel->contarProductos($search);
-        $totalPages = max(1, ceil($total / $perPage));
-        if ($page > $totalPages) {
-            $page = $totalPages;
-        }
-        $offset = ($page - 1) * $perPage;
-        $productos = $catalogModel->obtenerProductos($search, $perPage, $offset);
+    public function __construct()
+    {
+        $this->catalogModel = new CatalogModel();
+        $this->stockModel = new StockModel();
+        $this->sheetModel = new SheetsModel();
+        $this->controllerHelper = new Controller();
     }
+    public function showCatalog()
+    {
+        return ErrorHandler::handle(function () {
+            AuthMiddleware::requireAuth();
 
-    $title = 'Catálogo';
-    view('Admin/catalog', compact(
-        'title',
-        'productos',
-        'page',
-        'totalPages',
-        'search',
-        'total'
-    ));
-}
+            $page = $_GET['page'] ?? 1;
+            $search = $_GET['search'] ?? '';
+            $perPage = 9;
+
+            if ($_SESSION['auth']['type'] != 'store') {
+                $products = $this->catalogModel->getProducts($search);
+            } else {
+                $idStore = $_SESSION['auth']['id'] ?? null;
+                $products = $this->stockModel->obtenerStockPorTienda($idStore);
+            }
+
+            $productsPaginated = $this->controllerHelper->paginate($products, $page, $perPage);
+
+            view('Admin/catalogView', [
+                'title' => "Catálogo",
+                'layout' => "main",
+                'productsPaginated' => $productsPaginated,
+            ]);
+        });
+    }
 
     public function showVidaUtil()
     {
-        $page = $_GET['page'] ?? 1;
-        $search = $_GET['search'] ?? '';
+        return ErrorHandler::handle(function () {
+            AuthMiddleware::requireAuth();
 
-        $sheetModel = new SheetsModel();
-        $sheetData = $sheetModel->getVidaUtil($page, 9, $search);
+            $page = $_GET['page'] ?? 1;
+            $search = $_GET['search'] ?? '';
+            $perPage = 9;
 
-        $title = 'Vida Útil';
-        view('Admin/vida_util', compact('title', 'sheetData'));
+            $shelfLife = $this->catalogModel->getShelfLife($search);
+            $shelfLifePaginated = $this->controllerHelper->paginate($shelfLife, $page, $perPage);
+
+            view('Admin/shelfLifeView', [
+                'title' => 'Vida Útil',
+                'layout' => "main",
+                'shelfLifePaginated' => $shelfLifePaginated
+            ]);
+        });
     }
 
     public function ShowDate()
     {
-        $title = 'Fechas';
-        $modelo = new SheetsModel();
-        $buscar = $_GET['buscar'] ?? '';
-        $page = $_GET['page'] ?? 1;
-        $perPage = 6;
-        $fechasData = $modelo->getFechasDesdeOtroArchivo('Fechas!A:B', $page, $perPage, $buscar);
-        $layout = '';
-        view('Admin/fecha', compact('title', 'fechasData', 'layout'));
+        return ErrorHandler::handle(function () {
+            AuthMiddleware::requireAuth();
+
+            $search = $_GET['search'] ?? '';
+
+            $dates = $this->sheetModel->getDatesFromSheets('Fechas!A:B', $search);
+            $datesPaginated = $this->controllerHelper->paginate($dates['data']);
+
+            view('Admin/dateView', [
+                'title' => "Fechas",
+                'layout' => "main",
+                'datesPaginated' => $datesPaginated,
+            ]);
+        });
     }
 }
